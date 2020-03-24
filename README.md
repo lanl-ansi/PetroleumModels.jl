@@ -1,1 +1,1 @@
-# PetroleumModels-jl
+# PetroleumModels.jl
