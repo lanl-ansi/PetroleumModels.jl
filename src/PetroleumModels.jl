@@ -1,15 +1,15 @@
 module PetroleumModels
 
-    using JSON
-    using JuMP
-    using InfrastructureModels
+    import JSON
+    import JuMP
+    import InfrastructureModels
 #    using Compat
-    using Memento
+    import Memento
 
 
 
     # Create our module level logger (this will get precompiled)
-    const LOGGER = getlogger(@__MODULE__)
+    const LOGGER = Memento.getlogger(PetroleumModels)
 
     # Register the module level logger at runtime so that folks can access the logger via `getlogger(PetroleumModels)`
     # NOTE: If this line is not included then the precompiled `PetroleumModels.LOGGER` won't be registered at runtime.

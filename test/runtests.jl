@@ -1,11 +1,12 @@
-# using PetroleumModels
-using InfrastructureModels
-using Memento
-using DelimitedFiles
-using JuMP
-using Ipopt
+using PetroleumModels
+
+import Memento
+import DelimitedFiles
+import JuMP
+import Ipopt
 # using Cbc
-using Juniper
+import Juniper
+import InfrastructureModels
 
 
 ipopt_solver = JuMP.with_optimizer(Ipopt.Optimizer, print_level=0, sb="yes")
