@@ -1,4 +1,103 @@
-function build_solution(pm::AbstractPetroleumFormulation, status, solve_time; solution_builder=get_solution)
+function _IM.solution_preprocessor(pm::AbstractPetroleumModel, solution::Dict)
+    solution["per_unit"] = pm.data["per_unit"]
+    solution["multinetwork"] = ismultinetwork(pm.data)
+    solution["baseH"] = pm.ref[:baseH]
+    solution["base_h_loss"] = pm.ref[:base_h_loss]
+    solution["baseQ"] = pm.ref[:baseQ]
+    solution["base_z"] = pm.ref[:base_z]
+    solution["base_a"] = pm.ref[:base_a]
+    solution["base_b"] = pm.ref[:base_b]
+end
+
+
+
+function sol_psqr_to_p!(pm::AbstractPetroleumModel, solution::Dict)
+    if haskey(solution, "nw")
+        nws_data = solution["nw"]
+    else
+        nws_data = Dict("0" => solution)
+    end
+
+    for (n, nw_data) in nws_data
+        if haskey(nw_data, "junction")
+            for (i,junction) in nw_data["junction"]
+                # if haskey(junction, "psqr")
+                #     junction["p"] = sqrt(max(0.0, junction["psqr"]))
+                # end
+            end
+        end
+    end
+end
+
+
+function sol_first!(pm::AbstractPetroleumModel, solution::Dict)
+    if haskey(solution, "nw")
+        nws_data = solution["nw"]
+    else
+        nws_data = Dict("0" => solution)
+    end
+
+    for (n, nw_data) in nws_data
+        if haskey(nw_data, "pump")
+            for (i,pump) in nw_data["pump"]
+                # if haskey(pump, "rsqr")
+                #     pump["r"] = sqrt(max(0.0, pump["rsqr"]))
+                # end
+            end
+        end
+    end
+end
+
+
+function sol_pump!(pm::AbstractPetroleumModel, solution::Dict)
+    if haskey(solution, "nw")
+        nws_data = solution["nw"]
+    else
+        nws_data = Dict("0" => solution)
+    end
+
+    for (n, nw_data) in nws_data
+        if haskey(nw_data, "pump")
+            for (k,pump) in nw_data["pump"]
+                i = ref(pm,:pump,parse(Int64,k); nw=parse(Int64, n))["fr_junction"]
+                j = ref(pm,:pump,parse(Int64,k); nw=parse(Int64, n))["to_junction"]
+                # f = pump["f"]
+                # pi = max(0.0, nw_data["junction"][string(i)]["psqr"])
+                # pj = max(0.0, nw_data["junction"][string(j)]["psqr"])
+
+                # pump["r"] = (f >= 0) ? sqrt(pj) / sqrt(pi) : sqrt(pi) / sqrt(pj)
+            end
+        end
+    end
+end
+
+
+function sol_ne_pump!(pm::AbstractPetroleumModel, solution::Dict)
+    if haskey(solution, "nw")
+        nws_data = solution["nw"]
+    else
+        nws_data = Dict("0" => solution)
+    end
+
+    for (n, nw_data) in nws_data
+        if haskey(nw_data, "ne_pump")
+            for (k,pump) in nw_data["ne_pump"]
+                i = ref(pm,:ne_pump,parse(Int64,k); nw=parse(Int64, n))["fr_junction"]
+                j = ref(pm,:ne_pump,parse(Int64,k); nw=parse(Int64, n))["to_junction"]
+                # f = pump["f"]
+                # pi = max(0.0, nw_data["junction"][string(i)]["psqr"])
+                # pj = max(0.0, nw_data["junction"][string(j)]["psqr"])
+
+                # pump["r"] = (f >= 0) ? sqrt(pj) / sqrt(pi) : sqrt(pi) / sqrt(pj)
+            end
+        end
+    end
+end
+
+
+
+
+function build_solution(pm::AbstractPetroleumModel, status, solve_time; solution_builder=get_solution)
     if status != :Error
         objective = status != :Infeasible ? JuMP.objective_value(pm.model) : NaN
         status = optimizer_status_dict(Symbol(typeof(pm.model.moi_backend).name.module), status)
@@ -51,13 +150,13 @@ end
 
 
 ""
-function _init_solution(pm::AbstractPetroleumFormulation)
+function _init_solution(pm::AbstractPetroleumModel)
     data_keys = ["per_unit", "baseH", "baseQ", "multinetwork"]
     return Dict{String,Any}(key => pm.data[key] for key in data_keys)
 end
 
 " Get all the solution values "
-function get_solution(pm::AbstractPetroleumFormulation,sol::Dict{String,Any})
+function get_solution(pm::AbstractPetroleumModel,sol::Dict{String,Any})
     add_junction_head_setpoint(sol, pm)
     add_connection_flow_setpoint(sol, pm)
     add_load_volume_flow_setpoint(sol, pm)
@@ -69,46 +168,36 @@ end
 
 
 " Get head solutions "
-function add_junction_head_setpoint(sol, pm::AbstractPetroleumFormulation)
+function add_junction_head_setpoint(sol, pm::AbstractPetroleumModel)
      add_setpoint(sol, pm, "junction", "H", :H)
 end
 
 
 
 " Get the load flow solutions "
-function add_load_volume_flow_setpoint(sol, pm::AbstractPetroleumFormulation)
+function add_load_volume_flow_setpoint(sol, pm::AbstractPetroleumModel)
     add_setpoint(sol, pm, "consumer", "ql", :ql; default_value = (item) -> 0)
 end
 
 " Get the production flow set point "
-function add_production_volume_flow_setpoint(sol, pm::AbstractPetroleumFormulation)
+function add_production_volume_flow_setpoint(sol, pm::AbstractPetroleumModel)
     add_setpoint(sol, pm, "producer", "qg", :qg; default_value = (item) -> 0)
 end
 
-
-# " Get the direction set points"
-# function add_direction_setpoint(sol, pm::AbstractPetroleumFormulation)
-#     add_setpoint(sol, pm, "pipe", "y", :y)
-#     add_setpoint(sol, pm, "pump", "y", :y)
-# end
-
-
 " Add the flow solutions "
-function add_connection_flow_setpoint(sol, pm::AbstractPetroleumFormulation)
+function add_connection_flow_setpoint(sol, pm::AbstractPetroleumModel)
     add_setpoint(sol, pm, "pipe", "q", :q)
     add_setpoint(sol, pm, "pump", "q", :q)
 
 end
 
-function add_dual_head!(sol, pm::AbstractPetroleumFormulation)
+function add_dual_head!(sol, pm::AbstractPetroleumModel)
         add_dual!(sol, pm, "pipe", "q", :junction_volume_flow_balance)
         add_dual!(sol, pm, "pump", "q", :junction_volume_flow_balance)
 end
 
-
-
 ""
-function add_setpoint(sol, pm::AbstractPetroleumFormulation, dict_name, param_name, variable_symbol; index_name = nothing, default_value = (item) -> NaN, scale = (x,item) -> JuMP.value(x), extract_var = (var,idx,item) -> var[idx])
+function add_setpoint(sol, pm::AbstractPetroleumModel, dict_name, param_name, variable_symbol; index_name = nothing, default_value = (item) -> NaN, scale = (x,item) -> JuMP.value(x), extract_var = (var,idx,item) -> var[idx])
     sol_dict = get(sol, dict_name, Dict{String,Any}())
 
     if pm.data["multinetwork"]

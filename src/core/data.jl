@@ -1,4 +1,13 @@
-# tools for working with PetroleumModels internal data format
+# tools for working with GasModels internal data format
+
+
+"data getters"
+@inline h_base(data::Dict{String,Any}) = data["baseH"]
+@inline base_h_loss(data::Dict{String,Any}) = data["base_h_loss"]
+@inline q_base(data::Dict{String,Any}) = data["baseQ"]
+@inline z_base(data::Dict{String,Any}) = data["base_z"]
+@inline a_base(data::Dict{String,Any}) = data["base_a"]
+@inline b_base(data::Dict{String,Any}) = data["base_b"]
 
 "calculates constant flow production"
 function calc_qg(data::Dict{String,Any}, producer::Dict{String,Any})
@@ -7,211 +16,10 @@ end
 
 "calculates constant flow consumer"
 function calc_ql(data::Dict{String,Any}, consumer::Dict{String,Any})
-
     consumer["ql"]
 end
 
-
-"Ensures that consumer priority exists as a field in loads"
-function add_default_consumer_priority(data::Dict{String,Any})
-    nws_data = data["multinetwork"] ? data["nw"] : nws_data = Dict{String,Any}("0" => data)
-
-    for (n,data) in nws_data
-        for (idx,component) in data["consumer"]
-            if !haskey(component,"priority")
-                component["priority"] = 1
-            end
-        end
-    end
-end
-
-
-
-"Add the degree information"
-function add_degree(ref::Dict{Symbol,Any})
-    for (i,junction) in ref[:junction]
-        junction["degree"] = 0
-        junction["degree_all"] = 0
-    end
-end
-
-
-function calc_head_loss(data::Dict{String,Any}, pipe::Dict{String,Any})
-    beta       = 0.0246 # s/m2, assume turbulent flow
-    @show keys(data)
-    nu         = data["nu"]
-    D          = pipe["diameter"]
-    L          = pipe["length"]
-    head_loss = (beta * nu^0.25 / D^4.75 * L * 1.02)
-
-    if !haskey(data, "per_unit") || data["per_unit"] == true
-        head_loss  = head_loss / data["base_h_loss"]
-    end
-    return head_loss
-end
-
-
-"Transforms network data into per-unit (non-dimensionalized)"
-function make_per_unit!(data::Dict{String,Any})
-
-    if !haskey(data, "per_unit") || data["per_unit"] == true
-        h_base = data["baseH"]
-        q_base = data["baseQ"]
-        z_base = data["base_z"]
-        a_base = data["base_a"]
-        b_base = data["base_b"]
-
-
-        if InfrastructureModels.ismultinetwork(data)
-            for (i,nw_data) in data["nw"]
-                _make_per_unit!(nw_data, h_base, q_base, z_base, a_base, b_base)
-            end
-        else
-            _make_per_unit!(data, h_base, q_base, z_base, a_base, b_base)
-        end
-    end
-end
-
-""
-function _make_per_unit!(data::Dict{String,Any}, h_base::Real, q_base::Real, z_base::Real, a_base::Real, b_base::Real)
-    rescale_q      = x -> x/q_base
-    rescale_H      = x -> x/h_base
-    rescale_z      = x -> x/z_base
-    rescale_a      = x -> x/a_base
-    rescale_b      = x -> x/b_base
-
-    if haskey(data, "junction")
-        for (i, junction) in data["junction"]
-            _apply_func!(junction, "Hmax", rescale_H)
-            _apply_func!(junction, "Hmin", rescale_H)
-            _apply_func!(junction, "z", rescale_z)
-        end
-    end
-
-    if haskey(data, "consumer")
-        for (i, consumer) in data["consumer"]
-            _apply_func!(consumer, "qlmin", rescale_q)
-            _apply_func!(consumer, "qlmax", rescale_q)
-        end
-    end
-
-    if haskey(data, "producer")
-        for (i, producer) in data["producer"]
-            _apply_func!(producer, "qgmin", rescale_q)
-            _apply_func!(producer, "qgmin", rescale_q)
-            _apply_func!(producer, "qgmax", rescale_q)
-        end
-    end
-
-    if haskey(data, "pipe")
-        for (i, pipe) in data["pipe"]
-              _apply_func!(pipe, "Qmin", rescale_q)
-              _apply_func!(pipe, "Qmax", rescale_q)
-        end
-    end
-
-    if haskey(data, "pump")
-        for (i, pump) in data["pump"]
-            # _apply_func!(pump, "q", rescale_q)
-            _apply_func!(pump, "delta_Hmax", rescale_H)
-            _apply_func!(pump, "delta_Hmin", rescale_H)
-            _apply_func!(pump, "a", rescale_a)
-            _apply_func!(pump, "b", rescale_b)
-        end
-    end
-
-
-
-end
-
-
-"Transforms network data into si-units (inverse of per-unit)--non-dimensionalized"
-function make_si_unit!(data::Dict{String,Any}, result::Dict{String,Any})
-    if haskey(data, "per_unit") && data["per_unit"] == true
-        q_base = data["baseQ"]
-        h_base = data["baseH"]
-        z_base = data["base_z"]
-        a_base = data["base_a"]
-        b_base = data["base_b"]
-
-        if InfrastructureModels.ismultinetwork(data)
-            for (i,nw_data) in data["nw"]
-                _make_si_unit!(nw_data, h_base, q_base, z_base, a_base, b_base, nw_result)
-            end
-        else
-             _make_si_unit!(data, h_base, q_base, z_base, a_base, b_base, result)
-        end
-    end
-end
-
-
-""
-function _make_si_unit!(data::Dict{String,Any}, h_base::Real, q_base::Real, z_base::Real, a_base::Real, b_base::Real, result::Dict{String,Any})
-    rescale_q      = x -> x*q_base
-    rescale_H      = x -> x*h_base
-    rescale_z      = x -> x*z_base
-    rescale_a      = x -> x*a_base
-    rescale_b      = x -> x*b_base
-
-    if haskey(result, "junction")
-        for (i, junction) in result["junction"]
-            _apply_func!(junction, "Hmax", rescale_H)
-            _apply_func!(junction, "Hmin", rescale_H)
-            _apply_func!(junction, "H", rescale_H)
-            _apply_func!(junction, "z", rescale_z)
-        end
-    end
-
-    if haskey(result, "consumer")
-        for (i, consumer) in result["consumer"]
-            _apply_func!(consumer, "qlmin", rescale_q)
-            _apply_func!(consumer, "qlmax", rescale_q)
-            _apply_func!(consumer, "ql", rescale_q)
-        end
-    end
-
-    if haskey(result, "producer")
-        for (i, producer) in result["producer"]
-            _apply_func!(producer, "qgmin", rescale_q)
-            _apply_func!(producer, "qgmax", rescale_q)
-            _apply_func!(producer, "qg", rescale_q)
-        end
-    end
-
-    if haskey(result, "pipe")
-        for (i, pipe) in result["pipe"]
-            _apply_func!(pipe, "q", rescale_q)
-            _apply_func!(pipe, "Qmin", rescale_q)
-            _apply_func!(pipe, "Qmax", rescale_q)
-        end
-    end
-
-    if haskey(result, "pump")
-        for (i, pump) in result["pump"]
-            _apply_func!(pump, "q", rescale_q)
-            _apply_func!(pump, "delta_Hmax", rescale_H)
-            _apply_func!(pump, "delta_Hmin", rescale_H)
-            _apply_func!(pump, "q_nom", rescale_q)
-            _apply_func!(pump, "a", rescale_a)
-            _apply_func!(pump, "b", rescale_b)
-        end
-    end
-
-
-end
-
-
-function replicate(sn_data::Dict{String,<:Any}, count::Int; global_keys::Set{String}=Set{String}())
-    return InfrastructureModels.replicate(sn_data, count, union(global_keys, _pm_global_keys))
-end
-
-"turns a single network and a time_series data block into a multi-network"
-function make_multinetwork(data::Dict{String, <:Any}; global_keys::Set{String}=Set{String}())
-    return InfrastructureModels.make_multinetwork(data, union(global_keys, _pm_global_keys))
-end
-
-
-""
+"apply a function on a dict entry"
 function _apply_func!(data::Dict{String,Any}, key::String, func)
     if haskey(data, key)
         data[key] = func(data[key])
@@ -219,41 +27,517 @@ function _apply_func!(data::Dict{String,Any}, key::String, func)
 end
 
 
-"calculates minimum mass flow consumption"
-function _calc_flmin(data::Dict{String,Any}, consumer::Dict{String,Any})
-    return consumer["qlmin"] * data["standard_density"]
+function calc_head_loss(data::Dict{String,Any}, pipe::Dict{String,Any})
+    beta       = 0.0246 # s/m2, assume turbulent flow
+    nu         = data["nu"]
+    D          = pipe["diameter"]
+    L          = pipe["length"]
+    head_loss = (beta * nu^0.25 / D^4.75 * L * 1.02)
+
+    if !haskey(data, "per_unit") || data["per_unit"] == true
+        head_loss  = head_loss / base_h_loss(data)
+    end
+    return head_loss
+end
+
+function calc_tank_head_initial(data::Dict{String,Any}, tank::Dict{String,Any})
+    radius     = tank["radius"]
+    volume     = tank["Initial_Volume"]
+    g          = data["gravitational_acceleration"]
+    head_initial = (volume / (3.14 * radius ^ 2))
+
+    if !haskey(data, "per_unit") || data["per_unit"] == true
+        head_initial  = head_initial / h_base(data)
+    end
+    return head_initial
 end
 
 
-"calculates maximum mass flow consumption"
-function _calc_flmax(data::Dict{String,Any}, consumer::Dict{String,Any})
-    return consumer["qlmax"] * data["standard_density"]
+
+"if original data is in per-unit ensure it has base values"
+function per_unit_data_field_check!(data::Dict{String,Any})
+    if get(data, "per_unit", false) == true
+        if get(data, "base_head", false) == false
+            Memento.error(
+                _LOGGER,
+                "data in .m file is in per unit but no base_head (in Pa) and base_length (in m) values are provided")
+        else
+            (get(data, "base_flow", false) == false) &&
+            (data["base_flow"] = calc_base_flow(data))
+        end
+    end
 end
 
 
-"prints the text summary for a data file or dictionary to stdout"
-function print_summary(obj::Union{String, Dict{String,Any}}; kwargs...)
-    summary(stdout, obj; kwargs...)
+"adds additional non-dimensional constants to data dictionary"
+function add_base_values!(data::Dict{String,Any})
+    (get(data, "base_head", false) == false) &&
+    (data["base_head"] = calc_base_head(data))
+    # data["base_diameter"] = 1.0
+    # (get(data, "base_flow", false) == false) && (data["base_flow"] = calc_base_flow(data))
 end
 
-"calculates minimum mass flow production"
-function _calc_fgmin(data::Dict{String,Any}, producer::Dict{String,Any})
-    return producer["qgmin"] * data["standard_density"]
+"make transient data to si units"
+function make_si_units!(
+    transient_data::Array{Dict{String,Any},1},
+    static_data::Dict{String,Any},
+)
+    if static_data["units"] == "si"
+        return
+    end
+    mmscfd_to_kgps = x -> x * get_mmscfd_to_kgps_conversion_factor(static_data)
+    inv_mmscfd_to_kgps = x -> x / get_mmscfd_to_kgps_conversion_factor(static_data)
+    head_params = [
+        "Hmin",
+        "Hmax",
+        "H"
+    ]
+    flow_params = [
+        "q_pipe",
+        "q_pump",
+        "Qmin",
+        "Qmax",
+        "qg",
+        "ql",
+        "qgmin",
+        "qgmax",
+        "qlmin",
+        "qlmax",
+        "q_tank_in",
+        "q_tank_out",
+
+    ]
+    inv_flow_params = ["bid_price", "offer_price"]
+    for line in transient_data
+        param = line["parameter"]
+        if param in head_params
+            line["value"] = psi_to_pascal(line["value"])
+        end
+        if param in flow_params
+            line["value"] = mmscfd_to_kgps(line["value"])
+        end
+        if param in inv_flow_params
+            line["value"] = inv_mmscfd_to_kgps(line["value"])
+        end
+    end
+end
+
+const _params_for_unit_conversions = Dict(
+    "junction" =>
+        ["Hmax", "Hmin",  "z"],
+    #
+    # "original_junction" => ["p_min", "p_max", "p_nominal", "p"],
+
+    "pipe" => ["Qmin", "Qmax"],
+
+    "ne_pipe" => ["Qmin", "Qmax"],
+
+    "pump" => [
+    "delta_Hmax",
+    "delta_Hmin",
+    "a",
+    "b"
+    ],
+    "ne_pump" => [
+    "delta_Hmax",
+    "delta_Hmin",
+    "a",
+    "b"
+    ],
+    "consumer" => [
+        "qlmin",
+        "qlmax"
+    ],
+    "producer" => [
+        "qgmin",
+        "qgmax"
+    ],
+
+    "tank" => [
+
+    "Min_Capacity_Limitation",
+    "Max_Capacity_Limitation",
+    "Min_Load_Flow_Rate",
+    "Max_Load_Flow_Rate",
+    "Min_Unload_Flow_Rate",
+    "Max_Unload_Flow_Rate"
+
+    ],
+)
+
+function _rescale_functions(
+    rescale_q_pipe::Function,
+    rescale_q_pump::Function,
+    rescale_q_tank_in::Function,
+    rescale_q_tank_out::Function,
+    rescale_H::Function,
+    rescale_z::Function,
+    rescale_a::Function,
+    rescale_b::Function
+)::Dict{String,Function}
+    Dict{String,Function}(
+        "Hmax" => rescale_H,
+        "Hmin" => rescale_H,
+        "z" => rescale_z,
+        "qlmin" => rescale_q,
+        "qlmax" => rescale_q,
+        "qgmin" => rescale_q,
+        "qgmax" => rescale_q,
+        "Qmin" => rescale_q,
+        "Qmax" => rescale_q,
+        "delta_Hmax" => rescale_H,
+        "delta_Hmin" => rescale_H,
+        "a" => rescale_a,
+        "b" => rescale_b
+    )
+end
+"Transforms data to si units"
+function si_to_pu!(data::Dict{String,<:Any}; id = "0")
+    rescale_q_pipe   = x -> x/q_base(data)
+    rescale_q_pump   = x -> x/q_base(data)
+    rescale_q_tank_in = x -> x/q_base(data)
+    rescale_q_tank_out = x -> x/q_base(data)
+    rescale_H      = x -> x/h_base(data)
+    rescale_z      = x -> x/z_base(data)
+    rescale_a      = x -> x/a_base(data)
+    rescale_b      = x -> x/b_base(data)
+
+    functions = _rescale_functions(
+    rescale_q_pipe,
+    rescale_q_pump,
+    rescale_q_tank_in,
+    rescale_q_tank_out,
+    rescale_H,
+    rescale_z,
+    rescale_a,
+    rescale_b
+    )
+
+    nw_data = (id == "0") ? data : data["nw"][id]
+    _apply_func!(nw_data, "time_point", rescale_time)
+    for (component, parameters) in _params_for_unit_conversions
+        for (i, comp) in get(nw_data, component, [])
+            if ~haskey(comp, "per_unit") && ~haskey(data, "per_unit")
+                Memento.error(
+                    _LOGGER,
+                    "the current units of the data/result dictionary unknown")
+            end
+            if ~haskey(comp, "per_unit") && haskey(data, "per_unit")
+                comp["per_unit"] = data["per_unit"]
+                comp["is_si_units"] = 0
+            end
+            if comp["is_si_units"] == true && comp["per_unit"] == false
+                for param in parameters
+                    _apply_func!(comp, param, functions[param])
+                    comp["is_si_units"] = 0
+                    comp["per_unit"] = 1
+                end
+            end
+        end
+    end
+end
+
+function pu_to_si!(data::Dict{String,<:Any}; id = "0")
+    rescale_q_pipe          = x -> x*q_base(data)
+    rescale_q_pump          = x -> x*q_base(data)
+    rescale_q_tank_in       = x -> x*q_base(data)
+    rescale_q_tank_out      = x -> x*q_base(data)
+    rescale_H      = x -> x*h_base(data)
+    rescale_z      = x -> x*z_base(data)
+    rescale_a      = x -> x*a_base(data)
+    rescale_b      = x -> x*b_base(data)
+
+    functions = _rescale_functions(
+    rescale_q_pipe,
+    rescale_q_pump,
+    rescale_q_tank_in,
+    rescale_q_tank_out,
+    rescale_H,
+    rescale_z,
+    rescale_a,
+    rescale_b
+    )
+
+    nw_data = (id == "0") ? data : data["nw"][id]
+    _apply_func!(nw_data, "time_point", rescale_time)
+    for (component, parameters) in _params_for_unit_conversions
+        for (i, comp) in get(nw_data, component, [])
+            if ~haskey(comp, "per_unit") && ~haskey(data, "per_unit")
+                Memento.error(
+                    _LOGGER,
+                    "the current units of the data/result dictionary unknown",
+                )
+            end
+            if ~haskey(comp, "per_unit") && haskey(data, "per_unit")
+                @assert data["per_unit"] == 1
+                comp["per_unit"] = data["per_unit"]
+                comp["is_si_units"] = 0
+            end
+            if comp["is_si_units"] == false && comp["per_unit"] == true
+                for param in parameters
+                    _apply_func!(comp, param, functions[param])
+                    comp["is_si_units"] = 1
+                    comp["per_unit"] = 0
+                end
+            end
+        end
+    end
 end
 
 
-"calculates maximum mass flow production"
-function _calc_fgmax(data::Dict{String,Any}, producer::Dict{String,Any})
-    return producer["qgmax"] * data["standard_density"]
+
+"transforms data to si units"
+function make_si_units!(data::Dict{String,<:Any})
+    if get(data, "is_si_units", false) == true
+        return
+    end
+    if get(data, "per_unit", false) == true
+        if _IM.ismultinetwork(data)
+            for (i, _) in data["nw"]
+                pu_to_si!(data, id = i)
+            end
+        else
+            pu_to_si!(data)
+        end
+        if haskey(data, "time_step")
+            rescale_time = x -> x * get_base_time(data)
+            data["time_step"] = rescale_time(data["time_step"])
+        end
+        data["is_si_units"] = 1
+        data["per_unit"] = 0
+    end
+    if get(data, "is_english_units", false) == true
+        if _IM.ismultinetwork(data)
+            for (i, _) in data["nw"]
+                english_to_si!(data, id = i)
+            end
+        else
+            english_to_si!(data)
+        end
+        data["is_si_units"] = 1
+        data["per_unit"] = 0
+    end
 end
 
 
-"calculates constant mass flow production"
-function _calc_fg(data::Dict{String,Any}, producer::Dict{String,Any})
-    return producer["qg"] * data["standard_density"]
+"Transforms network data into per unit"
+function make_per_unit!(data::Dict{String,<:Any})
+    if get(data, "per_unit", false) == true
+        return
+    end
+    if get(data, "is_si_units", false) == true
+        if _IM.ismultinetwork(data)
+            for (i, _) in data["nw"]
+                si_to_pu!(data, id = i)
+            end
+        else
+            si_to_pu!(data)
+        end
+        if haskey(data, "time_step")
+            rescale_time = x -> x / get_base_time(data)
+            data["time_step"] = rescale_time(data["time_step"])
+        end
+        data["is_si_units"] = 0
+        data["per_unit"] = 1
+    end
+end
+
+"checks for non-negativity of certain fields in the data"
+function check_non_negativity(data::Dict{String,<:Any})
+    for field in non_negative_metadata
+        if get(data, field, 0.0) < 0.0
+            Memento.error(
+            _LOGGER,"metadata $field is < 0")
+        end
+    end
+
+    for field in keys(non_negative_data)
+        for (i, table) in get(data, field, [])
+            for column_name in get(non_negative_data, field, [])
+                if get(table, column_name, 0.0) < 0.0
+                    Memento.error(
+            _LOGGER,"$field[$i][$column_name] is < 0")
+                end
+            end
+        end
+    end
 end
 
 
+"extracts the start value"
+function comp_start_value(set, item_key, value_key, default = 0.0)
+    return get(get(set, item_key, Dict()), value_key, default)
+end
+
+
+"Helper function for determining if direction cuts can be applied"
+function _apply_mass_flow_cuts(yp, branches)
+    is_disjunction = true
+    for k in branches
+        is_disjunction &= haskey(yp, k)
+    end
+    return is_disjunction
+end
+
+
+"calculates connections in parallel with one another and their orientation"
+function _calc_parallel_connections(
+    pm::AbstractPetroleumModel,
+    n::Int,
+    connection::Dict{String,Any},
+)
+    i = min(connection["fr_junction"], connection["to_junction"])
+    j = max(connection["fr_junction"], connection["to_junction"])
+
+    parallel_pipes =
+        haskey(ref(pm, n, :parallel_pipes), (i, j)) ? ref(pm, n, :parallel_pipes, (i, j)) :
+        []
+    parallel_pumps = haskey(ref(pm, n, :parallel_pumps), (i, j)) ?
+        ref(pm, n, :parallel_pumps, (i, j)) : []
+    parallel_tanks = haskey(ref(pm, n, :parallel_tanks), (i, j)) ?
+        ref(pm, n, :parallel_tanks, (i, j)) : []
+
+    num_connections =
+        length(parallel_pipes) +
+        length(parallel_pumps) +
+        length(parallel_tanks)
+
+    pipes = ref(pm, n, :pipe)
+    pumps = ref(pm, n, :pump)
+    tanks = ref(pm, n, :tank)
+
+
+    aligned_pipes =
+        filter(i -> pipes[i]["fr_junction"] == connection["fr_junction"], parallel_pipes)
+    opposite_pipes =
+        filter(i -> pipes[i]["fr_junction"] != connection["fr_junction"], parallel_pipes)
+    aligned_pumps = filter(
+        i -> pumps[i]["fr_junction"] == connection["fr_junction"],
+        parallel_pumps,
+    )
+    opposite_pumps = filter(
+        i -> pumps[i]["fr_junction"] != connection["fr_junction"],
+        parallel_pumps,
+    )
+    aligned_tanks = filter(
+        i -> tanks[i]["fr_junction"] == connection["fr_junction"],
+        parallel_tanks,
+    )
+    opposite_pumps = filter(
+        i -> tanks[i]["fr_junction"] != connection["fr_junction"],
+        parallel_tanks,
+    )
+
+
+    return num_connections,
+    aligned_pipes,
+    opposite_pipes,
+    aligned_pumps,
+    opposite_pumps,
+    aligned_tanks,
+    opposite_tanks
+end
+
+
+"calculates connections in parallel with one another and their orientation"
+function _calc_parallel_ne_connections(
+    pm::AbstractPetroleumModel,
+    n::Int,
+    connection::Dict{String,Any},
+)
+    i = min(connection["fr_junction"], connection["to_junction"])
+    j = max(connection["fr_junction"], connection["to_junction"])
+
+    parallel_pipes = haskey(ref(pm, n, :parallel_pipes), (i, j)) ?
+        ref(pm, n, :parallel_pipes, (i, j)) : []
+    parallel_pumps = haskey(ref(pm, n, :parallel_pumps), (i, j)) ?
+        ref(pm, n, :parallel_pumps, (i, j)) : []
+    parallel_tanks = haskey(ref(pm, n, :parallel_tanks), (i, j)) ?
+        ref(pm, n, :parallel_tanks, (i, j)) : []
+
+    parallel_ne_pipes = haskey(ref(pm, n, :parallel_ne_pipes), (i, j)) ?
+        ref(pm, n, :parallel_ne_pipes, (i, j)) : []
+    parallel_ne_pumps = haskey(ref(pm, n, :parallel_ne_pumps), (i, j)) ?
+        ref(pm, n, :parallel_ne_pumps, (i, j)) : []
+    parallel_ne_tanks = haskey(ref(pm, n, :parallel_ne_tanks), (i, j)) ?
+        ref(pm, n, :parallel_ne_tanks, (i, j)) : []
+
+    num_connections =
+        length(parallel_pipes) +
+        length(parallel_pumps) +
+        length(parallel_tanks) +
+        length(parallel_ne_pipes) +
+        length(parallel_ne_pumps) +
+        length(parallel_ne_tanks)
+
+    pipes = ref(pm, n, :pipe)
+    pumps = ref(pm, n, :pump)
+    tank = ref(pm, n, :tank)
+    ne_pipes = ref(pm, n, :ne_pipe)
+    ne_pumps = ref(pm, n, :ne_pump)
+    ne_tanks = ref(pm, n, :ne_tank)
+
+    aligned_pipes = filter(
+        i -> pipes[i]["fr_junction"] == connection["fr_junction"], parallel_pipes
+    )
+    opposite_pipes = filter(
+        i -> pipes[i]["fr_junction"] != connection["fr_junction"], parallel_pipes
+    )
+    aligned_pumps = filter(
+        i -> pumps[i]["fr_junction"] == connection["fr_junction"],
+        parallel_pumps,
+    )
+    opposite_pumps = filter(
+        i -> pumps[i]["fr_junction"] != connection["fr_junction"],
+        parallel_pumps,
+    )
+    aligned_tanks = filter(
+        i -> tanks[i]["fr_junction"] == connection["fr_junction"],
+        parallel_tanks,
+    )
+    opposite_tanks = filter(
+        i -> tanks[i]["fr_junction"] != connection["fr_junction"],
+        parallel_tanks,
+    )
+    aligned_ne_pipes = filter(
+        i -> ne_pipes[i]["fr_junction"] == connection["fr_junction"],
+        parallel_ne_pipes,
+    )
+    opposite_ne_pipes = filter(
+        i -> ne_pipes[i]["fr_junction"] != connection["fr_junction"],
+        parallel_ne_pipes,
+    )
+    aligned_ne_pumps = filter(
+        i -> ne_pumps[i]["fr_junction"] == connection["fr_junction"],
+        parallel_ne_pumps,
+    )
+    opposite_ne_pumps = filter(
+        i -> ne_pumps[i]["fr_junction"] != connection["fr_junction"],
+        parallel_ne_pumps,
+    )
+    aligned_ne_tanks = filter(
+        i -> ne_tanks[i]["fr_junction"] == connection["fr_junction"],
+        parallel_ne_tanks,
+    )
+    opposite_ne_tanks = filter(
+        i -> ne_tanks[i]["fr_junction"] != connection["fr_junction"],
+        parallel_ne_tanks,
+    )
+
+    return num_connections,
+    aligned_pipes,
+    opposite_pipes,
+    aligned_pumps,
+    opposite_pumps,
+    aligned_tanks,
+    opposite_tanks,
+    aligned_ne_pipes,
+    opposite_ne_pipes,
+    aligned_ne_pumps,
+    opposite_ne_pumps,
+    aligned_ne_tanks,
+    opposite_ne_tanks
+end
 
 
 "prints the text summary for a data file to IO"
@@ -265,120 +549,69 @@ end
 
 
 const _pm_component_types_order = Dict(
-    "junction" => 1.0, "connection" => 2.0, "producer" => 3.0, "consumer" => 4.0
+    "junction" => 1.0,
+    "pipe" => 2.0,
+    "pump" => 3.0,
+    "consumer" => 4.0,
+    "producer" => 5.0,
+    "tank" => 6.0,
 )
 
 
 const _pm_component_parameter_order = Dict(
-    "junction_i" => 1.0, "junction_type" => 2.0,
-    "Hmin" => 3.0, "Hmax" => 4.0,
-
-    "type" => 10.0,
-    "f_junction" => 11.0, "t_junction" => 12.0,
-    "length" => 13.0, "diameter" => 14.0,
-
-
-    "producer_i" => 50.0, "junction" => 51.0,
-    "qg" => 52.0, "qgmin" => 53.0, "qgmax" => 54.0,
-
-    "consumer_i" => 70.0, "junction" => 71.0,
-    "ql" => 72.0, "qlmin" => 73.0, "qlmax" => 74.0,
-
+    "id" => 1.0,
+    "junction_type" => 2.0,
+    "Hmin" => 3.0,
+    "Hmax" => 4.0,
+    "fr_junction" => 11.0,
+    "to_junction" => 12.0,
+    "length" => 13.0,
+    "diameter" => 14.0,
+    "Qmin" => 16.0,
+    "Qmax" => 17.0,
+    "delta_Hmin" => 18.0,
+    "delta_Hmax" => 19.0,
+    "junction_id" => 51.0,
     "status" => 500.0,
 )
-
-const _pm_component_types = ["pipe", "pump", "junction", "consumer",
-                             "producer"]
-
-const _pm_junction_keys = ["f_junction", "t_junction", "junction"]
-
-const _pm_edge_types = ["pipe", "pump"]
 
 
 "prints the text summary for a data dictionary to IO"
 function summary(io::IO, data::Dict{String,Any}; kwargs...)
-    InfrastructureModels.summary(io, data;
+    _IM.summary(
+        io,
+        data;
         component_types_order = _pm_component_types_order,
         component_parameter_order = _pm_component_parameter_order,
-        kwargs...)
+        kwargs...,
+    )
 end
-
-"extracts the start value"
-function comp_start_value(set, item_key, value_key, default = 0.0)
-    return get(get(set, item_key, Dict()), value_key, default)
-end
-
-
-function check_connectivity(data::Dict{String,<:Any})
-    if InfrastructureModels.ismultinetwork(data)
-        for (n, nw_data) in data["nw"]
-            _check_connectivity(nw_data)
-        end
-    else
-        _check_connectivity(data)
-    end
-end
-
-function _check_connectivity(data::Dict{String,<:Any})
-    junc_ids = Set(junc["junction_i"] for (i,junc) in data["junction"])
-    @assert(length(junc_ids) == length(data["junction"]))
-
-    for comp_type in _pm_component_types
-        for (i, comp) in get(data, comp_type, Dict())
-            for junc_key in _pm_junction_keys
-                if haskey(comp, junc_key)
-                    if !(comp[junc_key] in junc_ids)
-                        @warn "$junc_key $(comp[junc_key]) in $comp_type $i is not defined"
-                    end
-                end
-            end
-        end
-    end
-end
-
-
-"checks that active components are not connected to inactive buses, otherwise prints warnings"
-function check_status(data::Dict{String,<:Any})
-    if InfrastructureModels.ismultinetwork(data)
-        @warn "check_status does not yet support multinetwork data"
-    end
-
-    active_junction_ids = Set(junction["junction_i"] for (i,junction) in data["junction"] if get(junction, "status", 1) != 0)
-
-    for comp_type in _pm_component_types
-        for (i, comp) in get(data, comp_type, Dict())
-            for junc_key in _pm_junction_keys
-                if haskey(comp, junc_key)
-                    if get(comp, "status", 1) != 0 && !(comp[junc_key] in active_junction_ids)
-                        @warn "active $comp_type $i is connected to inactive junction $(comp[junc_key])"
-                    end
-                end
-            end
-        end
-    end
-end
-
-
 
 
 """
 computes the connected components of the network graph
 returns a set of sets of juntion ids, each set is a connected component
 """
-function calc_connected_components(data::Dict{String,<:Any}; edges=_pm_edge_types)
-    if InfrastructureModels.ismultinetwork(data)
-        @warn "calc_connected_components does not yet support multinetwork data"
+function calc_connected_components(data::Dict{String,<:Any}; edges = _pm_edge_types)
+    if _IM.ismultinetwork(data)
+        Memento.error(
+            _LOGGER,
+            "calc_connected_components does not yet support multinetwork data",
+        )
     end
 
     active_junction = Dict(x for x in data["junction"] if x.second["status"] != 0)
-    active_junction_ids = Set{Int64}([junction["junction_i"] for (i,junction) in active_junction])
+    active_junction_ids =
+        Set{Int64}([junction["junction_i"] for (i, junction) in active_junction])
 
     neighbors = Dict(i => [] for i in active_junction_ids)
     for edge_type in edges
         for edge in values(get(data, edge_type, Dict()))
-            if get(edge, "status", 1) != 0 && edge["f_junction"] in active_junction_ids && edge["t_junction"] in active_junction_ids
-                push!(neighbors[edge["f_junction"]], edge["t_junction"])
-                push!(neighbors[edge["t_junction"]], edge["f_junction"])
+            if get(edge, "status", 1) != 0 &&
+               edge["fr_junction"] in active_junction_ids &&
+               edge["to_junction"] in active_junction_ids
+                push!(neighbors[edge["fr_junction"]], edge["to_junction"])
+                push!(neighbors[edge["to_junction"]], edge["fr_junction"])
             end
         end
     end
@@ -395,5 +628,19 @@ function calc_connected_components(data::Dict{String,<:Any}; edges=_pm_edge_type
     ccs = (Set(values(component_lookup)))
 
     return ccs
+end
 
+
+"perModels DFS on a graph"
+function _dfs(i, neighbors, component_lookup, touched)
+    push!(touched, i)
+    for j in neighbors[i]
+        if !(j in touched)
+            new_comp = union(component_lookup[i], component_lookup[j])
+            for k in new_comp
+                component_lookup[k] = new_comp
+            end
+            _dfs(j, neighbors, component_lookup, touched)
+        end
+    end
 end

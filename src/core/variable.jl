@@ -2,101 +2,173 @@
 # The purpose of this file is to define commonly used and created variables used in petroleum flow models
 ##########################################################################################################
 
-"extracts the start value"
-function getstart(set, item_key, value_key, default = 0.0)
-    return get(get(set, item_key, Dict()), value_key, default)
-end
 
+function variable_volume_flow_pipe(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
 
+    q_pipe = pm.var[:nw][nw][:q_pipe] = JuMP.@variable(pm.model,
+        [i in ids(pm,nw,:pipe)],
+        base_name="$(nw)_q_pipe",
+        start=comp_start_value(pm.ref[:nw][nw][:pipe], i, "q_pipe_start",  pm.ref[:nw][nw][:pipe][i]["Qmin"])
+    )
 
-" variables associated with volume flow "
-function variable_volume_flow(pm::AbstractPetroleumFormulation; n::Int=pm.cnw, bounded::Bool = true)
-    # max_flow = pm.ref[:nw][n][:max_volume_flow]
-    # min_flow = pm.ref[:nw][n][:min_volume_flow]
-    # num_time_points = length(keys(pm.ref[:nw]))
-    # println("heere:")
-    # @show(num_time_points)
-    @show n
     if bounded
-        pm.var[:nw][n][:q] = @variable(pm.model, [i in keys(pm.ref[:nw][n][:connection])], base_name="$(n)_q")
-        for i in keys(pm.ref[:nw][n][:pipe])
-            JuMP.set_lower_bound(pm.var[:nw][n][:q][i], pm.ref[:nw][n][:pipe][i]["Qmin"])
-            JuMP.set_upper_bound(pm.var[:nw][n][:q][i], pm.ref[:nw][n][:pipe][i]["Qmax"])
+        for (i, pipe) in ref(pm, nw, :pipe)
+            JuMP.set_lower_bound(q_pipe[i], pm.ref[:nw][nw][:pipe][i]["Qmin"])
+            JuMP.set_upper_bound(q_pipe[i], pm.ref[:nw][nw][:pipe][i]["Qmax"])
         end
-            # lower_bound = pm.ref[:nw][n][:pipe][i]["Qmin"],
-            # upper_bound = pm.ref[:nw][n][:pipe][i]["Qmax"],
-            # start = getstart(pm.ref[:nw][n][:pipe], i, "q_start", 0))
-    else
-        pm.var[:nw][n][:q] = @variable(pm.model, [i in keys(pm.ref[:nw][n][:pipe])], base_name="$(n)_q",
-                                                                                           start = getstart(pm.ref[:nw][n][:pipe], i, "q_start", 0))
     end
+
+    report && _IM.sol_component_value(pm, nw, :pipe, :q_pipe, ids(pm, nw, :pipe), q_pipe)
 end
+
+function variable_volume_flow_pump(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
+
+    q_pump = pm.var[:nw][nw][:q_pump] = JuMP.@variable(pm.model,
+        [i in ids(pm,nw,:pump)],
+        base_name="$(nw)_q_pump",
+        start=comp_start_value(pm.ref[:nw][nw][:pump], i, "q_pump_start", 0)
+    )
+
+    if bounded
+        for (i, pump) in ref(pm, nw, :pump)
+            JuMP.set_lower_bound(q_pump[i], pm.ref[:nw][nw][:pump][i]["q_nom"] * 0.8)
+            JuMP.set_upper_bound(q_pump[i], pm.ref[:nw][nw][:pump][i]["q_nom"] * 1.2)
+        end
+    end
+
+    report && _IM.sol_component_value(pm, nw, :pump, :q_pump, ids(pm, nw, :pump), q_pump)
+end
+
 
 " variables associated with production "
-function variable_production_volume_flow(pm::AbstractPetroleumFormulation; n::Int=pm.cnw, bounded::Bool = true)
-    prod_set = collect(keys(Dict(x for x in pm.ref[:nw][n][:producer] if x.second["qgmax"] != 0 || x.second["qgmin"] != 0)))
+function variable_production_volume_flow(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
+
+    qg = pm.var[:nw][nw][:qg] = JuMP.@variable(pm.model,
+        [i in ids(pm,nw,:producer)],
+        base_name="$(nw)_qg",
+        start=comp_start_value(pm.ref[:nw][nw][:producer], i, "qg_start", 0.01)
+    )
+
     if bounded
-        pm.var[:nw][n][:qg] = @variable(pm.model, [i in prod_set], base_name="$(n)_qg", lower_bound = pm.ref[:nw][n][:producer][i]["qgmin"],
-                                                                                        upper_bound = pm.ref[:nw][n][:producer][i]["qgmax"],
-                                                                                        start = getstart(pm.ref[:nw][n][:producer], i, "qg_start",
-                                                                                        pm.ref[:nw][n][:producer][i]["qgmin"]))
-    else
-        pm.var[:nw][n][:qg] = @variable(pm.model, [i in prod_set], base_name="$(n)_qg", start = getstart(pm.ref[:nw][n][:producer], i, "qg_start",
-                                                                                        pm.ref[:nw][n][:producer][i]["qgmin"] ))
+        for (i, producer) in ref(pm, nw, :producer)
+            JuMP.set_lower_bound(qg[i], pm.ref[:nw][nw][:producer][i]["qgmin"])
+            JuMP.set_upper_bound(qg[i], pm.ref[:nw][nw][:producer][i]["qgmax"])
+        end
     end
+
+    report && _IM.sol_component_value(pm, nw, :producer, :qg, ids(pm, nw, :producer), qg)
 end
 
-" variables associated with demand "
-function variable_demand_volume_flow(pm::AbstractPetroleumFormulation; n::Int=pm.cnw, bounded::Bool = true)
-    cons_set = collect(keys(Dict(x for x in pm.ref[:nw][n][:consumer] if x.second["qlmax"] != 0 || x.second["qlmin"] != 0)))
+"variables associated with demand"
+function variable_demand_volume_flow(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
+
+    ql = pm.var[:nw][nw][:ql] = JuMP.@variable(pm.model,
+        [i in ids(pm,nw,:consumer)],
+        base_name="$(nw)_ql",
+        start=comp_start_value(pm.ref[:nw][nw][:consumer], i, "ql_start", 0.01)
+    )
+
     if bounded
-        pm.var[:nw][n][:ql] = @variable(pm.model, [i in cons_set], base_name="$(n)_ql", lower_bound = pm.ref[:nw][n][:consumer][i]["qlmin"],
-                                                                                        upper_bound = pm.ref[:nw][n][:consumer][i]["qlmax"],
-                                                                                        start = getstart(pm.ref[:nw][n][:consumer], i, "ql_start",
-                                                                                        pm.ref[:nw][n][:consumer][i]["qlmin"]))
-    else
-        pm.var[:nw][n][:ql] = @variable(pm.model, [i in cons_set], base_name="$(n)_ql", start = getstart(pm.ref[:nw][n][:consumer], i, "ql_start",
-                                                                                        pm.ref[:nw][n][:consumer][i]["qlmin"]))
+        for (i, consumer) in ref(pm, nw, :consumer)
+            JuMP.set_lower_bound(ql[i],  pm.ref[:nw][nw][:consumer][i]["qlmin"])
+            JuMP.set_upper_bound(ql[i],   pm.ref[:nw][nw][:consumer][i]["qlmax"])
+        end
     end
+
+    report && _IM.sol_component_value(pm, nw, :consumer, :ql, ids(pm, nw, :consumer), ql)
 end
+
 
 " variables associated with pump efficiency."
-function variable_pump_efficiency(pm::AbstractPetroleumFormulation; n::Int=pm.cnw, bounded::Bool = true)
+function variable_pump_efficiency(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
+
+    eta = pm.var[:nw][nw][:eta] = JuMP.@variable(pm.model,
+        [i in ids(pm,nw,:pump)],
+        base_name="$(nw)_eta",
+        start=comp_start_value(pm.ref[:nw][nw][:pump], i, "eta_start", 0)
+    )
 
     if bounded
-        pm.var[:nw][n][:eta] = @variable(pm.model, [i in keys(pm.ref[:nw][n][:pump])], base_name="$(n)_eta",
-                                                                                           lower_bound = pm.ref[:nw][n][:pump][i]["min_pump_efficiency"],
-                                                                                           upper_bound = pm.ref[:nw][n][:pump][i]["max_pump_efficiency"] ,
-                                                                                           start = getstart(pm.ref[:nw][n][:pump], i, "eta_start", pm.ref[:nw][n][:pump][i]["min_pump_efficiency"]))
-    else
-        pm.var[:nw][n][:eta] = @variable(pm.model, [i in keys(pm.ref[:nw][n][:pump])], base_name="$(n)_eta",
-                                                                                           start = getstart(pm.ref[:nw][n][:pump], i, "eta_start", pm.ref[:nw][n][:pump][i]["min_pump_efficiency"]))
+        for (i, pump) in ref(pm, nw, :pump)
+            JuMP.set_lower_bound(eta[i], pm.ref[:nw][nw][:pump][i]["min_pump_efficiency"])
+            JuMP.set_upper_bound(eta[i], pm.ref[:nw][nw][:pump][i]["max_pump_efficiency"])
+        end
     end
+
+    report && _IM.sol_component_value(pm, nw, :pump, :eta, ids(pm, nw, :pump), eta)
 end
 
 " variables associated with pump rotation."
-function variable_pump_rotation(pm::AbstractPetroleumFormulation; n::Int=pm.cnw, bounded::Bool = true)
+function variable_pump_rotation(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
+
+    w = pm.var[:nw][nw][:w] = JuMP.@variable(pm.model,
+        [i in ids(pm,nw,:pump)],
+        base_name="$(nw)_w",
+        start=comp_start_value(pm.ref[:nw][nw][:pump], i, "w_start", 0)
+    )
 
     if bounded
-        pm.var[:nw][n][:w] = @variable(pm.model, [i in keys(pm.ref[:nw][n][:pump])], base_name="$(n)_w",
-                                                                                           lower_bound = pm.ref[:nw][n][:pump][i]["min_w"],
-                                                                                           upper_bound = pm.ref[:nw][n][:pump][i]["max_w"],
-                                                                                           start = getstart(pm.ref[:nw][n][:pump], i, "w_start", pm.ref[:nw][n][:pump][i]["min_w"]))
-    else
-        pm.var[:nw][n][:w] = @variable(pm.model, [i in keys(pm.ref[:nw][n][:pump])], base_name="$(n)_w",
-                                                                                           start = getstart(pm.ref[:nw][n][:pump], i, "w_start", pm.ref[:nw][n][:pump][i]["min_w"]))
+        for (i, pump) in ref(pm, nw, :pump)
+            JuMP.set_lower_bound(w[i], pm.ref[:nw][nw][:pump][i]["min_w"])
+            JuMP.set_upper_bound(w[i], pm.ref[:nw][nw][:pump][i]["max_w"])
+        end
     end
+
+    report && _IM.sol_component_value(pm, nw, :pump, :w, ids(pm, nw, :pump), w)
 end
 
 " variables associated with head "
-function variable_head(pm::AbstractPetroleumFormulation; n::Int=pm.cnw, bounded::Bool = true)
+function variable_head(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
+
+    H = pm.var[:nw][nw][:H] = JuMP.@variable(pm.model,
+        [i in ids(pm,nw,:junction)],
+        base_name="$(nw)_H",
+        start=comp_start_value(pm.ref[:nw][nw][:junction], i, "H_start", 0.1)
+    )
+
     if bounded
-        pm.var[:nw][n][:H] = @variable(pm.model, [i in keys(pm.ref[:nw][n][:junction])], base_name="$(n)_H",
-                                                                                           lower_bound = pm.ref[:nw][n][:junction][i]["Hmin"],
-                                                                                           upper_bound = pm.ref[:nw][n][:junction][i]["Hmax"],
-                                                                                           start = getstart(pm.ref[:nw][n][:junction], i, "H_start", pm.ref[:nw][n][:junction][i]["Hmin"]))
-    else
-        pm.var[:nw][n][:H] = @variable(pm.model, [i in keys(pm.ref[:nw][n][:junction])], base_name="$(n)_H",
-                                                                                           start = getstart(pm.ref[:nw][n][:junction], i, "H_start", pm.ref[:nw][n][:junction][i]["Hmin"]))
+        for (i, junction) in ref(pm, nw, :junction)
+            JuMP.set_lower_bound(H[i], pm.ref[:nw][nw][:junction][i]["Hmin"])
+            JuMP.set_upper_bound(H[i], pm.ref[:nw][nw][:junction][i]["Hmax"])
+        end
     end
+
+    report && _IM.sol_component_value(pm, nw, :junction, :H, ids(pm, nw, :junction), H)
+end
+
+" variables associated with tank outflow "
+function variable_tank_in(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
+
+    q_tank_in = pm.var[:nw][nw][:q_tank_in] = JuMP.@variable(pm.model,
+        [i in ids(pm,nw,:tank)],
+        base_name="$(nw)_q_tank_in",
+        start=comp_start_value(pm.ref[:nw][nw][:tank], i, "q_tank_in_start", 0)
+    )
+
+    if bounded
+        for (i, tank) in ref(pm, nw, :tank)
+            JuMP.set_lower_bound(q_tank_in[i], pm.ref[:nw][nw][:tank][i]["Min_Load_Flow_Rate"])
+            JuMP.set_upper_bound(q_tank_in[i], pm.ref[:nw][nw][:tank][i]["Max_Load_Flow_Rate"])
+        end
+    end
+
+    report && _IM.sol_component_value(pm, nw, :tank, :q_tank_in, ids(pm, nw, :tank), q_tank_in)
+end
+
+function variable_tank_out(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
+
+    q_tank_out = pm.var[:nw][nw][:q_tank_out] = JuMP.@variable(pm.model,
+        [i in ids(pm,nw,:tank)],
+        base_name="$(nw)_q_tank_out",
+        start=comp_start_value(pm.ref[:nw][nw][:tank], i, "q_tank_out_start", 0)
+    )
+
+    if bounded
+        for (i, tank) in ref(pm, nw, :tank)
+            JuMP.set_lower_bound(q_tank_out[i], pm.ref[:nw][nw][:tank][i]["Min_Unload_Flow_Rate"])
+            JuMP.set_upper_bound(q_tank_out[i], pm.ref[:nw][nw][:tank][i]["Max_Unload_Flow_Rate"])
+        end
+    end
+
+    report && _IM.sol_component_value(pm, nw, :tank, :q_tank_out, ids(pm, nw, :tank), q_tank_out)
 end
