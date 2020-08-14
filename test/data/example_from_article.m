@@ -1,20 +1,21 @@
-function mgc = lib1
+function mpc = lib1
 
-mgc.rho = 851.5;  % petroleum density, kg per cubic m
-mgc.nu = 11.6e-6;  % petroleum viscosity, squared m per second
-mgc.gravitational_acceleration = 9.8;
-mgc.standard_density = 850; % petroleum base density, kg per m3
-mgc.baseQ = 3600; % petroleum volume flow rate, m3 per hour
-mgc.baseH = 100; % base head, m
-mgc.base_z = 100; % base inclination, m
-mgc.base_h_loss = 100; % base head loss
-mgc.base_a = 100 ; % base a coefficient
-mgc.base_b = 100 ; % base b coefficient
-mgc.per_unit = 1;
+mpc.rho = 851.5;  % petroleum density, kg per cubic m
+mpc.nu = 11.6e-6;  % petroleum viscosity, squared m per second
+mpc.gravitational_acceleration = 9.8;
+mpc.standard_density = 850; % petroleum base density, kg per m3
+mpc.baseQ = 1; % petroleum volume flow rate, m3 per hour
+mpc.units    = 'si';
+mpc.baseH = 100; % base head, m
+mpc.base_z = 100; % base inclination, m
+mpc.base_h_loss = 100; % base head loss
+mpc.base_a = 100 ; % base a coefficient
+mpc.base_b = 100 ; % base b coefficient
+mpc.per_unit = 1;
 
 %% junction data
 %  junction_i type Hmin Hmax H z status
-mgc.junction = [
+mpc.junction = [
 1  1  120 130 0  332.8 1
 2  0  40 950 0   332.8 1
 3  0  40 950 0   332.8 1
@@ -37,8 +38,8 @@ mgc.junction = [
 ];
 
 %% pipeline data
-% pipeline_i f_junction t_junction diameter length Qmin Qmax status
-mgc.pipe = [
+% pipeline_i fr_junction to_junction diameter length Qmin Qmax status
+mpc.pipe = [
 15  15 16    1.04  137.5e3 0.1388 1.388  1
 14  14 15    1.04  96.1e3 0.1388 1.388  1
 
@@ -53,14 +54,14 @@ mgc.pipe = [
 ];
 
 %% booster_pump data
-% pump_i f_junction t_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
-mgc.booster_pump = [
+% pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
+mpc.booster_pump = [
 6  1  2   3  319.1 5.43e-6 4500  160 280 0.6 0.87  3000 2400  3600 1      1
 ];
 
 %% pump data
-% pump_i f_junction t_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
-mgc.pump = [
+% pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
+mpc.pump = [
 13  13  14   3  319.1 5.43e-6 4500  160 280 0.6 0.87  3000 2400  3600 0.07      1
 
 
@@ -75,7 +76,7 @@ mgc.pump = [
 
 %% producer
 % producer_i junction qgmin qgmax qg status dispatchable price
-mgc.producer = [
+mpc.producer = [
 1  1  0.1 1.3 1.125 1 1 150
 2  12 0.1 0.39 209.7 1 1 150
 3  13 0.1 0.15 139.8 1 1 150
@@ -86,8 +87,18 @@ mgc.producer = [
 
 %% consumer
 % consumer_i junction qlmin qlmax ql status dispatchable price
-mgc.consumer = [
-1	 16	0.1 0.15 1.12 1 0 270
+mpc.consumer = [
+1	 16	0.1 0.15 1.12 1 1 270
 
 ];
+
+
+%% tank
+% tank_i fr_junction to_junction vessel_pressure_head radius Min_Capacity_Limitation Max_Capacity_Limitation Initial_Volume Min_Load_Flow_Rate Max_Load_Flow_Rate Min_Unload_Flow_Rate Max_Unload_Flow_Rate Cd status price p_price
+mpc.tank = [
+
+];
+
+
+
 end
