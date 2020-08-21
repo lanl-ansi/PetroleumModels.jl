@@ -7,7 +7,7 @@ function build_ls(pm::AbstractPetroleumModel)
     variable_head(pm)
     variable_volume_flow_pipe(pm)
     variable_volume_flow_pump(pm)
-    # variable_pump_rotation(pm)
+    variable_pump_rotation(pm)
     variable_pump_efficiency(pm)
     variable_production_volume_flow(pm)
     variable_demand_volume_flow(pm)
@@ -24,10 +24,10 @@ function build_ls(pm::AbstractPetroleumModel)
         constraint_nodal_volume_balance(pm, i)
     end
 
-    # for i in ids(pm, :pump)
-    #     constraint_pump_efficiency_and_rotation(pm, i)
-    #
-    # end
+    for i in ids(pm, :pump)
+        constraint_pump_efficiency_and_rotation(pm, i)
+
+    end
 
     for i in ids(pm, :junction)
         constraint_junction_volume_flow_balance(pm, i)

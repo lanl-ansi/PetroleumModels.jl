@@ -15,12 +15,12 @@
 
          obj = JuMP.@NLobjective(pm.model, Min,
          sum(
-                -(-sum(pm.ref[:nw][n][:producer][i]["offer_price"] * qg[n][i] for (i, producer) in pm.ref[:nw][n][:producer]) -
-                # sum(pm.ref[:nw][n][:tank][i]["p_price"] * q_tank[n][i] for (i, tank) in pm.ref[:nw][n][:tank]) +
-                   # sum(pm.ref[:nw][n][:tank][i]["p_price"] * q_tank[n][i] for (i, tank) in pm.ref[:nw][n][:tank]) +
-                sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * ql[n][i] for (i, consumer) in pm.ref[:nw][n][:consumer])) * 3600
-                -pm.data["rho"] * pm.data["gravitational_acceleration"]  * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] *
-                q_pump[n][i] * (pm.var[:nw][n][:H][pump["to_junction"]] - pm.var[:nw][n][:H][pump["fr_junction"]]) / (0.966 * 0.95 * pm.var[:nw][n][:eta][i])  / 1000
-                     for (i, pump) in pm.ref[:nw][n][:pump] )
-                                             for n in nws))
+              -(-sum(pm.ref[:nw][n][:producer][i]["offer_price"] * qg[n][i] for (i, producer) in pm.ref[:nw][n][:producer]) +
+              sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * ql[n][i] for (i, consumer) in pm.ref[:nw][n][:consumer])) * 3600 +
+              pm.data["rho"] * pm.data["gravitational_acceleration"]  * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] *
+              q_pump[n][i] * (pm.var[:nw][n][:H][pump["to_junction"]] -
+              pm.var[:nw][n][:H][pump["fr_junction"]]) / (0.966 * 0.95 * pm.var[:nw][n][:eta][i])  / 1000
+                   for (i, pump) in pm.ref[:nw][n][:pump] )
+                                           for n in nws))
+
  end

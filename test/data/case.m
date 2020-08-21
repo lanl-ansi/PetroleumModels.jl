@@ -11,15 +11,16 @@ mpc.base_z = 100; % base inclination, m
 mpc.base_h_loss = 100; % base head loss
 mpc.base_a = 100 ; % base a coefficient
 mpc.base_b = 100 ; % base b coefficient
+mpc.base_volume = 1000 ;
 mpc.per_unit = 1;
-
+mpc.time_step = 0;
 
 
 %% junction data
 %  id type Hmin Hmax H z status
 mpc.junction = [
-111  0  0  740   0   273 1
-222  0  0  740   0   273 1
+111  0  30  740   0   273 1
+222  0  30  740   0   273 1
 333  0  30 740 0   273 1
 444  0  30 740 0   273 1
 88  0  30 740 0   293 1
@@ -48,7 +49,7 @@ mpc.pump = [
 %% producer
 % producer_i junction_id qgmin qgmax qg status is_dispatchable offer_price
 mpc.producer = [
-1	 111	0.01 1.35 1440 1 1 300
+1	 111	0.1 1.35 1440 1 1 300
 ];
 
 %% consumer

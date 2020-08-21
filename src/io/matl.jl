@@ -8,8 +8,8 @@ end
 const _mlab_data_names = Vector{String}([
 "mpc.rho", "mpc.nu", "mpc.gravitational_acceleration",
  "mpc.standard_density", "mpc.baseQ", "mpc.baseH", "mpc.base_z", "mpc.base_h_loss", "mpc.base_a",
- "mpc.base_b", "mpc.per_unit","mpc.units","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
- "mpc.tank", "mpc.num_steps"
+ "mpc.base_b",  "mpc.base_volume","mpc.per_unit","mpc.units","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
+ "mpc.tank", "mpc.time_step"
 ])
 
 const _mlab_junction_columns = Vector{Tuple{String,Type}}([
@@ -227,11 +227,11 @@ function parse_m_string(data_string::String)
     required_metadata_names = ["mpc.rho",
     "mpc.nu",
     "mpc.gravitational_acceleration",
-    "mpc.standard_density", "mpc.units"]
+    "mpc.standard_density", "mpc.units", "mpc.time_step"]
 
     optional_metadata_names = ["mpc.baseH", "mpc.base_z",
     "mpc.base_h_loss", "mpc.base_a",
-    "mpc.base_b", "mpc.baseQ", "mpc.per_unit"]
+    "mpc.base_b", "mpc.baseQ",  "mpc.base_volume","mpc.per_unit"]
 
     for data_name in required_metadata_names
         (data_name == "mpc.units") && (continue)
@@ -311,6 +311,13 @@ function parse_m_string(data_string::String)
     else
         Memento.warn(_LOGGER,"no base_b found in .m file.
             The file seems to be missing \"mpc.base_b = ...\" \n")
+    end
+
+    if haskey(matlab_data, "mpc.base_volume")
+        case["base_volume"] = matlab_data["mpc.base_volume"]
+    else
+        Memento.warn(_LOGGER,"no base_volume found in .m file.
+            The file seems to be missing \"mpc.base_volume = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.junction")
@@ -561,7 +568,7 @@ const _matlab_global_params_order_required = ["rho",
 "order of optional global parameters"
 const _matlab_global_params_order_optional = ["baseH", "base_z",
 "base_h_loss", "base_a",
-"base_b", "baseQ", "per_unit"]
+"base_b", "base_volume", "baseQ", "per_unit", "mpc.time_step"]
 
 
 "list of units of meta data fields"
@@ -574,6 +581,7 @@ const _units = Dict{String,Dict{String,String}}(
         "base_a" => "m",
         "base_b" => "m",
         "baseH" => "m",
+        "base_volume" => "m3",
         "baseQ" => "m3/s",
     ),
     "english" => Dict{String,String}(

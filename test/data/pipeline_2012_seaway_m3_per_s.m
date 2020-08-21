@@ -11,13 +11,15 @@ mpc.base_z = 100; % base inclination, m
 mpc.base_h_loss = 100; % base head loss
 mpc.base_a = 100 ; % base a coefficient
 mpc.base_b = 100 ; % base b coefficient
-mpc.per_unit = 1;
+mpc.base_volume = 1000 ;
+mpc.per_unit = 0;
+mpc.time_step = 0;
 
 
 %% junction data
 %  junction_i type Hmin Hmax H z status
 mpc.junction = [
-1  0  0  5   0   273 1
+1  1  0 300 0  273 1
 2  0  30 740 0   273 1
 3  0  30 740 0   273 1
 4  0  30 740 0   293 1
@@ -25,22 +27,22 @@ mpc.junction = [
 6  0  30 740 0   201 1
 7  0  30 740 0   266 1
 8  0  30 740 0   266 1
-9  0  0  5   0   180 1
+9  0  30 740 0   180 1
 10  0  30 740 0   153 1
-11  0  30 740 0   153 1
-12  0  30 740 0   146 1
-13  0  30 740 0   146 1
-14  0  30 740 0   146 1
-15  0  30 740 0   107 1
-16  0  30 740 0   106 1
-17  0  30 740 0   92 1
-18  0  0  5   0   92 1
-19  0  30 740 0   202 1
-20  0  30 740 0   202 1
-21  0  30 740 0   95 1
-22  0  30 740 0   95 1
-23  0  30 740 0   2 1
-24  0  30 740 0   2 1
+11  0  30 1740 0   153 1
+12  0  30 1740 0   146 1
+13  0  30 1740 0   146 1
+14  0  30 1740 0   146 1
+15  0  30 1740 0   107 1
+16  0  30 1740 0   106 1
+17  0  30 1740 0   92 1
+18  0  30 1740 0   92 1
+19  0  30 1740 0   202 1
+20  0  30 1740 0   202 1
+21  0  30 1740 0   95 1
+22  0  30 1740 0   95 1
+23  0  30 1740 0   2 1
+
 
 ];
 
@@ -96,20 +98,21 @@ mpc.pump = [
 %% producer
 % producer_i junction qgmin qgmax qg status dispatchable price
 mpc.producer = [
-3	 18	0.01 1.35 1440 1 1 300
+1  1  0.1  0.65 1440 1 1 300
+2  9  0.1  0.83 1440 1 1 300
+3  18 0.1  0.83 1440 1 1 300
 ];
 
 %% consumer
 % consumer_i junction qlmin qlmax ql status dispatchable price
 mpc.consumer = [
-1	 15	0.2 0.85 0.305 1 1 310
-2	 24	0.2 0.85 0.305 1 1 310
+1	 15	0.1 0.6 0.305 1 1 310
+2	 23	0.1 0.6 0.305 1 1 310
 ];
 
 %% tank
 % tank_i fr_junction to_junction vessel_pressure_head radius Min_Capacity_Limitation Max_Capacity_Limitation Initial_Volume Min_Load_Flow_Rate Max_Load_Flow_Rate Min_Unload_Flow_Rate Max_Unload_Flow_Rate Cd status price p_price
 mpc.tank = [
-31  23 24 0 14.25 459 10283 10000 0.138 1.138 0.01 1.35 0.94 1 0.00800458 300
 ];
 
 

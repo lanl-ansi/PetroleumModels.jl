@@ -8,6 +8,8 @@
 @inline z_base(data::Dict{String,Any}) = data["base_z"]
 @inline a_base(data::Dict{String,Any}) = data["base_a"]
 @inline b_base(data::Dict{String,Any}) = data["base_b"]
+@inline volume_base(data::Dict{String,Any}) = data["base_volume"]
+# @inline get_base_time(data::Dict{String,Any}) = data["base_time"]
 
 "calculates constant flow production"
 function calc_qg(data::Dict{String,Any}, producer::Dict{String,Any})
@@ -154,14 +156,12 @@ const _params_for_unit_conversions = Dict(
     ],
 
     "tank" => [
-
     "Min_Capacity_Limitation",
     "Max_Capacity_Limitation",
     "Min_Load_Flow_Rate",
     "Max_Load_Flow_Rate",
     "Min_Unload_Flow_Rate",
     "Max_Unload_Flow_Rate"
-
     ],
 )
 
@@ -173,22 +173,30 @@ function _rescale_functions(
     rescale_H::Function,
     rescale_z::Function,
     rescale_a::Function,
-    rescale_b::Function
+    rescale_b::Function,
+    rescale_volume::Function
 )::Dict{String,Function}
     Dict{String,Function}(
         "Hmax" => rescale_H,
         "Hmin" => rescale_H,
         "z" => rescale_z,
-        "qlmin" => rescale_q,
-        "qlmax" => rescale_q,
-        "qgmin" => rescale_q,
-        "qgmax" => rescale_q,
-        "Qmin" => rescale_q,
-        "Qmax" => rescale_q,
+        "qlmin" => rescale_q_pipe,
+        "qlmax" => rescale_q_pipe,
+        "qgmin" => rescale_q_pipe,
+        "qgmax" => rescale_q_pipe,
+        "Qmin" => rescale_q_pipe,
+        "Qmax" => rescale_q_pipe,
         "delta_Hmax" => rescale_H,
         "delta_Hmin" => rescale_H,
         "a" => rescale_a,
-        "b" => rescale_b
+        "b" => rescale_b,
+
+        "Min_Capacity_Limitation" => rescale_volume,
+        "Max_Capacity_Limitation" => rescale_volume,
+        "Min_Load_Flow_Rate" => rescale_q_pipe,
+        "Max_Load_Flow_Rate" => rescale_q_pipe,
+        "Min_Unload_Flow_Rate" => rescale_q_pipe,
+        "Max_Unload_Flow_Rate" => rescale_q_pipe
     )
 end
 "Transforms data to si units"
@@ -201,6 +209,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_z      = x -> x/z_base(data)
     rescale_a      = x -> x/a_base(data)
     rescale_b      = x -> x/b_base(data)
+    rescale_volume  = x -> x/volume_base(data)
 
     functions = _rescale_functions(
     rescale_q_pipe,
@@ -210,11 +219,12 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_H,
     rescale_z,
     rescale_a,
-    rescale_b
+    rescale_b,
+    rescale_volume
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
-    _apply_func!(nw_data, "time_point", rescale_time)
+    # _apply_func!(nw_data, "time_point", rescale_time)
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
             if ~haskey(comp, "per_unit") && ~haskey(data, "per_unit")
@@ -246,6 +256,7 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_z      = x -> x*z_base(data)
     rescale_a      = x -> x*a_base(data)
     rescale_b      = x -> x*b_base(data)
+    rescale_volume = x -> x*volume_base(data)
 
     functions = _rescale_functions(
     rescale_q_pipe,
@@ -255,11 +266,12 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_H,
     rescale_z,
     rescale_a,
-    rescale_b
+    rescale_b,
+    rescale_volume
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
-    _apply_func!(nw_data, "time_point", rescale_time)
+    # _apply_func!(nw_data, "time_point", rescale_time)
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
             if ~haskey(comp, "per_unit") && ~haskey(data, "per_unit")
@@ -299,10 +311,12 @@ function make_si_units!(data::Dict{String,<:Any})
         else
             pu_to_si!(data)
         end
-        if haskey(data, "time_step")
-            rescale_time = x -> x * get_base_time(data)
-            data["time_step"] = rescale_time(data["time_step"])
-        end
+
+        # if haskey(data, "time_step")
+        #     rescale_time = x -> x * get_base_time(data)
+        #     data["time_step"] = rescale_time(data["time_step"])
+        # end
+
         data["is_si_units"] = 1
         data["per_unit"] = 0
     end
@@ -333,10 +347,11 @@ function make_per_unit!(data::Dict{String,<:Any})
         else
             si_to_pu!(data)
         end
-        if haskey(data, "time_step")
-            rescale_time = x -> x / get_base_time(data)
-            data["time_step"] = rescale_time(data["time_step"])
-        end
+        # if haskey(data, "time_step")
+        #     rescale_time = x -> x / get_base_time(data)
+        #     data["time_step"] = rescale_time(data["time_step"])
+        # end
+
         data["is_si_units"] = 0
         data["per_unit"] = 1
     end

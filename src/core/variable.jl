@@ -31,7 +31,7 @@ function variable_volume_flow_pump(pm::AbstractPetroleumModel, nw::Int=pm.cnw; b
 
     if bounded
         for (i, pump) in ref(pm, nw, :pump)
-            JuMP.set_lower_bound(q_pump[i], pm.ref[:nw][nw][:pump][i]["q_nom"] * 0.8)
+            JuMP.set_lower_bound(q_pump[i], pm.ref[:nw][nw][:pump][i]["q_nom"] * 0.05)
             JuMP.set_upper_bound(q_pump[i], pm.ref[:nw][nw][:pump][i]["q_nom"] * 1.2)
         end
     end
