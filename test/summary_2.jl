@@ -99,7 +99,7 @@ q_pump_values =[]
          ipopt = JuMP.optimizer_with_attributes(Ipopt.Optimizer)
           # solution = pm.optimize_model!(pm, ipopt)
          JuMP.set_optimizer(pm.model, ipopt)
-         println(pm.model)
+         # println(pm.model)
          a = JuMP.optimize!(pm.model)
 
          e = 0

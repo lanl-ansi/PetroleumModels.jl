@@ -16,7 +16,8 @@
          obj = JuMP.@NLobjective(pm.model, Min,
          sum(
               -(-sum(pm.ref[:nw][n][:producer][i]["offer_price"] * qg[n][i] for (i, producer) in pm.ref[:nw][n][:producer]) +
-              sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * ql[n][i] for (i, consumer) in pm.ref[:nw][n][:consumer])) * 3600 +
+              sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * ql[n][i] for (i, consumer) in pm.ref[:nw][n][:consumer])) * 3600
+              +
               pm.data["rho"] * pm.data["gravitational_acceleration"]  * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] *
               q_pump[n][i] * (pm.var[:nw][n][:H][pump["to_junction"]] -
               pm.var[:nw][n][:H][pump["fr_junction"]]) / (0.966 * 0.95 * pm.var[:nw][n][:eta][i])  / 1000

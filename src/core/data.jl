@@ -36,10 +36,12 @@ function calc_head_loss(data::Dict{String,Any}, pipe::Dict{String,Any})
     L          = pipe["length"]
     head_loss = (beta * nu^0.25 / D^4.75 * L * 1.02)
 
+    @show(data["per_unit"])
     if !haskey(data, "per_unit") || data["per_unit"] == true
         head_loss  = head_loss / base_h_loss(data)
     end
     return head_loss
+    return data["per_unit"]
 end
 
 function calc_tank_head_initial(data::Dict{String,Any}, tank::Dict{String,Any})
@@ -59,14 +61,12 @@ end
 "if original data is in per-unit ensure it has base values"
 function per_unit_data_field_check!(data::Dict{String,Any})
     if get(data, "per_unit", false) == true
-        if get(data, "base_head", false) == false
+        if get(data, "baseH", false) == false
             Memento.error(
                 _LOGGER,
-                "data in .m file is in per unit but no base_head (in Pa) and base_length (in m) values are provided")
-        else
-            (get(data, "base_flow", false) == false) &&
-            (data["base_flow"] = calc_base_flow(data))
+                "data in .m file is in per unit but no base_head (in m) value is provided")
         end
+
     end
 end
 

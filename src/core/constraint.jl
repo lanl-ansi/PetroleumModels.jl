@@ -102,7 +102,7 @@ function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::
     Hi       = var(pm,n,:H,i)
     Hj       = var(pm,n,:H,j)
     _add_constraint!(pm, n, :eta_con, i, @NLconstraint(pm.model, eta == eta_max - (q_pump / q_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
-    _add_constraint!(pm, n, :pump_head_con, i, @NLconstraint(pm.model, (Hj - Hi) == (w_pump / w_nom)^2 * a -  (q_pump*3600)^2 * b ))
+    _add_constraint!(pm, n, :pump_head_con, i, @constraint(pm.model, (Hj - Hi) == (w_pump / w_nom)^2 * a -  (q_pump*3600)^2 * b ))
     _add_constraint!(pm, n, :delta_Hmax_con, i, @constraint(pm.model, delta_Hmax <= (Hj - Hi)))
     _add_constraint!(pm, n, :delta_Hmin_con, i, @constraint(pm.model, (Hj - Hi) <= delta_Hmin))
 end
