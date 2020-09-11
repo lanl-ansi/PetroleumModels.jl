@@ -6,8 +6,8 @@ function parse_matlab(file::Union{IO, String})
 end
 
 const _mlab_data_names = Vector{String}([
-"mpc.rho", "mpc.nu", "mpc.gravitational_acceleration",
- "mpc.standard_density", "mpc.baseQ", "mpc.baseH", "mpc.base_z", "mpc.base_h_loss", "mpc.base_a",
+"mpc.beta","mpc.rho", "mpc.nu", "mpc.gravitational_acceleration",
+ "mpc.base_rho", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length", "mpc.baseQ", "mpc.baseH", "mpc.base_z", "mpc.base_h_loss", "mpc.base_a",
  "mpc.base_b",  "mpc.base_volume","mpc.per_unit","mpc.units","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
  "mpc.tank", "mpc.time_step"
 ])
@@ -224,12 +224,13 @@ function parse_m_string(data_string::String)
         case["source_version"] = "0.0.0+"
     end
 
-    required_metadata_names = ["mpc.rho",
+    required_metadata_names = ["mpc.beta","mpc.rho",
     "mpc.nu",
     "mpc.gravitational_acceleration",
-    "mpc.standard_density", "mpc.units", "mpc.time_step"]
+     "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim"]
 
-    optional_metadata_names = ["mpc.baseH", "mpc.base_z",
+    optional_metadata_names = [ "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length",
+    "mpc.baseH", "mpc.base_z",
     "mpc.base_h_loss", "mpc.base_a",
     "mpc.base_b", "mpc.baseQ",  "mpc.base_volume","mpc.per_unit"]
 
@@ -268,11 +269,39 @@ function parse_m_string(data_string::String)
             This value will be auto-assigned based on the head limits provided in the data"))
     end
 
+    if haskey(matlab_data, "mpc.base_length")
+        case["base_length"] = matlab_data["mpc.base_length"]
+    else
+        Memento.warn(_LOGGER, string("no base_length found in .m file.
+            This value will be auto-assigned based on the head limits provided in the data"))
+    end
+
+    if haskey(matlab_data, "mpc.base_rho")
+        case["base_rho"] = matlab_data["mpc.base_rho"]
+    else
+        Memento.warn(_LOGGER,"no base_rho found in .m file.
+            The file seems to be missing \"mpc.base_rho = ...\" \n")
+    end
+
+    if haskey(matlab_data, "mpc.base_nu")
+        case["base_nu"] = matlab_data["mpc.base_nu"]
+    else
+        Memento.warn(_LOGGER,"no base_nu found in .m file.
+            The file seems to be missing \"mpc.base_nu = ...\" \n")
+    end
+
+    if haskey(matlab_data, "mpc.base_diameter")
+        case["base_diameter"] = matlab_data["mpc.base_diameter"]
+    else
+        Memento.warn(_LOGGER,"no base_diameter found in .m file.
+            The file seems to be missing \"mpc.base_diameter = ...\" \n")
+    end
+
     if haskey(matlab_data, "mpc.baseQ")
         case["baseQ"] = matlab_data["mpc.baseQ"]
     else
-        Memento.warn(_LOGGER, string("no baseQ found in .m file.
-            This value will be auto-assigned based on the pipe data"))
+        Memento.warn(_LOGGER,"no baseQ found in .m file.
+            The file seems to be missing \"mpc.baseQ = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.per_unit")
@@ -559,14 +588,14 @@ const _matlab_field_order = Dict{String,Array}(
 
 
 "order of required global parameters"
-const _matlab_global_params_order_required = ["rho",
+const _matlab_global_params_order_required = ["beta", "rho",
 "nu",
-"gravitational_acceleration",
-"standard_density"]
+"gravitational_acceleration", "Q_pipe_dim", "Q_pump_dim"]
 
 
 "order of optional global parameters"
-const _matlab_global_params_order_optional = ["baseH", "base_z",
+const _matlab_global_params_order_optional = ["base_rho", "base_nu", "base_diameter",
+"base_length","baseH", "base_z",
 "base_h_loss", "base_a",
 "base_b", "base_volume", "baseQ", "per_unit", "mpc.time_step"]
 
@@ -574,8 +603,10 @@ const _matlab_global_params_order_optional = ["baseH", "base_z",
 "list of units of meta data fields"
 const _units = Dict{String,Dict{String,String}}(
     "si" => Dict{String,String}(
-        "gravitational_acceleration" => "unitless",
-        "standard_density" => "kg/m3",
+        "base_rho" => "kg/m3",
+        "base_nu"  => "m2/s",
+        "base_diameter" => "m",
+        "base_length" => "m",
         "base_z" => "m",
         "base_h_loss" => "m",
         "base_a" => "m",

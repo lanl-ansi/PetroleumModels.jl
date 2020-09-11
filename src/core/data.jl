@@ -4,11 +4,17 @@
 "data getters"
 @inline h_base(data::Dict{String,Any}) = data["baseH"]
 @inline base_h_loss(data::Dict{String,Any}) = data["base_h_loss"]
+@inline base_rho(data::Dict{String,Any}) = data["base_rho"]
+@inline base_nu(data::Dict{String,Any}) = data["base_nu"]
+@inline base_diameter(data::Dict{String,Any}) = data["base_diameter"]
+@inline base_length(data::Dict{String,Any}) = data["base_length"]
 @inline q_base(data::Dict{String,Any}) = data["baseQ"]
 @inline z_base(data::Dict{String,Any}) = data["base_z"]
 @inline a_base(data::Dict{String,Any}) = data["base_a"]
 @inline b_base(data::Dict{String,Any}) = data["base_b"]
 @inline volume_base(data::Dict{String,Any}) = data["base_volume"]
+@inline Q_pipe_dim(data::Dict{String,Any}) = data["Q_pipe_dim"]
+@inline Q_pump_dim(data::Dict{String,Any}) = data["Q_pump_dim"]
 # @inline get_base_time(data::Dict{String,Any}) = data["base_time"]
 
 "calculates constant flow production"
@@ -29,20 +35,38 @@ function _apply_func!(data::Dict{String,Any}, key::String, func)
 end
 
 
-function calc_head_loss(data::Dict{String,Any}, pipe::Dict{String,Any})
-    beta       = 0.0246 # s/m2, assume turbulent flow
-    nu         = data["nu"]
-    D          = pipe["diameter"]
-    L          = pipe["length"]
-    head_loss = (beta * nu^0.25 / D^4.75 * L * 1.02)
+# function calc_head_loss(data::Dict{String,Any}, pipe::Dict{String,Any})
+#     beta       = 0.0246 # s/m2, assume turbulent flow
+#     nu         = data["nu"]
+#     D          = pipe["diameter"]
+#     L          = pipe["length"]
+#     head_loss = (beta * (nu)^0.25 / (D)^4.75 * (L) * 1.02)
+#
+#     # @show(data["per_unit"])
+#     println("PRINT")
+#     @show(head_loss)
+#
+#     return head_loss
+#     return data["per_unit"]
+# end
 
-    @show(data["per_unit"])
-    if !haskey(data, "per_unit") || data["per_unit"] == true
-        head_loss  = head_loss / base_h_loss(data)
-    end
-    return head_loss
-    return data["per_unit"]
-end
+# function calc_Q_pipe_dim(data::Dict{String,Any})
+#     Q_pipe_dim   = 3600
+#     @show(data["per_unit"])
+#     if !haskey(data, "per_unit") || data["per_unit"] == true
+#         Q_pipe_dim  = Q_pipe_dim / 3600
+#     end
+#     return Q_pipe_dim
+# end
+#
+# function calc_Q_pump_dim(data::Dict{String,Any})
+#     Q_pump_dim   = 1
+#     @show(data["per_unit"])
+#     if !haskey(data, "per_unit") || data["per_unit"] == true
+#         Q_pump_dim  = Q_pump_dim * 3600
+#     end
+#     return Q_pump_dim
+# end
 
 function calc_tank_head_initial(data::Dict{String,Any}, tank::Dict{String,Any})
     radius     = tank["radius"]
@@ -61,10 +85,12 @@ end
 "if original data is in per-unit ensure it has base values"
 function per_unit_data_field_check!(data::Dict{String,Any})
     if get(data, "per_unit", false) == true
-        if get(data, "baseH", false) == false
+        if get(data, "baseH", false) == false ||
+           get(data, "base_length", false) == false
             Memento.error(
                 _LOGGER,
                 "data in .m file is in per unit but no base_head (in m) value is provided")
+
         end
 
     end
@@ -75,8 +101,12 @@ end
 function add_base_values!(data::Dict{String,Any})
     (get(data, "base_head", false) == false) &&
     (data["base_head"] = calc_base_head(data))
-    # data["base_diameter"] = 1.0
-    # (get(data, "base_flow", false) == false) && (data["base_flow"] = calc_base_flow(data))
+    (get(data, "base_nu", false) == false) && (data["base_nu"] = calc_base_nu(data))
+    (get(data, "base_rho", false) == false) && (data["base_rho"] = calc_base_rho(data))
+    (get(data, "base_length", false) == false) && (data["base_length"] = 500.0)
+    data["base_diameter"] = 0.75
+    (get(data, "baseQ", false) == false) && (data["baseQ"] = calc_base_flow(data))
+
 end
 
 "make transient data to si units"
@@ -95,8 +125,13 @@ function make_si_units!(
         "H"
     ]
     flow_params = [
+        "rho",
+        "nu",
+        "Q_pipe_dim",
+        "Q_pump_dim",
         "q_pipe",
         "q_pump",
+        "q_nom",
         "Qmin",
         "Qmax",
         "qg",
@@ -125,22 +160,29 @@ function make_si_units!(
 end
 
 const _params_for_unit_conversions = Dict(
+
     "junction" =>
         ["Hmax", "Hmin",  "z"],
     #
     # "original_junction" => ["p_min", "p_max", "p_nominal", "p"],
 
-    "pipe" => ["Qmin", "Qmax"],
+    "pipe" => ["Qmin", "Qmax",
+    "diameter",
+    "length"],
 
-    "ne_pipe" => ["Qmin", "Qmax"],
+    "ne_pipe" => ["Qmin", "Qmax",
+    "diameter",
+    "length"],
 
     "pump" => [
+    "q_nom",
     "delta_Hmax",
     "delta_Hmin",
     "a",
     "b"
     ],
     "ne_pump" => [
+    "q_nom",
     "delta_Hmax",
     "delta_Hmin",
     "a",
@@ -168,13 +210,20 @@ const _params_for_unit_conversions = Dict(
 function _rescale_functions(
     rescale_q_pipe::Function,
     rescale_q_pump::Function,
+    rescale_q_pump_nom::Function,
     rescale_q_tank_in::Function,
     rescale_q_tank_out::Function,
+    rescale_rho::Function,
+    rescale_nu::Function,
+    rescale_diameter::Function,
+    rescale_length::Function,
     rescale_H::Function,
     rescale_z::Function,
     rescale_a::Function,
     rescale_b::Function,
-    rescale_volume::Function
+    rescale_volume::Function,
+    rescale_Q_pipe_dim::Function,
+    rescale_Q_pump_dim::Function
 )::Dict{String,Function}
     Dict{String,Function}(
         "Hmax" => rescale_H,
@@ -186,10 +235,17 @@ function _rescale_functions(
         "qgmax" => rescale_q_pipe,
         "Qmin" => rescale_q_pipe,
         "Qmax" => rescale_q_pipe,
+        "q_nom" => rescale_q_pump_nom,
         "delta_Hmax" => rescale_H,
         "delta_Hmin" => rescale_H,
         "a" => rescale_a,
         "b" => rescale_b,
+        "rho" => rescale_rho,
+        "nu" => rescale_nu,
+        "diameter" => rescale_diameter,
+        "length" => rescale_length,
+        "Q_pipe_dim" => rescale_Q_pipe_dim,
+        "Q_pump_dim" => rescale_Q_pump_dim,
 
         "Min_Capacity_Limitation" => rescale_volume,
         "Max_Capacity_Limitation" => rescale_volume,
@@ -202,9 +258,16 @@ end
 "Transforms data to si units"
 function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pipe   = x -> x/q_base(data)
+    rescale_Q_pipe_dim = x -> x/Q_pipe_dim(data)
+    rescale_Q_pump_dim = x ->  Q_pump_dim(data) * 3600
     rescale_q_pump   = x -> x/q_base(data)
+    rescale_q_pump_nom   = x -> x/q_base(data)
     rescale_q_tank_in = x -> x/q_base(data)
     rescale_q_tank_out = x -> x/q_base(data)
+    rescale_rho = x -> x/base_rho(data)
+    rescale_nu = x -> x/base_nu(data)
+    rescale_diameter = x -> x/base_diameter(data)
+    rescale_length = x -> x/(base_length(data))
     rescale_H      = x -> x/h_base(data)
     rescale_z      = x -> x/z_base(data)
     rescale_a      = x -> x/a_base(data)
@@ -213,9 +276,16 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
 
     functions = _rescale_functions(
     rescale_q_pipe,
+    rescale_Q_pipe_dim,
+    rescale_Q_pump_dim,
     rescale_q_pump,
+    rescale_q_pump_nom,
     rescale_q_tank_in,
     rescale_q_tank_out,
+    rescale_rho,
+    rescale_nu,
+    rescale_diameter,
+    rescale_length,
     rescale_H,
     rescale_z,
     rescale_a,
@@ -224,7 +294,10 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
-    # _apply_func!(nw_data, "time_point", rescale_time)
+    _apply_func!(nw_data, "nu", rescale_nu)
+    _apply_func!(nw_data, "rho", rescale_rho)
+    _apply_func!(nw_data, "Q_pipe_dim", rescale_Q_pipe_dim)
+    _apply_func!(nw_data, "Q_pump_dim", rescale_Q_pump_dim)
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
             if ~haskey(comp, "per_unit") && ~haskey(data, "per_unit")
@@ -249,9 +322,16 @@ end
 
 function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pipe          = x -> x*q_base(data)
+    rescale_Q_pipe_dim      = x -> x/Q_pipe_dim(data)
+    rescale_Q_pump_dim      = x -> Q_pipe_dim(data)/3600
     rescale_q_pump          = x -> x*q_base(data)
+    rescale_q_pump_nom      = x -> x*q_base(data)
     rescale_q_tank_in       = x -> x*q_base(data)
     rescale_q_tank_out      = x -> x*q_base(data)
+    rescale_rho             = x -> x*base_rho(data)
+    rescale_nu              = x -> x*base_nu(data)
+    rescale_diameter        = x -> x*base_diameter(data)
+    rescale_length = x -> x*base_length(data)
     rescale_H      = x -> x*h_base(data)
     rescale_z      = x -> x*z_base(data)
     rescale_a      = x -> x*a_base(data)
@@ -261,8 +341,13 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     functions = _rescale_functions(
     rescale_q_pipe,
     rescale_q_pump,
+    rescale_q_pump_nom,
     rescale_q_tank_in,
     rescale_q_tank_out,
+    rescale_rho,
+    rescale_nu,
+    rescale_diameter,
+    rescale_length,
     rescale_H,
     rescale_z,
     rescale_a,
@@ -602,6 +687,41 @@ function summary(io::IO, data::Dict{String,Any}; kwargs...)
     )
 end
 
+function add_pump_fields!(data::Dict{String,<:Any})
+    is_si_units = get(data, "is_si_units", 0)
+    is_english_units = get(data, "is_english_units", 0)
+    is_per_unit = get(data, "is_per_unit", false)
+    for (i, pump) in data["pump"]
+        if is_si_units == true
+            pump["Q_pump_dim"] = 3600
+        end
+        if is_english_units == true
+
+        end
+        if is_per_unit == true
+
+        end
+    end
+
+end
+
+function add_pipe_fields!(data::Dict{String,:Any})
+    is_si_units = get(data, "is_si_units", 0)
+    is_english_units = get(data, "is_english_units", 0)
+    is_per_unit = get(data, "is_per_unit", false)
+    for (i, pipe) in data["pipe"]
+        if is_si_units == true
+            pump["Q_pipe_dim"] = 1
+        end
+        if is_english_units == true
+
+        end
+        if is_per_unit == true
+
+        end
+    end
+
+end
 
 """
 computes the connected components of the network graph

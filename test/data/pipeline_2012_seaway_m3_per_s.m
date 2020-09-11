@@ -7,12 +7,12 @@ mpc.standard_density = 850; % petroleum base density, kg per m3
 mpc.baseQ = 1; % petroleum volume flow rate, m3 per hour
 mpc.units    = 'si';
 mpc.baseH = 100; % base head, m
-mpc.base_z = 100; % base inclination, m
+mpc.base_z = 100; % base elevation, m
 mpc.base_h_loss = 100; % base head loss
 mpc.base_a = 100 ; % base a coefficient
 mpc.base_b = 100 ; % base b coefficient
 mpc.base_volume = 1000 ;
-mpc.per_unit = 0;
+mpc.per_unit = 1;
 mpc.time_step = 0;
 
 
@@ -47,27 +47,27 @@ mpc.junction = [
 ];
 
 %% pipeline data
-% pipeline_i fr_junction to_junction diameter length Qmin Qmax status
+% pipeline_i fr_junction to_junction diameter length Qmin Qmax Q_pipe_dim status
 mpc.pipe = [
-22 22 23  0.75  13.62e3 0.138 1.388 1
+22 22 23  0.75  13.62e3 0.138 1.388 1 1
 
-20  20 21  0.75  173.6e3 0.138 1.388 1
+20  20 21  0.75  173.6e3 0.138 1.388 1 1
 
-18 18 19  0.75  87e3    0.138 1.388 1
-17 17 18  0.75  10.7e3  0.138 1.388 1
-16 16 17  0.75  83.2e3  0.138 1.388 1
-15 15 16  0.75  0.87e3  0.138 1.388 1
-14 14 15  0.75  2.94e3  0.138 1.388 1
+18 18 19  0.75  87e3    0.138 1.388 1 1
+17 17 18  0.75  10.7e3  0.138 1.388 1 1
+16 16 17  0.75  83.2e3  0.138 1.388 1 1
+15 15 16  0.75  0.87e3  0.138 1.388 1 1
+14 14 15  0.75  2.94e3  0.138 1.388 1 1
 
-11 11 12  0.75  165e3   0.138 1.388 1
+11 11 12  0.75  165e3   0.138 1.388 1 1
 
-9  9 10    0.75  36e3    0.138 1.388 1
-8  8 9    0.75  106.3e3 0.138 1.388 1
+9  9 10    0.75  36e3    0.138 1.388 1 1
+8  8 9    0.75  106.3e3 0.138 1.388 1 1
 
-6  6 7    0.75  132e3   0.138 1.388 1
-5  5 6    0.75  3.8e3   0.138 1.388 1
+6  6 7    0.75  132e3   0.138 1.388 1 1
+5  5 6    0.75  3.8e3   0.138 1.388 1 1
 
-3  3 4    0.75  154e3   0.138 1.388 1
+3  3 4    0.75  154e3   0.138 1.388 1 1
 ];
 
 %% booster_pump data
@@ -77,23 +77,23 @@ mpc.booster_pump = [
 ];
 
 %% pump data
-% pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
+% pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status Q_pump_dim
 mpc.pump = [
-21  21  22    1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.14 1
+21  21  22    1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.14 1 1
 
-19  19  20    1  276.8  7.1e-6  1 144 217 0.6 0.87  3000 2400  3600 0.08 1
+19  19  20    1  276.8  7.1e-6  1 144 217 0.6 0.87  3000 2400  3600 0.08 1 1
 
-13  13  14    1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.15 1
-12  12  13    1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.15 1
+13  13  14    1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.15 1 1
+12  12  13    1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.15 1 1
 
-10  10  11     1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.12 1
+10  10  11     1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.12 1 1
 
-7  7  8      1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.11 1
+7  7  8      1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.11 1 1
 
-4  4  5      1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.13 1
+4  4  5      1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.13 1 1
 
-2  2  3      1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.12 1
-1  1  2      1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.12 1
+2  2  3      1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.12 1 1
+1  1  2      1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.12 1 1
 ];
 %% producer
 % producer_i junction qgmin qgmax qg status dispatchable price

@@ -60,10 +60,10 @@ Some of the common keys include:
 * `:degree` -- the degree of junction i using existing connections (see `ref_degree!`)),
 """
 function ref_add_core!(refs::Dict{Symbol,<:Any})
-    _ref_add_core!(refs[:nw], baseQ=refs[:baseQ], baseH=refs[:baseH], base_z=refs[:base_z], base_h_loss = refs[:base_h_loss], base_a = refs[:base_a] , base_b=refs[:base_b])
+    _ref_add_core!(refs[:nw], base_rho=refs[:base_rho], base_nu=refs[:base_nu], base_diameter=refs[:base_diameter], base_length=refs[:base_length], baseQ=refs[:baseQ], baseH=refs[:baseH], base_z=refs[:base_z], base_a = refs[:base_a] , base_b=refs[:base_b])
 end
 
-function _ref_add_core!(nw_refs::Dict{Int,<:Any}; baseQ = 1, baseH = 100, base_z = 100, base_h_loss = 100, base_a = 100, base_b = 100)
+function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_rho=850, base_nu= 4.9e-6, base_diameter=0.75, base_length=500, baseQ = 1, baseH = 100, base_z = 100, base_a = 100, base_b = 100)
     for (nw, ref) in nw_refs
         ref[:junction] = haskey(ref, :junction) ? Dict(x for x in ref[:junction] if x.second["status"] == 1) : Dict()
         ref[:pipe] = haskey(ref, :pipe) ? Dict(x for x in ref[:pipe] if x.second["status"] == 1 && x.second["fr_junction"] in keys(ref[:junction]) && x.second["to_junction"] in keys(ref[:junction])) : Dict()
@@ -71,7 +71,7 @@ function _ref_add_core!(nw_refs::Dict{Int,<:Any}; baseQ = 1, baseH = 100, base_z
         ref[:consumer] = haskey(ref, :consumer) ? Dict(x for x in ref[:consumer] if x.second["status"] == 1 && x.second["junction_id"] in keys(ref[:junction])) : Dict()
         ref[:producer] = haskey(ref, :producer) ? Dict(x for x in ref[:producer] if x.second["status"] == 1 && x.second["junction_id"] in keys(ref[:junction])) : Dict()
         ref[:tank] = haskey(ref, :tank) ? Dict(x for x in ref[:tank] if x.second["status"] == 1 && x.second["fr_junction"] in keys(ref[:junction]) && x.second["to_junction"] in keys(ref[:junction])) : Dict()
-
+        ref[:properties] = haskey(ref, :properties) ? Dict(x for x in ref[:junction] if x.second["status"] == 1) : Dict()
 
         # dispatchable consumers, and producers
         ref[:dispatchable_consumer] = Dict(x for x in ref[:consumer] if x.second["is_dispatchable"] == 1)

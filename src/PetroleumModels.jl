@@ -37,7 +37,7 @@
 
 
 const _pm_global_keys = Set(["time_series_block", "per_unit", "nu", "base_h_loss", "rho", "gravitational_acceleration",
-"baseH", "baseQ", "base_a", "base_z", "base_b"])
+"baseH", "baseQ", "base_a", "base_z", "base_b", "base_length", "base_diameter", "base_rho", "base_nu"])
 include("core/base.jl")
 include("core/data.jl")
 # include("core/types.jl")

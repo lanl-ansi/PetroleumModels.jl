@@ -78,7 +78,7 @@ q_pump_values =[]
 @testset "test ----------" begin
     @testset "-------" begin
         println("Testing ----------------")
-        data = parse_file("../test/data/pipeline_2012_seaway_m3_per_s.m")
+        data = parse_file("../test/data/pipeline_2012_seaway_m3_per_h.m")
         # data = parse_file("../test/data/small_case.m")
         # result = run_ls("../test/data/input1.m", MISOCPPetroleumModel, cvx_solver)
         # @test result["status"] == :LocalOptimal || result["status"] == :Optimal
@@ -99,7 +99,7 @@ q_pump_values =[]
          ipopt = JuMP.optimizer_with_attributes(Ipopt.Optimizer)
           # solution = pm.optimize_model!(pm, ipopt)
          JuMP.set_optimizer(pm.model, ipopt)
-         # println(pm.model)
+         println(pm.model)
          a = JuMP.optimize!(pm.model)
 
          e = 0
@@ -112,13 +112,13 @@ q_pump_values =[]
          n=0
 
          A = sum((-sum(pm.ref[:nw][n][:producer][i]["offer_price"] * JuMP.value(pm.var[:nw][n][:qg][i]) for (i, producer) in pm.ref[:nw][n][:producer]) +
-         sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * JuMP.value(pm.var[:nw][n][:ql][i]) for (i, consumer) in pm.ref[:nw][n][:consumer]))  * 3600 for n in nws)
+         sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * JuMP.value(pm.var[:nw][n][:ql][i]) for (i, consumer) in pm.ref[:nw][n][:consumer])) for n in nws)
 
-         B =  sum(pm.data["rho"] * pm.data["gravitational_acceleration"]  * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] * JuMP.value(pm.var[:nw][n][:q_pump][i]) * pm.data["baseQ"] * JuMP.value((pm.var[:nw][n][:H][pump["to_junction"]]) -
+         B =  sum(pm.data["rho"] * pm.data["gravitational_acceleration"]  * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] * JuMP.value(pm.var[:nw][n][:q_pump][i]) / 3600  * JuMP.value((pm.var[:nw][n][:H][pump["to_junction"]]) -
          JuMP.value(pm.var[:nw][n][:H][pump["fr_junction"]])) / (0.966 * 0.95 * JuMP.value(pm.var[:nw][n][:eta][i])) / 1000 for (i, pump) in pm.ref[:nw][n][:pump]) for n in nws)
 
          B2 =  sum(sum(JuMP.value((pm.var[:nw][n][:H][pump["to_junction"]]) -
-         JuMP.value(pm.var[:nw][n][:H][pump["fr_junction"]])) * pm.data["baseH"] / 1000 for (i, pump) in pm.ref[:nw][n][:pump]) for n in nws)
+         JuMP.value(pm.var[:nw][n][:H][pump["fr_junction"]]))/ 1000 for (i, pump) in pm.ref[:nw][n][:pump]) for n in nws)
 
 
          # C = sum(sum( JuMP.value(pm.var[:nw][n][:q_tank][i]) for (i, tank) in pm.ref[:nw][n][:tank]) * pm.data["baseQ"] * 3600 for n in nws)
@@ -128,8 +128,8 @@ q_pump_values =[]
          println(A)
          println("power term")
          println(B)
-         # println()
-         # println(A-B)
+         println(B2)
+         println(A-B)
 
 
 # for n in 1:length(pm.ref[:nw])

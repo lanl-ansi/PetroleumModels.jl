@@ -80,29 +80,30 @@ end
 #################################################################################################
 
 "Pipe volume flow balance equation "
-function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k, i, j, e, zi, zj)
-    inclination_i = zi
-    inclination_j = zj
-    h_loss = e
-    Hi = var(pm,n,:H,i)
-    Hj = var(pm,n,:H,j)
-    q  = var(pm,n,:q_pipe,k)
-    _add_constraint!(pm, n, :nodal_volume_balance, k, @NLconstraint(pm.model, (Hi - Hj) == (inclination_j - inclination_i) + h_loss * q^1.75))
-end
+function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k, i, j, beta, nu, D, L, zi, zj, Q_pipe_dim)
+        inclination_i = zi
+        inclination_j = zj
+        Hi = var(pm,n,:H,i)
+        Hj = var(pm,n,:H,j)
+        q  = var(pm,n,:q_pipe,k)
+        println("Q_pipe_dim=", Q_pipe_dim)
+        _add_constraint!(pm, n, :nodal_volume_balance, k, @NLconstraint(pm.model, (Hi - Hj) == (inclination_j - inclination_i) + (beta * nu^0.25 / D^4.75 * L * 1.02) * (q / Q_pipe_dim)^1.75))
+    end
 
 #################################################################################################
 # Constraints associated with pumps
 #################################################################################################
 
 " constraints on pump efficiency and rotation"
-function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::Int, k, i, j, eta_min, eta_max, w_min, w_max, q_nom, w_nom, a, b, delta_Hmin, delta_Hmax)
+function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::Int, k, i, j, eta_min, eta_max, w_min, w_max, q_nom, w_nom, a, b, delta_Hmin, delta_Hmax, Q_pump_dim)
     q_pump   = var(pm,n,:q_pump,k)
     w_pump   = var(pm,n,:w,k)
     eta      = var(pm,n,:eta,k)
     Hi       = var(pm,n,:H,i)
     Hj       = var(pm,n,:H,j)
+
     _add_constraint!(pm, n, :eta_con, i, @NLconstraint(pm.model, eta == eta_max - (q_pump / q_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
-    _add_constraint!(pm, n, :pump_head_con, i, @constraint(pm.model, (Hj - Hi) == (w_pump / w_nom)^2 * a -  (q_pump*3600)^2 * b ))
+    _add_constraint!(pm, n, :pump_head_con, i, @constraint(pm.model, (Hj - Hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim)^2 * b ))
     _add_constraint!(pm, n, :delta_Hmax_con, i, @constraint(pm.model, delta_Hmax <= (Hj - Hi)))
     _add_constraint!(pm, n, :delta_Hmin_con, i, @constraint(pm.model, (Hj - Hi) <= delta_Hmin))
 end

@@ -99,15 +99,20 @@ end
 # Constraints associated with pipes
 #################################################################################################
 
-function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k; pipe_head_loss = calc_head_loss)
+function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k)
         pipe = ref(pm,n,:pipe,k)
         i    = pipe["fr_junction"]
         j    = pipe["to_junction"]
-        e  = pipe_head_loss(pm.data, pipe)
+        beta = pm.data["beta"]
+        nu = pm.data["nu"]
+        D = pipe["diameter"]
+        L = pipe["length"]
         zi = ref(pm,n,:junction, i)["z"]
         zj = ref(pm,n,:junction, j)["z"]
+        Q_pipe_dim = pm.data["Q_pipe_dim"]
+        println("Q_pipe_dim=", Q_pipe_dim)
+        constraint_nodal_volume_balance(pm, n, k, i, j, beta, nu, D, L, zi, zj, Q_pipe_dim)
 
-        constraint_nodal_volume_balance(pm, n, k, i, j, e, zi, zj)
 
 end
 constraint_nodal_volume_balance(pm::AbstractPetroleumModel, k::Int) = constraint_nodal_volume_balance(pm, pm.cnw, k)
@@ -144,8 +149,10 @@ function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::
     b = pm.ref[:nw][n][:pump][k]["b"]
     delta_Hmax = pm.ref[:nw][n][:pump][k]["delta_Hmax"]
     delta_Hmin = pm.ref[:nw][n][:pump][k]["delta_Hmin"]
-
-    constraint_pump_efficiency_and_rotation(pm, n, k, i, j, eta_min, eta_max, w_min, w_max, q_nom, w_nom, a, b, delta_Hmin, delta_Hmax)
+    Q_pump_dim = pm.data["Q_pump_dim"]
+    println("Q_pump_dim=")
+    println(pm.data["Q_pump_dim"])
+    constraint_pump_efficiency_and_rotation(pm, n, k, i, j, eta_min, eta_max, w_min, w_max, q_nom, w_nom, a, b, delta_Hmin, delta_Hmax, Q_pump_dim)
 end
 constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, k::Int) = constraint_pump_efficiency_and_rotation(pm, pm.cnw, k)
 
