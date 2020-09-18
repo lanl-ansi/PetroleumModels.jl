@@ -1,16 +1,3 @@
-#Check the second order cone model on load shedding
-# @testset "test input4" begin
-#     @testset "input4 case" begin
-#         println("input4 - MISCOP")
-#         ipopt_solver = with_optimizer(Ipopt.Optimizer)
-#         data = parse_file("input4.m")
-#         result = run_ls(data,  MISOCPPetroleumModel, ipopt_solver)
-#         println("------")
-#         println(typeof(result))
-#         @test result["status"] == :LocalOptimal || result["status"] == :Optimal
-#         # @test result["status"] == :Optimal
-#     end
-# end
 
 H_values         = []
 delta_H_values   = []
@@ -42,35 +29,6 @@ Hmin = []
 q_max = []
 q_min = []
 q_pump_values =[]
-#Check the second order cone model on load shedding
-# function check_head_status(sol, pm)
-#     println()
-#     for (idx,val) in sol["junction"]
-#         @test val["H"] <= pm.ref[:nw][pm.cnw][:junction][parse(Int64,idx)]["Hmax"]
-#         # pm = build_generic_model(data, MISOCPPetroleumModel, post_ls_)
-#         # check_head_status(result["solution"], pm)
-# # println(JuMP.value(val["H"]))
-# # println(dual_status((val["H"]))
-# # println("&&&&&&&&&&")
-# # println(((pm.var[:nw][0][:H])))
-#     end
-# end
-
-
-#Check the second order code model
-# @testset "test ----------" begin
-#     @testset "-------" begin
-#         println("Testing ----------------")
-#         data = parse_file("../test/data/input1.m")
-#         result = run_ls("../test/data/input1.m", MISOCPPetroleumModel, cvx_solver)
-#         @test result["status"] == :LocalOptimal || result["status"] == :Optimal
-#         # @test isapprox(result["objective"], 0; atol = 1e-6)
-#         pm = build_generic_model(data, MISOCPPetroleumModel, post_ls_)
-#         check_head_status(result["solution"], pm)
-#
-# end
-# end
-
 
 
 
@@ -79,27 +37,16 @@ q_pump_values =[]
     @testset "-------" begin
         println("Testing ----------------")
         data = parse_file("../test/data/pipeline_2012_seaway_m3_per_h.m")
-        # data = parse_file("../test/data/small_case.m")
-        # result = run_ls("../test/data/input1.m", MISOCPPetroleumModel, cvx_solver)
-        # @test result["status"] == :LocalOptimal || result["status"] == :Optimal
-        # @test isapprox(result["objective"], 0; atol = 1e-6)
+
     for i=1:1
         data_new = deepcopy(data)
-        # data_new["producer"]["1"]["price"] = data["producer"]["1"]["price"] + 20*i
-        # data_new["producer"]["2"]["price"] = data["producer"]["2"]["price"] + 5*i
-        # data_new["consumer"]["1"]["price"] = data["consumer"]["1"]["price"] + 5*i
-        # data_new["consumer"]["2"]["price"] = data["consumer"]["2"]["price"] + 10*i
-        # data_new["electricity_price"] = data["electricity_price"] + 0.05*i
 
-        # println(data_new["consumer"]["price"])
-         # @show "head_values_$i.csv"
-         # mn_data = InfrastructureModels.make_multinetwork(data_new, _pm_global_keys)
          pm = instantiate_model(data_new, MISOCPPetroleumModel, build_ls)
          # ipopt = JuMP.with_optimizer(Ipopt.Optimizer, print_level = 5)
          ipopt = JuMP.optimizer_with_attributes(Ipopt.Optimizer)
           # solution = pm.optimize_model!(pm, ipopt)
          JuMP.set_optimizer(pm.model, ipopt)
-         println(pm.model)
+         # println(pm.model)
          a = JuMP.optimize!(pm.model)
 
          e = 0
@@ -114,7 +61,7 @@ q_pump_values =[]
          A = sum((-sum(pm.ref[:nw][n][:producer][i]["offer_price"] * JuMP.value(pm.var[:nw][n][:qg][i]) for (i, producer) in pm.ref[:nw][n][:producer]) +
          sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * JuMP.value(pm.var[:nw][n][:ql][i]) for (i, consumer) in pm.ref[:nw][n][:consumer])) for n in nws)
 
-         B =  sum(pm.data["rho"] * pm.data["gravitational_acceleration"]  * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] * JuMP.value(pm.var[:nw][n][:q_pump][i]) / 3600  * JuMP.value((pm.var[:nw][n][:H][pump["to_junction"]]) -
+         B =  sum( pm.data["rho"] * pm.data["gravitational_acceleration"]  * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] * JuMP.value(pm.var[:nw][n][:q_pump][i]) /  3600 * JuMP.value((pm.var[:nw][n][:H][pump["to_junction"]]) -
          JuMP.value(pm.var[:nw][n][:H][pump["fr_junction"]])) / (0.966 * 0.95 * JuMP.value(pm.var[:nw][n][:eta][i])) / 1000 for (i, pump) in pm.ref[:nw][n][:pump]) for n in nws)
 
          B2 =  sum(sum(JuMP.value((pm.var[:nw][n][:H][pump["to_junction"]]) -
@@ -123,45 +70,59 @@ q_pump_values =[]
 
          # C = sum(sum( JuMP.value(pm.var[:nw][n][:q_tank][i]) for (i, tank) in pm.ref[:nw][n][:tank]) * pm.data["baseQ"] * 3600 for n in nws)
          # println(C)
-         println("economical term = ")
-         # println(( JuMP.value(pm.var[:nw][n][:q_tank][31]) ))
+         println("economic term = ")
+         # # println(( JuMP.value(pm.var[:nw][n][:q_tank][31]) ))
+         # println(A*3600)
+         # println("power term")
+         # println(B*100*827*3600)
+         # # println(B2)
+         # println((A*3600-B*100*827*3600))
+
          println(A)
          println("power term")
          println(B)
-         println(B2)
-         println(A-B)
-
+         println("objective func=")
+         println((A-B))
 
 # for n in 1:length(pm.ref[:nw])
     for n=0
      for i in sort(collect(ids(pm, :junction)))
          push!(H_values, (JuMP.value(pm.var[:nw][n][:H][i])) )
      end
-    println("_H_values = ", H_values)
+        # println("_H_values = ", H_values*100)
+        println("_H_values = ", H_values)
           println()
     for i in sort(collect(ids(pm, :pump)))
         push!(q_pump_values, (JuMP.value(pm.var[:nw][n][:q_pump][i])) )
     end
+   # println("q_pump_values = ", q_pump_values*3600)
    println("q_pump_values = ", q_pump_values)
 
-     # println("1 = ", JuMP.value(pm.var[:nw][0][:q][1]))
-     # println("9 = ", JuMP.value(pm.var[:nw][0][:q][9]) )
-     # println("19 = ", JuMP.value(pm.var[:nw][0][:q][18]) )
-     #
-     # println("15 = ", JuMP.value(pm.var[:nw][0][:q][15]) )
-     # println("22 = ", JuMP.value(pm.var[:nw][0][:q][22]) )
+   for i in sort(collect(ids(pm, :pump)))
+       push!(eta_values, (JuMP.value(pm.var[:nw][n][:eta][i])) )
+   end
+   for i in sort(collect(ids(pm, :pump)))
+       push!(w_values, (JuMP.value(pm.var[:nw][n][:w][i])) )
+   end
+   println("eta = ", eta_values)
+   println()
+   println("w_values=",w_values)
+
+
 
      for i in sort(collect(ids(pm, :producer)))
-          push!(qg_value, JuMP.value(pm.var[:nw][n][:qg][i]) * pm.data["baseQ"])
+          push!(qg_value, JuMP.value(pm.var[:nw][n][:qg][i]) )
      end
 
-    println("producer=", qg_value)
+    # println("producer=", qg_value*3600)
+    println("producer flow=", qg_value)
     println()
 
      for i in sort(collect(ids(pm, :consumer)))
-          push!(ql_value, JuMP.value(pm.var[:nw][n][:ql][i]) * pm.data["baseQ"] )
+          push!(ql_value, JuMP.value(pm.var[:nw][n][:ql][i]) )
      end
-      println("consumer=", ql_value)
+      # println("consumer=", ql_value*3600)
+      println("consumer flow=", ql_value)
       println()
 
 

@@ -8,7 +8,7 @@ using Ipopt
 # using Juniper
 
 
-ipopt_solver = JuMP.with_optimizer(Ipopt.Optimizer, print_level = 5)
+ipopt_solver = JuMP.with_optimizer(Ipopt.Optimizer, print_level = 5, tol=1e-10)
 
 # cbc_solver = JuMP.with_optimizer(Cbc.Optimizer, logLevel=0)
 # juniper_solver = JuMP.with_optimizer(Juniper.Optimizer, nl_solver=JuMP.with_optimizer(Ipopt.Optimizer, tol=1e-4, print_level=0, sb="yes"),
@@ -33,5 +33,6 @@ cvx_solver = ipopt_solver
 
 # include("ls.jl")
 
-include("summary_2.jl")
+include("summary2.jl")
+# include("summary2.jl")
 end

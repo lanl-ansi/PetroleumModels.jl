@@ -7,16 +7,16 @@ end
 
 const _mlab_data_names = Vector{String}([
 "mpc.beta","mpc.rho", "mpc.nu", "mpc.gravitational_acceleration",
- "mpc.base_rho", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length", "mpc.baseQ", "mpc.baseH", "mpc.base_z", "mpc.base_h_loss", "mpc.base_a",
- "mpc.base_b",  "mpc.base_volume","mpc.per_unit","mpc.units","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
- "mpc.tank", "mpc.time_step"
+ "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length", "mpc.baseQ", "mpc.baseH", "mpc.base_z", "mpc.base_a",
+ "mpc.base_b",  "mpc.base_volume","mpc.units","mpc.per_unit","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
+ "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim"
 ])
 
 const _mlab_junction_columns = Vector{Tuple{String,Type}}([
 ("id", Int),
 ("junction_type", Int),
-("Hmin", Float64), ("Hmax", Float64),
-("H", Float64),
+("Hmin", Float64),
+("Hmax", Float64),
 ("z", Float64),
 ("status", Int)
 ])
@@ -69,7 +69,8 @@ const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
 ("a", Float64),
 ("b", Float64),
 ("q_nom", Float64),
-("delta_Hmax", Float64), ("delta_Hmin", Float64),
+("delta_Hmax", Float64),
+("delta_Hmin", Float64),
 ("min_pump_efficiency", Float64),
 ("max_pump_efficiency", Float64),
 ("w_nom", Float64),
@@ -230,8 +231,7 @@ function parse_m_string(data_string::String)
      "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim"]
 
     optional_metadata_names = [ "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length",
-    "mpc.baseH", "mpc.base_z",
-    "mpc.base_h_loss", "mpc.base_a",
+    "mpc.baseH", "mpc.base_z", "mpc.base_a",
     "mpc.base_b", "mpc.baseQ",  "mpc.base_volume","mpc.per_unit"]
 
     for data_name in required_metadata_names
@@ -318,15 +318,6 @@ function parse_m_string(data_string::String)
         Memento.warn(_LOGGER,"no base_z found in .m file.
             The file seems to be missing \"mpc.base_z = ...\" \n")
     end
-
-
-    if haskey(matlab_data, "mpc.base_h_loss")
-        case["base_h_loss"] = matlab_data["mpc.base_h_loss"]
-    else
-        Memento.warn(_LOGGER,"no base_h_loss found in .m file.
-            The file seems to be missing \"mpc.base_h_loss = ...\" \n")
-    end
-
 
     if haskey(matlab_data, "mpc.base_a")
         case["base_a"] = matlab_data["mpc.base_a"]
@@ -590,14 +581,13 @@ const _matlab_field_order = Dict{String,Array}(
 "order of required global parameters"
 const _matlab_global_params_order_required = ["beta", "rho",
 "nu",
-"gravitational_acceleration", "Q_pipe_dim", "Q_pump_dim"]
+"gravitational_acceleration"]
 
 
 "order of optional global parameters"
 const _matlab_global_params_order_optional = ["base_rho", "base_nu", "base_diameter",
-"base_length","baseH", "base_z",
-"base_h_loss", "base_a",
-"base_b", "base_volume", "baseQ", "per_unit", "mpc.time_step"]
+"base_length","baseH", "base_z", "base_a",
+"base_b", "base_volume", "baseQ", "per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim"]
 
 
 "list of units of meta data fields"
@@ -608,7 +598,6 @@ const _units = Dict{String,Dict{String,String}}(
         "base_diameter" => "m",
         "base_length" => "m",
         "base_z" => "m",
-        "base_h_loss" => "m",
         "base_a" => "m",
         "base_b" => "m",
         "baseH" => "m",

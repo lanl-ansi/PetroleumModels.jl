@@ -16,9 +16,9 @@ function build_ls(pm::AbstractPetroleumModel)
 
     objective_min_expenses_max_benefit(pm)
 
-    for i in ids(pm, :junction)
-        constraint_node_head(pm, i)
-    end
+    # for i in ids(pm, :junction)
+    #     constraint_node_head(pm, i)
+    # end
 
     for i in ids(pm, :pipe)
         constraint_nodal_volume_balance(pm, i)
@@ -26,7 +26,6 @@ function build_ls(pm::AbstractPetroleumModel)
 
     for i in ids(pm, :pump)
         constraint_pump_efficiency_and_rotation(pm, i)
-
     end
 
     for i in ids(pm, :junction)
@@ -58,13 +57,13 @@ for (n, data) in nws(pm)
 # network_ids = sort(collect(nw_ids(pm)))
 
     for i in ids(pm, n, :junction)
-        constrainto_junction_volume_flow_balance(pm, n, i)
+        constraint_junction_volume_flow_balance(pm, n, i)
     end
-
-    for i in ids(pm, n, :junction)
-        constraint_node_head(pm, n, i)
-
-    end
+    #
+    # for i in ids(pm, n, :junction)
+    #     constraint_node_head(pm, n, i)
+    #
+    # end
 
     for i in ids(pm, n, :pipe)
         constraint_nodal_volume_balance(pm, n, i)

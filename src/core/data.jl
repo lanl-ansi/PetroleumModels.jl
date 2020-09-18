@@ -1,9 +1,8 @@
-# tools for working with GasModels internal data format
+# tools for working with PetroleumModels internal data format
 
 
 "data getters"
 @inline h_base(data::Dict{String,Any}) = data["baseH"]
-@inline base_h_loss(data::Dict{String,Any}) = data["base_h_loss"]
 @inline base_rho(data::Dict{String,Any}) = data["base_rho"]
 @inline base_nu(data::Dict{String,Any}) = data["base_nu"]
 @inline base_diameter(data::Dict{String,Any}) = data["base_diameter"]
@@ -13,8 +12,6 @@
 @inline a_base(data::Dict{String,Any}) = data["base_a"]
 @inline b_base(data::Dict{String,Any}) = data["base_b"]
 @inline volume_base(data::Dict{String,Any}) = data["base_volume"]
-@inline Q_pipe_dim(data::Dict{String,Any}) = data["Q_pipe_dim"]
-@inline Q_pump_dim(data::Dict{String,Any}) = data["Q_pump_dim"]
 # @inline get_base_time(data::Dict{String,Any}) = data["base_time"]
 
 "calculates constant flow production"
@@ -179,15 +176,16 @@ const _params_for_unit_conversions = Dict(
     "delta_Hmax",
     "delta_Hmin",
     "a",
-    "b"
-    ],
+    "b"],
+
     "ne_pump" => [
     "q_nom",
     "delta_Hmax",
     "delta_Hmin",
     "a",
     "b"
-    ],
+    ,
+    "Q_pump_dim" ],
     "consumer" => [
         "qlmin",
         "qlmax"
@@ -208,6 +206,7 @@ const _params_for_unit_conversions = Dict(
 )
 
 function _rescale_functions(
+
     rescale_q_pipe::Function,
     rescale_q_pump::Function,
     rescale_q_pump_nom::Function,
@@ -258,8 +257,8 @@ end
 "Transforms data to si units"
 function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pipe   = x -> x/q_base(data)
-    rescale_Q_pipe_dim = x -> x/Q_pipe_dim(data)
-    rescale_Q_pump_dim = x ->  Q_pump_dim(data) * 3600
+    rescale_Q_pipe_dim = x -> x/3600
+    rescale_Q_pump_dim = x ->  x*3600
     rescale_q_pump   = x -> x/q_base(data)
     rescale_q_pump_nom   = x -> x/q_base(data)
     rescale_q_tank_in = x -> x/q_base(data)
@@ -267,7 +266,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_rho = x -> x/base_rho(data)
     rescale_nu = x -> x/base_nu(data)
     rescale_diameter = x -> x/base_diameter(data)
-    rescale_length = x -> x/(base_length(data))
+    rescale_length = x -> x/base_length(data)
     rescale_H      = x -> x/h_base(data)
     rescale_z      = x -> x/z_base(data)
     rescale_a      = x -> x/a_base(data)
@@ -276,8 +275,6 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
 
     functions = _rescale_functions(
     rescale_q_pipe,
-    rescale_Q_pipe_dim,
-    rescale_Q_pump_dim,
     rescale_q_pump,
     rescale_q_pump_nom,
     rescale_q_tank_in,
@@ -290,7 +287,9 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_z,
     rescale_a,
     rescale_b,
-    rescale_volume
+    rescale_volume,
+    rescale_Q_pipe_dim,
+    rescale_Q_pump_dim
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
@@ -322,8 +321,8 @@ end
 
 function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pipe          = x -> x*q_base(data)
-    rescale_Q_pipe_dim      = x -> x/Q_pipe_dim(data)
-    rescale_Q_pump_dim      = x -> Q_pipe_dim(data)/3600
+    rescale_Q_pipe_dim      = x -> x*3600
+    rescale_Q_pump_dim      = x -> x/3600
     rescale_q_pump          = x -> x*q_base(data)
     rescale_q_pump_nom      = x -> x*q_base(data)
     rescale_q_tank_in       = x -> x*q_base(data)
@@ -332,7 +331,7 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_nu              = x -> x*base_nu(data)
     rescale_diameter        = x -> x*base_diameter(data)
     rescale_length = x -> x*base_length(data)
-    rescale_H      = x -> x*h_base(data)
+    rescale_H      = x -> x
     rescale_z      = x -> x*z_base(data)
     rescale_a      = x -> x*a_base(data)
     rescale_b      = x -> x*b_base(data)
@@ -352,7 +351,9 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_z,
     rescale_a,
     rescale_b,
-    rescale_volume
+    rescale_volume,
+    rescale_Q_pipe_dim,
+    rescale_Q_pump_dim
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
@@ -693,7 +694,7 @@ function add_pump_fields!(data::Dict{String,<:Any})
     is_per_unit = get(data, "is_per_unit", false)
     for (i, pump) in data["pump"]
         if is_si_units == true
-            pump["Q_pump_dim"] = 3600
+            # pump["Q_pump_dim"] = 3600
         end
         if is_english_units == true
 
@@ -764,7 +765,7 @@ function calc_connected_components(data::Dict{String,<:Any}; edges = _pm_edge_ty
 
     return ccs
 end
-
+println("check")
 
 "perModels DFS on a graph"
 function _dfs(i, neighbors, component_lookup, touched)

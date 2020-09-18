@@ -65,15 +65,7 @@ end
 # Constraints associated with junctions
 ##########################################################################################################
 
-function constraint_node_head(pm::AbstractPetroleumModel, n::Int, i::Int, junction)
-    H = var(pm,n,:H,i)
-    a = pm.ref[:nw][n][:junction][i]["H"]
-    if a > 0
-    junction_i = pm.ref[:nw][n][:junction][i]["junction_i"]
-    H = var(pm,n,:H,junction_i)
-    con(pm, n, :node_head)[i] = JuMP.@constraint(pm.model, H == pm.ref[:nw][n][:junction][junction_i]["H"])
-    end
-end
+
 
 #################################################################################################
 # Constraints associated with pipes
@@ -86,7 +78,6 @@ function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k, 
         Hi = var(pm,n,:H,i)
         Hj = var(pm,n,:H,j)
         q  = var(pm,n,:q_pipe,k)
-        println("Q_pipe_dim=", Q_pipe_dim)
         _add_constraint!(pm, n, :nodal_volume_balance, k, @NLconstraint(pm.model, (Hi - Hj) == (inclination_j - inclination_i) + (beta * nu^0.25 / D^4.75 * L * 1.02) * (q / Q_pipe_dim)^1.75))
     end
 
@@ -103,7 +94,7 @@ function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::
     Hj       = var(pm,n,:H,j)
 
     _add_constraint!(pm, n, :eta_con, i, @NLconstraint(pm.model, eta == eta_max - (q_pump / q_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
-    _add_constraint!(pm, n, :pump_head_con, i, @constraint(pm.model, (Hj - Hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim)^2 * b ))
+    _add_constraint!(pm, n, :pump_head_con, i, @constraint(pm.model, (Hj - Hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim )^2 * b ))
     _add_constraint!(pm, n, :delta_Hmax_con, i, @constraint(pm.model, delta_Hmax <= (Hj - Hi)))
     _add_constraint!(pm, n, :delta_Hmin_con, i, @constraint(pm.model, (Hj - Hi) <= delta_Hmin))
 end

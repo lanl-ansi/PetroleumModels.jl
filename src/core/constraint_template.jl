@@ -86,14 +86,7 @@ end
 # Templates for constraints associated with junctions
 #################################################################################################
 
-function constraint_node_head(pm::AbstractPetroleumModel, i; n::Int=pm.cnw)
-    if !haskey(con(pm, n), :node_head)
-        con(pm, n)[:node_head] = Dict{Int, JuMP.ConstraintRef}()
-    end
-    junction = ref(pm,n,:junction,i)
 
-    constraint_node_head(pm, n, i, junction)
-end
 
 #################################################################################################
 # Constraints associated with pipes
@@ -110,26 +103,11 @@ function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k)
         zi = ref(pm,n,:junction, i)["z"]
         zj = ref(pm,n,:junction, j)["z"]
         Q_pipe_dim = pm.data["Q_pipe_dim"]
-        println("Q_pipe_dim=", Q_pipe_dim)
         constraint_nodal_volume_balance(pm, n, k, i, j, beta, nu, D, L, zi, zj, Q_pipe_dim)
 
 
 end
 constraint_nodal_volume_balance(pm::AbstractPetroleumModel, k::Int) = constraint_nodal_volume_balance(pm, pm.cnw, k)
-
-
-"head_loss equation"
-function constraint_head_loss(pm::AbstractPetroleumModel, n::Int, k; pipe_head_loss = calc_head_loss)
-    pipe = ref(pm,n,:pump,k)
-    i = pipe["fr_junction"]
-    j = pipe["to_junction"]
-    mf = pm.ref[:nw][n][:max_volume_flow]
-    e  = haskey(pm.ref[:nw][n][:pipe], k) : pipe_head_loss(pm.data, pipe)
-    z  = junction["elevation"]
-
-    constraint_head_loss(pm, n, k, i, j, mf, e, z)
-end
-constraint_head_loss(pm::AbstractPetroleumModel, k::Int) = constraint_head_loss(pm, pm.cnw, k)
 
 #################################################################################################
 # Constraints associated with pumps
@@ -150,8 +128,6 @@ function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::
     delta_Hmax = pm.ref[:nw][n][:pump][k]["delta_Hmax"]
     delta_Hmin = pm.ref[:nw][n][:pump][k]["delta_Hmin"]
     Q_pump_dim = pm.data["Q_pump_dim"]
-    println("Q_pump_dim=")
-    println(pm.data["Q_pump_dim"])
     constraint_pump_efficiency_and_rotation(pm, n, k, i, j, eta_min, eta_max, w_min, w_max, q_nom, w_nom, a, b, delta_Hmin, delta_Hmax, Q_pump_dim)
 end
 constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, k::Int) = constraint_pump_efficiency_and_rotation(pm, pm.cnw, k)
