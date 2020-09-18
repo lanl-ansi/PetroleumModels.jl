@@ -36,8 +36,8 @@ q_pump_values =[]
 @testset "test ----------" begin
     @testset "-------" begin
         println("Testing ----------------")
-        data = parse_file("../test/data/pipeline_2012_seaway_m3_per_h.m")
-
+        # data/ = parse_file("../test/data/pipeline_2012_seaway_m3_per_h.m")
+        data = parse_file("../test/data/small_case.m")
     for i=1:1
         data_new = deepcopy(data)
 
