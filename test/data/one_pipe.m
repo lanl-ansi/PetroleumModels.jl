@@ -36,12 +36,6 @@ mpc.pipe = [
 30  1  2  0.8  10.0e3 360 5000 1
 ];
 
-%% booster_pump data
-% pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
-mpc.booster_pump = [
-6  1  2  1  276.8  7.1e-6  1  144 217 0.6 0.87  3000 2400  3600 0.14 1
-];
-
 %% pump data
 % pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
 mpc.pump = [

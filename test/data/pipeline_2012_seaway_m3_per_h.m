@@ -73,12 +73,6 @@ mpc.pipe = [
 3  3 4    0.75  154e3  500 5000  1
 ];
 
-%% booster_pump data
-% pump_i fr_junction to_junction station_i a b q_nom Q_pupm_min delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
-mpc.booster_pump = [
-6  1  2  1  276.8  7.1e-6  3600  144 217 0.6 0.87  3000 2400  3600 0.14 1
-];
-
 
 %% pump data
 % pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
@@ -110,8 +104,8 @@ mpc.producer = [
 %% consumer
 % consumer_i junction qlmin qlmax ql status dispatchable price
 mpc.consumer = [
-1	 15	288 3060 0.305 1 1 310
-2	 23	288 3060 0.305 1 1 310
+1	 15	288 3060 1100 1 1 310
+2	 23	288 3060 1100 1 1 310
 ];
 
 %% tank

@@ -24,8 +24,7 @@ mpc.time_step = 0;
 %% junction data
 %  junction_i type Hmin Hmax z status
 mpc.junction = [
-1  1  120 130  332.8 1
-2  0  40 950  332.8 1
+1  1  350 353  332.8 1
 3  0  40 950  332.8 1
 4  0  40 950  332.8 1
 5  0  40 950  352   1
@@ -34,15 +33,14 @@ mpc.junction = [
 8  0  40 950 526.5 1
 9  0  40 950 526.5 1
 
+10  0  40 950 595 1
+11  0  40 950  573.3 1
+12  0  30 950  482 1
+13  0  40 950  367.4 1
+14  0  40 950  367.4 1
 
-10  0  40 950 0  595 1
-11  0  40 950 0  573.3 1
-12  0  30 950 0  482 1
-13  0  30 950 0  367.4 1
-14  0  30 950 0  367.4 1
-
-15  0  30 950 0  565 1
-16  0  30 950 0  391.2 1
+15  0  40 950  565 1
+16  0  40 950  391.2 1
 ];
 
 %% pipeline data
@@ -61,12 +59,6 @@ mpc.pipe = [
 4  4 5       1.04  128e3  500 5000  1
 ];
 
-%% booster_pump data
-% pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
-mpc.booster_pump = [
-6  1  2   3  319.1 5.43e-6 4500  160 280 0.6 0.87  3000 2400  3600 1      1
-];
-
 %% pump data
 % pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
 mpc.pump = [
@@ -76,23 +68,23 @@ mpc.pump = [
 7  7  8      1  371  14.9e-6  3125  161 277 0.6 0.87  3000 2400  3600 0.12  1
 
 3  3  4      1  371  14.9e-6  3125  161 277 0.6 0.87  3000 2400  3600 0.1  1
-2  2  3      1  371  14.9e-6  3125  161 277 0.6 0.87  3000 2400  3600 0.1  1
-1  1  2      1  371  14.9e-6  3125  161 277 0.6 0.87  3000 2400  3600 0.1  1
+
+1  1  3      1  371  14.9e-6  3125  161 277 0.6 0.87  3000 2400  3600 0.1  1
 ];
 
 
 %% producer
 % producer_i junction qgmin qgmax qg status dispatchable price
 mpc.producer = [
-1  1  360 1540 1.125 1 1 150
-2  12 360 1540 209.7 1 1 150
-3  13 360 1540 139.8 1 1 150
+1  1  300 4200 1.125 1 1 150
+2  12 100 210 209.7 1 1 150
+3  13 100 150 139.8 1 1 150
 ];
 
 %% consumer
 % consumer_i junction qlmin qlmax ql status dispatchable price
 mpc.consumer = [
-1	 16	360 2400 1.12 1 1 270
+1	 16	4000 5000 1.12 1 1 270
 
 ];
 

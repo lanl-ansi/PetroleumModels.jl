@@ -40,8 +40,8 @@ q_pump_values =[]
 @testset "test ----------" begin
     @testset "-------" begin
         println("Testing ----------------")
-        # data = parse_file("../test/data/pipeline_2012_seaway_m3_per_h.m")
-        data = parse_file("../test/data/small_case.m")
+        data = parse_file("../test/data/pipeline_2012_seaway_m3_per_h.m")
+        # data = parse_file("../test/data/small_case.m")
 
     for i=1:1
         data_new = deepcopy(data)
@@ -76,12 +76,13 @@ q_pump_values =[]
          # C = sum(sum( JuMP.value(pm.var[:nw][n][:q_tank][i]) for (i, tank) in pm.ref[:nw][n][:tank]) * pm.data["baseQ"] * 3600 for n in nws)
          # println(C)
          println("economic term = ")
-         # # println(( JuMP.value(pm.var[:nw][n][:q_tank][31]) ))
+         # println(pm.data["rho"]  )
+         # println( pm.data["gravitational_acceleration"]  )
          println(A*3600)
          println("power term")
-         println(B*100*827*3600)
+         println(B*100*3600)
          println("objective func=")
-         println((A*3600-B*100*827*3600))
+         println((A*3600-B*100*3600))
 
         for n=0
      for i in sort(collect(ids(pm, :junction)))
