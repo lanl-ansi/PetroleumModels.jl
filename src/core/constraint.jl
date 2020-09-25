@@ -73,12 +73,12 @@ end
 
 "Pipe volume flow balance equation "
 function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k, i, j, beta, nu, D, L, zi, zj, Q_pipe_dim)
-        inclination_i = zi
-        inclination_j = zj
+        elevation_i = zi
+        elevation_j = zj
         Hi = var(pm,n,:H,i)
         Hj = var(pm,n,:H,j)
         q  = var(pm,n,:q_pipe,k)
-        _add_constraint!(pm, n, :nodal_volume_balance, k, @NLconstraint(pm.model, (Hi - Hj) == (inclination_j - inclination_i) + (beta * nu^0.25 / D^4.75 * L * 1.02) * (q / Q_pipe_dim)^1.75))
+        _add_constraint!(pm, n, :nodal_volume_balance, k, @NLconstraint(pm.model, (Hi - Hj) == (elevation_j - elevation_i) + (beta * nu^0.25 / D^4.75 * L * 1.02) * (q / Q_pipe_dim)^1.75))
     end
 
 #################################################################################################

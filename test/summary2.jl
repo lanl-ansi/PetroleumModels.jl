@@ -66,7 +66,7 @@ q_pump_values =[]
          A = sum((-sum(pm.ref[:nw][n][:producer][i]["offer_price"] * JuMP.value(pm.var[:nw][n][:qg][i]) for (i, producer) in pm.ref[:nw][n][:producer]) +
          sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * JuMP.value(pm.var[:nw][n][:ql][i]) for (i, consumer) in pm.ref[:nw][n][:consumer])) for n in nws)
 
-         B =  sum( pm.data["rho"] * pm.data["gravitational_acceleration"]  * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] * JuMP.value(pm.var[:nw][n][:q_pump][i]) /  3600 * JuMP.value((pm.var[:nw][n][:H][pump["to_junction"]]) -
+         B =  sum( pm.data["rho"]*827 * pm.data["gravitational_acceleration"]*9.8  * sum(pm.ref[:nw][n][:pump][i]["electricity_price"]/900  * JuMP.value(pm.var[:nw][n][:q_pump][i]) *100 * JuMP.value((pm.var[:nw][n][:H][pump["to_junction"]]) -
          JuMP.value(pm.var[:nw][n][:H][pump["fr_junction"]])) / (0.966 * 0.95 * JuMP.value(pm.var[:nw][n][:eta][i])) / 1000 for (i, pump) in pm.ref[:nw][n][:pump]) for n in nws)
 
          B2 =  sum(sum(JuMP.value((pm.var[:nw][n][:H][pump["to_junction"]]) -
@@ -76,13 +76,14 @@ q_pump_values =[]
          # C = sum(sum( JuMP.value(pm.var[:nw][n][:q_tank][i]) for (i, tank) in pm.ref[:nw][n][:tank]) * pm.data["baseQ"] * 3600 for n in nws)
          # println(C)
          println("economic term = ")
-         # println(pm.data["rho"]  )
-         # println( pm.data["gravitational_acceleration"]  )
+         println(pm.data["rho"]  )
+         println( pm.data["gravitational_acceleration"]  )
+         println( pm.ref[:nw][n][:pump][1]["electricity_price"] )
          println(A*3600)
          println("power term")
-         println(B*100*3600)
+         println(B)
          println("objective func=")
-         println((A*3600-B*100*3600))
+         println((A*3600-B))
 
         for n=0
      for i in sort(collect(ids(pm, :junction)))

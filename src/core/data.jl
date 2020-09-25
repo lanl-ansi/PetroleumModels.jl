@@ -3,8 +3,9 @@
 
 "data getters"
 @inline h_base(data::Dict{String,Any}) = data["baseH"]
-# @inline base_rho(data::Dict{String,Any}) = data["base_rho"]
+@inline base_rho(data::Dict{String,Any}) = data["base_rho"]
 @inline base_nu(data::Dict{String,Any}) = data["base_nu"]
+@inline base_gravitational_acceleration(data::Dict{String,Any}) = data["gravitational_acceleration"]
 @inline base_diameter(data::Dict{String,Any}) = data["base_diameter"]
 @inline base_length(data::Dict{String,Any}) = data["base_length"]
 @inline q_base(data::Dict{String,Any}) = data["baseQ"]
@@ -12,6 +13,8 @@
 @inline a_base(data::Dict{String,Any}) = data["base_a"]
 @inline b_base(data::Dict{String,Any}) = data["base_b"]
 @inline volume_base(data::Dict{String,Any}) = data["base_volume"]
+@inline E_base(data::Dict{String,Any}) = data["E_base"]
+
 # @inline get_base_time(data::Dict{String,Any}) = data["base_time"]
 
 "calculates constant flow production"
@@ -90,6 +93,7 @@ function make_si_units!(
     flow_params = [
         "rho",
         "nu",
+        "gravitational_acceleration",
         "Q_pipe_dim",
         "Q_pump_dim",
         "q_pipe",
@@ -105,6 +109,7 @@ function make_si_units!(
         "qlmax",
         "q_tank_in",
         "q_tank_out",
+        "electricity_price"
 
     ]
     inv_flow_params = ["bid_price", "offer_price"]
@@ -142,16 +147,19 @@ const _params_for_unit_conversions = Dict(
     "delta_Hmax",
     "delta_Hmin",
     "a",
-    "b"],
+    "b",
+    "electricity_price",
+    "Q_pump_dim"],
 
     "ne_pump" => [
     "q_nom",
     "delta_Hmax",
     "delta_Hmin",
     "a",
-    "b"
-    ,
+    "b",
+    "electricity_price",
     "Q_pump_dim" ],
+
     "consumer" => [
         "qlmin",
         "qlmax"
@@ -172,14 +180,15 @@ const _params_for_unit_conversions = Dict(
 )
 
 function _rescale_functions(
-
+    rescale_electricity_price::Function,
     rescale_q_pipe::Function,
     rescale_q_pump::Function,
     rescale_q_pump_nom::Function,
     rescale_q_tank_in::Function,
     rescale_q_tank_out::Function,
-    # rescale_rho::Function,
+    rescale_rho::Function,
     rescale_nu::Function,
+    rescale_gravitational_acceleration::Function,
     rescale_diameter::Function,
     rescale_length::Function,
     rescale_H::Function,
@@ -191,6 +200,7 @@ function _rescale_functions(
     rescale_Q_pump_dim::Function
 )::Dict{String,Function}
     Dict{String,Function}(
+        "electricity_price" => rescale_electricity_price,
         "Hmax" => rescale_H,
         "Hmin" => rescale_H,
         "z" => rescale_z,
@@ -205,8 +215,9 @@ function _rescale_functions(
         "delta_Hmin" => rescale_H,
         "a" => rescale_a,
         "b" => rescale_b,
-        # "rho" => rescale_rho,
+        "rho" => rescale_rho,
         "nu" => rescale_nu,
+        "gravitational_acceleration" => rescale_gravitational_acceleration,
         "diameter" => rescale_diameter,
         "length" => rescale_length,
         "Q_pipe_dim" => rescale_Q_pipe_dim,
@@ -222,6 +233,7 @@ function _rescale_functions(
 end
 "Transforms data to si units"
 function si_to_pu!(data::Dict{String,<:Any}; id = "0")
+    rescale_electricity_price   = x -> x*E_base(data)
     rescale_q_pipe   = x -> x/q_base(data)
     rescale_Q_pipe_dim = x -> x/3600
     rescale_Q_pump_dim = x ->  x*3600
@@ -229,8 +241,9 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pump_nom   = x -> x/q_base(data)
     rescale_q_tank_in = x -> x/q_base(data)
     rescale_q_tank_out = x -> x/q_base(data)
-    # rescale_rho = x -> x/base_rho(data)
+    rescale_rho = x -> x/base_rho(data)
     rescale_nu = x -> x/base_nu(data)
+    rescale_gravitational_acceleration = x -> x/9.8
     rescale_diameter = x -> x/base_diameter(data)
     rescale_length = x -> x/base_length(data)
     rescale_H      = x -> x/h_base(data)
@@ -240,13 +253,15 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_volume  = x -> x/volume_base(data)
 
     functions = _rescale_functions(
+    rescale_electricity_price,
     rescale_q_pipe,
     rescale_q_pump,
     rescale_q_pump_nom,
     rescale_q_tank_in,
     rescale_q_tank_out,
-    # rescale_rho,
+    rescale_rho,
     rescale_nu,
+    rescale_gravitational_acceleration,
     rescale_diameter,
     rescale_length,
     rescale_H,
@@ -260,7 +275,8 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
 
     nw_data = (id == "0") ? data : data["nw"][id]
     _apply_func!(nw_data, "nu", rescale_nu)
-    # _apply_func!(nw_data, "rho", rescale_rho)
+    _apply_func!(nw_data, "rho", rescale_rho)
+    _apply_func!(nw_data, "gravitational_acceleration", rescale_gravitational_acceleration)
     _apply_func!(nw_data, "Q_pipe_dim", rescale_Q_pipe_dim)
     _apply_func!(nw_data, "Q_pump_dim", rescale_Q_pump_dim)
     for (component, parameters) in _params_for_unit_conversions
@@ -286,6 +302,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
 end
 
 function pu_to_si!(data::Dict{String,<:Any}; id = "0")
+    rescale_electricity_price   = x -> x/E_base(data)
     rescale_q_pipe          = x -> x*q_base(data)
     rescale_Q_pipe_dim      = x -> x*3600
     rescale_Q_pump_dim      = x -> x/3600
@@ -293,8 +310,9 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pump_nom      = x -> x*q_base(data)
     rescale_q_tank_in       = x -> x*q_base(data)
     rescale_q_tank_out      = x -> x*q_base(data)
-    # rescale_rho             = x -> x*base_rho(data)
+    rescale_rho             = x -> x*base_rho(data)
     rescale_nu              = x -> x*base_nu(data)
+    rescale_gravitational_acceleration = x -> x*9.8
     rescale_diameter        = x -> x*base_diameter(data)
     rescale_length = x -> x*base_length(data)
     rescale_H      = x -> x
@@ -304,13 +322,15 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_volume = x -> x*volume_base(data)
 
     functions = _rescale_functions(
+    rescale_electricity_price,
     rescale_q_pipe,
     rescale_q_pump,
     rescale_q_pump_nom,
     rescale_q_tank_in,
     rescale_q_tank_out,
-    # rescale_rho,
+    rescale_rho,
     rescale_nu,
+    rescale_gravitational_acceleration,
     rescale_diameter,
     rescale_length,
     rescale_H,

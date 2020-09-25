@@ -15,9 +15,10 @@ mpc.base_volume = 1000;
 mpc.base_diameter = 0.75; % m
 mpc.Q_pipe_dim = 3600; % petroleum pipe flow coefficient
 mpc.Q_pump_dim = 1; % petroleum pump flow coefficient
+mpc.E_base = 900; % pump base energy, kw*h
 mpc.units    = 'si';
 
-mpc.per_unit = 0;
+mpc.per_unit = 1;
 mpc.time_step = 0;
 
 %% junction data

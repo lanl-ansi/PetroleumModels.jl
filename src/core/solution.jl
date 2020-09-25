@@ -64,11 +64,7 @@ function sol_pump!(pm::AbstractPetroleumModel, solution::Dict)
             for (k,pump) in nw_data["pump"]
                 i = ref(pm,:pump,parse(Int64,k); nw=parse(Int64, n))["fr_junction"]
                 j = ref(pm,:pump,parse(Int64,k); nw=parse(Int64, n))["to_junction"]
-                # f = pump["f"]
-                # pi = max(0.0, nw_data["junction"][string(i)]["psqr"])
-                # pj = max(0.0, nw_data["junction"][string(j)]["psqr"])
 
-                # pump["r"] = (f >= 0) ? sqrt(pj) / sqrt(pi) : sqrt(pi) / sqrt(pj)
             end
         end
     end
@@ -88,16 +84,10 @@ function sol_ne_pump!(pm::AbstractPetroleumModel, solution::Dict)
                 i = ref(pm,:ne_pump,parse(Int64,k); nw=parse(Int64, n))["fr_junction"]
                 j = ref(pm,:ne_pump,parse(Int64,k); nw=parse(Int64, n))["to_junction"]
                 # f = pump["f"]
-                # pi = max(0.0, nw_data["junction"][string(i)]["psqr"])
-                # pj = max(0.0, nw_data["junction"][string(j)]["psqr"])
-
-                # pump["r"] = (f >= 0) ? sqrt(pj) / sqrt(pi) : sqrt(pi) / sqrt(pj)
             end
         end
     end
 end
-
-
 
 
 function build_solution(pm::AbstractPetroleumModel, status, solve_time; solution_builder=get_solution)
@@ -156,47 +146,6 @@ end
 function _init_solution(pm::AbstractPetroleumModel)
     data_keys = ["per_unit", "baseH", "baseQ", "multinetwork"]
     return Dict{String,Any}(key => pm.data[key] for key in data_keys)
-end
-
-" Get all the solution values "
-function get_solution(pm::AbstractPetroleumModel,sol::Dict{String,Any})
-    add_junction_head_setpoint(sol, pm)
-    add_connection_flow_setpoint(sol, pm)
-    add_load_volume_flow_setpoint(sol, pm)
-    add_production_volume_flow_setpoint(sol, pm)
-    # add_dual_head!(sol, pm)
-    # add_pump_ratio_setpoint(sol, pm)
-end
-
-
-
-" Get head solutions "
-function add_junction_head_setpoint(sol, pm::AbstractPetroleumModel)
-     add_setpoint(sol, pm, "junction", "H", :H)
-end
-
-
-
-" Get the load flow solutions "
-function add_load_volume_flow_setpoint(sol, pm::AbstractPetroleumModel)
-    add_setpoint(sol, pm, "consumer", "ql", :ql; default_value = (item) -> 0)
-end
-
-" Get the production flow set point "
-function add_production_volume_flow_setpoint(sol, pm::AbstractPetroleumModel)
-    add_setpoint(sol, pm, "producer", "qg", :qg; default_value = (item) -> 0)
-end
-
-" Add the flow solutions "
-function add_connection_flow_setpoint(sol, pm::AbstractPetroleumModel)
-    add_setpoint(sol, pm, "pipe", "q", :q)
-    add_setpoint(sol, pm, "pump", "q", :q)
-
-end
-
-function add_dual_head!(sol, pm::AbstractPetroleumModel)
-        add_dual!(sol, pm, "pipe", "q", :junction_volume_flow_balance)
-        add_dual!(sol, pm, "pump", "q", :junction_volume_flow_balance)
 end
 
 ""

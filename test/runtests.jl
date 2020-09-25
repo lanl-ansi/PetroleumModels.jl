@@ -31,7 +31,7 @@ cvx_solver = ipopt_solver
 
 @testset "Petroleum" begin
 
-# include("ls.jl")
+include("ls.jl")
 
 include("summary.jl")
 # include("summary2.jl")

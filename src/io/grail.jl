@@ -137,22 +137,6 @@ function parse_grail(network_file::AbstractString, time_series_file::AbstractStr
         @assert edge["fr_node"] == node_id_to_junction_id[edge["f_id"]]
         @assert edge["to_node"] == node_id_to_junction_id[edge["t_id"]]
 
-        # assume diameter units in inches, convert to meters
-        # assume length units is in degrees, convert to meters
-        #
-        # length = max(edge["length"], 0.1) # to be robust to zero values
-        # c = 96.074830e-15            # petroleum relative constant
-        # L = length*54.0*1.6          # length of the pipe [km]
-        # D = edge["diameter"]*25.4    # interior diameter of the pipe [mm]
-        # T = 281.15                   # petroleum temperature [K]
-        # epsilon = 0.05               # absolute rugosity of pipe [mm]
-        # delta = 0.6106               # density of the petroleum relative to air [-]
-        # z = 0.8                      # petroleum compressibility factor [-]
-        # B = 3.6*D/epsilon
-        # lambda = 1/((2*log10(B))^2)
-        # resistance = c*(D^5/(lambda*z*T*L*delta));
-        #
-        # resistance = max(resistance, 0.01) # to have numerical robustness
 # pipe
         pm_connection = Dict{String,Any}(
             "index" => edge["index"],
@@ -164,10 +148,6 @@ function parse_grail(network_file::AbstractString, time_series_file::AbstractStr
             "Qmax" => Qmax,
             "type" => "pipe"
         )
-
-        # if pm_connection["friction_factor"] == 0.0
-        #     pm_connection["type"] = "short_pipe"
-        # end
 
         connection_index = "$(pm_connection["index"])"
         @assert !haskey(pm_connections, connection_index)
@@ -228,8 +208,6 @@ function parse_grail(network_file::AbstractString, time_series_file::AbstractStr
             "type" => "pump",
 
         )
-
-        # @assert pump["cmin"] >= 1.0
 
         connection_index = "$(pm_connection["index"])"
         @assert !haskey(pm_connections, connection_index)

@@ -81,13 +81,3 @@ end
 objective_min_expenses_max_benefit(pm)
 
 end
-
-# Get all the load shedding solution values
-function get_ls_solution(pm::AbstractPetroleumModel,sol::Dict{String,Any})
-
-    add_connection_flow_setpoint(sol, pm)
-    add_junction_head_setpoint(pm, i, nw=n)
-    add_load_volume_flow_setpoint(sol, pm)
-    add_production_volume_flow_setpoint(sol, pm)
-
-end

@@ -9,7 +9,7 @@ const _mlab_data_names = Vector{String}([
 "mpc.beta","mpc.rho", "mpc.nu", "mpc.gravitational_acceleration",
  "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length", "mpc.baseQ", "mpc.baseH", "mpc.base_z", "mpc.base_a",
  "mpc.base_b",  "mpc.base_volume","mpc.units","mpc.per_unit","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
- "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim"
+ "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"
 ])
 
 const _mlab_junction_columns = Vector{Tuple{String,Type}}([
@@ -51,7 +51,8 @@ const _mlab_ne_pipe_columns =  Vector{Tuple{String,Type}}([
 # ("a", Float64),
 # ("b", Float64),
 # ("q_nom", Float64),
-# ("delta_Hmax", Float64), ("delta_Hmin", Float64),
+# ("delta_Hmax", Float64),
+# ("delta_Hmin", Float64),
 # ("min_pump_efficiency", Float64),
 # ("max_pump_efficiency", Float64),
 # ("w_nom", Float64),
@@ -228,7 +229,7 @@ function parse_m_string(data_string::String)
     required_metadata_names = ["mpc.beta","mpc.rho",
     "mpc.nu",
     "mpc.gravitational_acceleration",
-     "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim"]
+     "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
 
     optional_metadata_names = [ "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length",
     "mpc.baseH", "mpc.base_z", "mpc.base_a",
@@ -587,7 +588,7 @@ const _matlab_global_params_order_required = ["beta", "rho",
 "order of optional global parameters"
 const _matlab_global_params_order_optional = ["base_rho", "base_nu", "base_diameter",
 "base_length","baseH", "base_z", "base_a",
-"base_b", "base_volume", "baseQ", "per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim"]
+"base_b", "base_volume", "baseQ", "per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
 
 
 "list of units of meta data fields"
