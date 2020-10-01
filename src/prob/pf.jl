@@ -1,9 +1,9 @@
 
-function run_ls(file, model_type, optimizer; kwargs...)
-    return run_model(file, model_type, optimizer, build_ls; kwargs...)
+function run_pf(file, model_type, optimizer; kwargs...)
+    return run_model(file, model_type, optimizer, build_pf; kwargs...)
 end
 
-function build_ls(pm::AbstractPetroleumModel)
+function build_pf(pm::AbstractPetroleumModel)
     variable_head(pm)
     variable_volume_flow_pipe(pm)
     variable_volume_flow_pump(pm)
@@ -40,7 +40,7 @@ function build_ls(pm::AbstractPetroleumModel)
 end
 
 " construct the feasbility problem "
-function post_ls_(pm::AbstractPetroleumModel)
+function post_pf_(pm::AbstractPetroleumModel)
 network_ids = sort(collect(nw_ids(pm)))
 
 for (n, data) in nws(pm)

@@ -8,7 +8,7 @@ end
 const _mlab_data_names = Vector{String}([
 "mpc.beta","mpc.rho", "mpc.nu", "mpc.gravitational_acceleration",
  "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length", "mpc.baseQ", "mpc.baseH", "mpc.base_z", "mpc.base_a",
- "mpc.base_b",  "mpc.base_volume","mpc.units","mpc.per_unit","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
+ "mpc.base_b",  "mpc.base_volume","mpc.units","mpc.is_per_unit","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
  "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"
 ])
 
@@ -233,7 +233,7 @@ function parse_m_string(data_string::String)
 
     optional_metadata_names = [ "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length",
     "mpc.baseH", "mpc.base_z", "mpc.base_a",
-    "mpc.base_b", "mpc.baseQ",  "mpc.base_volume","mpc.per_unit"]
+    "mpc.base_b", "mpc.baseQ",  "mpc.base_volume","mpc.is_per_unit"]
 
     for data_name in required_metadata_names
         (data_name == "mpc.units") && (continue)
@@ -305,12 +305,12 @@ function parse_m_string(data_string::String)
             The file seems to be missing \"mpc.baseQ = ...\" \n")
     end
 
-    if haskey(matlab_data, "mpc.per_unit")
-        case["per_unit"] = matlab_data["mpc.per_unit"]
+    if haskey(matlab_data, "mpc.is_per_unit")
+        case["is_per_unit"] = matlab_data["mpc.is_per_unit"]
     else
-        Memento.warn(_LOGGER, string("no per_unit found in .m file.
-            Auto assigning a value of 0 (false) for the per_unit field"))
-        case["per_unit"] = 0
+        Memento.warn(_LOGGER, string("no is_per_unit found in .m file.
+            Auto assigning a value of 0 (false) for the is_per_unit field"))
+        case["is_per_unit"] = 0
     end
 
     if haskey(matlab_data, "mpc.base_z")
@@ -348,7 +348,7 @@ function parse_m_string(data_string::String)
             junction_data["index"] = _IM.check_type(Int, junction_row[1])
             junction_data["is_si_units"] = case["is_si_units"]
             junction_data["is_english_units"] = case["is_english_units"]
-            junction_data["per_unit"] = case["per_unit"]
+            junction_data["is_per_unit"] = case["is_per_unit"]
             push!(junctions, junction_data)
         end
         case["junction"] = junctions
@@ -364,7 +364,7 @@ function parse_m_string(data_string::String)
             pipe_data["index"] = _IM.check_type(Int, pipe_row[1])
             pipe_data["is_si_units"] = case["is_si_units"]
             pipe_data["is_english_units"] = case["is_english_units"]
-            pipe_data["per_unit"] = case["per_unit"]
+            pipe_data["is_per_unit"] = case["is_per_unit"]
             push!(pipes, pipe_data)
         end
         case["pipe"] = pipes
@@ -380,7 +380,7 @@ function parse_m_string(data_string::String)
             pipe_data["index"] = _IM.check_type(Int, pipe_row[1])
             pipe_data["is_si_units"] = case["is_si_units"]
             pipe_data["is_english_units"] = case["is_english_units"]
-            pipe_data["per_unit"] = case["per_unit"]
+            pipe_data["is_per_unit"] = case["is_per_unit"]
             push!(ne_pipes, pipe_data)
         end
         case["ne_pipe"] = ne_pipes
@@ -393,7 +393,7 @@ function parse_m_string(data_string::String)
             pump_data["index"] = _IM.check_type(Int, pump_row[1])
             pump_data["is_si_units"] = case["is_si_units"]
             pump_data["is_english_units"] = case["is_english_units"]
-            pump_data["per_unit"] = case["per_unit"]
+            pump_data["is_per_unit"] = case["is_per_unit"]
             push!(pumps, pump_data)
         end
         case["pump"] = pumps
@@ -406,7 +406,7 @@ function parse_m_string(data_string::String)
             pump_data["index"] = _IM.check_type(Int, pump_row[1])
             pump_data["is_si_units"] = case["is_si_units"]
             pump_data["is_english_units"] = case["is_english_units"]
-            pump_data["per_unit"] = case["per_unit"]
+            pump_data["is_per_unit"] = case["is_per_unit"]
             push!(ne_pumps, pump_data)
         end
         case["ne_pump"] = ne_pumps
@@ -419,7 +419,7 @@ function parse_m_string(data_string::String)
             producer_data["index"] = _IM.check_type(Int, producer_row[1])
             producer_data["is_si_units"] = case["is_si_units"]
             producer_data["is_english_units"] = case["is_english_units"]
-            producer_data["per_unit"] = case["per_unit"]
+            producer_data["is_per_unit"] = case["is_per_unit"]
             push!(producers, producer_data)
         end
         case["producer"] = producers
@@ -432,7 +432,7 @@ function parse_m_string(data_string::String)
             consumer_data["index"] = _IM.check_type(Int, consumer_row[1])
             consumer_data["is_si_units"] = case["is_si_units"]
             consumer_data["is_english_units"] = case["is_english_units"]
-            consumer_data["per_unit"] = case["per_unit"]
+            consumer_data["is_per_unit"] = case["is_per_unit"]
             push!(consumers, consumer_data)
         end
         case["consumer"] = consumers
@@ -445,7 +445,7 @@ function parse_m_string(data_string::String)
             tank_data["index"] = _IM.check_type(Int, tank_row[1])
             tank_data["is_si_units"] = case["is_si_units"]
             tank_data["is_english_units"] = case["is_english_units"]
-            tank_data["per_unit"] = case["per_unit"]
+            tank_data["is_per_unit"] = case["is_per_unit"]
             push!(tanks, tank_data)
         end
         case["tank"] = tanks
@@ -458,7 +458,7 @@ function parse_m_string(data_string::String)
             tank_data["index"] = _IM.check_type(Int, tank_row[1])
             tank_data["is_si_units"] = case["is_si_units"]
             tank_data["is_english_units"] = case["is_english_units"]
-            tank_data["per_unit"] = case["per_unit"]
+            tank_data["is_per_unit"] = case["is_per_unit"]
             push!(ne_tanks, tank_data)
         end
         case["ne_tank"] = ne_tanks
@@ -588,7 +588,7 @@ const _matlab_global_params_order_required = ["beta", "rho",
 "order of optional global parameters"
 const _matlab_global_params_order_optional = ["base_rho", "base_nu", "base_diameter",
 "base_length","baseH", "base_z", "base_a",
-"base_b", "base_volume", "baseQ", "per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
+"base_b", "base_volume", "baseQ", "is_per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
 
 
 "list of units of meta data fields"

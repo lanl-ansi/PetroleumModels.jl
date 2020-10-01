@@ -46,7 +46,7 @@ q_pump_values =[]
     for i=1:1
         data_new = deepcopy(data)
 
-         pm = instantiate_model(data_new, MISOCPPetroleumModel, build_ls)
+         pm = instantiate_model(data_new, MISOCPPetroleumModel, build_pf)
          # ipopt = JuMP.with_optimizer(Ipopt.Optimizer, print_level = 5)
          ipopt = JuMP.optimizer_with_attributes(Ipopt.Optimizer)
           # solution = pm.optimize_model!(pm, ipopt)

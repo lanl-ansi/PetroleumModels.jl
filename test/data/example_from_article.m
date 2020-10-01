@@ -12,20 +12,20 @@ mpc.base_z = 100; % base elevation, m
 mpc.base_a = 100 ; % base a coefficient
 mpc.base_b = 100 ; % base b coefficient
 mpc.base_volume = 1000;
-mpc.base_diameter = 1.04; % m
+mpc.base_diameter = 0.75; % m
 mpc.Q_pipe_dim = 3600; % petroleum pipe flow coefficient
 mpc.Q_pump_dim = 1; % petroleum pump flow coefficient
 mpc.E_base = 900; % pump base energy, kw*h
 mpc.units    = 'si';
 
-mpc.per_unit = 1;
+mpc.is_per_unit = 0;
 mpc.time_step = 0;
 
 
 %% junction data
 %  junction_i type Hmin Hmax z status
 mpc.junction = [
-1  1  350 353  332.8 1
+1  1  353 353  332.8 1
 3  0  40 950  332.8 1
 4  0  40 950  332.8 1
 5  0  40 950  352   1
@@ -77,7 +77,7 @@ mpc.pump = [
 %% producer
 % producer_i junction qgmin qgmax qg status dispatchable price
 mpc.producer = [
-1  1  300 4200 1.125 1 1 150
+1  1  300 4200 210 1 1 150
 2  12 100 210 209.7 1 1 150
 3  13 100 150 139.8 1 1 150
 ];
@@ -86,7 +86,6 @@ mpc.producer = [
 % consumer_i junction qlmin qlmax ql status dispatchable price
 mpc.consumer = [
 1	 16	4000 5000 1.12 1 1 270
-
 ];
 
 

@@ -40,7 +40,7 @@ function calc_tank_head_initial(data::Dict{String,Any}, tank::Dict{String,Any})
     g          = data["gravitational_acceleration"]
     head_initial = (volume / (3.14 * radius ^ 2))
 
-    if !haskey(data, "per_unit") || data["per_unit"] == true
+    if !haskey(data, "is_per_unit") || data["is_per_unit"] == true
         head_initial  = head_initial / h_base(data)
     end
     return head_initial
@@ -49,8 +49,8 @@ end
 
 
 "if original data is in per-unit ensure it has base values"
-function per_unit_data_field_check!(data::Dict{String,Any})
-    if get(data, "per_unit", false) == true
+function is_per_!(data::Dict{String,Any})
+    if get(data, "is_per_unit", false) == true
         if get(data, "baseH", false) == false ||
            get(data, "base_length", false) == false
             Memento.error(
@@ -76,9 +76,7 @@ function add_base_values!(data::Dict{String,Any})
 end
 
 "make transient data to si units"
-function make_si_units!(
-    transient_data::Array{Dict{String,Any},1},
-    static_data::Dict{String,Any},
+function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::Dict{String,Any},
 )
     if static_data["units"] == "si"
         return
@@ -281,20 +279,20 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     _apply_func!(nw_data, "Q_pump_dim", rescale_Q_pump_dim)
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
-            if ~haskey(comp, "per_unit") && ~haskey(data, "per_unit")
+            if ~haskey(comp, "is_per_unit") && ~haskey(data, "is_per_unit")
                 Memento.error(
                     _LOGGER,
                     "the current units of the data/result dictionary unknown")
             end
-            if ~haskey(comp, "per_unit") && haskey(data, "per_unit")
-                comp["per_unit"] = data["per_unit"]
+            if ~haskey(comp, "is_per_unit") && haskey(data, "is_per_unit")
+                comp["is_per_unit"] = data["is_per_unit"]
                 comp["is_si_units"] = 0
             end
-            if comp["is_si_units"] == true && comp["per_unit"] == false
+            if comp["is_si_units"] == true && comp["is_per_unit"] == false
                 for param in parameters
                     _apply_func!(comp, param, functions[param])
                     comp["is_si_units"] = 0
-                    comp["per_unit"] = 1
+                    comp["is_per_unit"] = 1
                 end
             end
         end
@@ -346,22 +344,22 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     # _apply_func!(nw_data, "time_point", rescale_time)
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
-            if ~haskey(comp, "per_unit") && ~haskey(data, "per_unit")
+            if ~haskey(comp, "is_per_unit") && ~haskey(data, "is_per_unit")
                 Memento.error(
                     _LOGGER,
                     "the current units of the data/result dictionary unknown",
                 )
             end
-            if ~haskey(comp, "per_unit") && haskey(data, "per_unit")
-                @assert data["per_unit"] == 1
-                comp["per_unit"] = data["per_unit"]
+            if ~haskey(comp, "is_per_unit") && haskey(data, "is_per_unit")
+                @assert data["is_per_unit"] == 1
+                comp["is_per_unit"] = data["is_per_unit"]
                 comp["is_si_units"] = 0
             end
-            if comp["is_si_units"] == false && comp["per_unit"] == true
+            if comp["is_si_units"] == false && comp["is_per_unit"] == true
                 for param in parameters
                     _apply_func!(comp, param, functions[param])
                     comp["is_si_units"] = 1
-                    comp["per_unit"] = 0
+                    comp["is_per_unit"] = 0
                 end
             end
         end
@@ -369,13 +367,12 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
 end
 
 
-
 "transforms data to si units"
 function make_si_units!(data::Dict{String,<:Any})
     if get(data, "is_si_units", false) == true
         return
     end
-    if get(data, "per_unit", false) == true
+    if get(data, "is_per_unit", false) == true
         if _IM.ismultinetwork(data)
             for (i, _) in data["nw"]
                 pu_to_si!(data, id = i)
@@ -383,34 +380,23 @@ function make_si_units!(data::Dict{String,<:Any})
         else
             pu_to_si!(data)
         end
-
         # if haskey(data, "time_step")
         #     rescale_time = x -> x * get_base_time(data)
         #     data["time_step"] = rescale_time(data["time_step"])
         # end
+        data["is_si_units"] = 1
+        data["is_per_unit"] = 0
+    end
 
-        data["is_si_units"] = 1
-        data["per_unit"] = 0
-    end
-    if get(data, "is_english_units", false) == true
-        if _IM.ismultinetwork(data)
-            for (i, _) in data["nw"]
-                english_to_si!(data, id = i)
-            end
-        else
-            english_to_si!(data)
-        end
-        data["is_si_units"] = 1
-        data["per_unit"] = 0
-    end
 end
 
 
 "Transforms network data into per unit"
 function make_per_unit!(data::Dict{String,<:Any})
-    if get(data, "per_unit", false) == true
+    if get(data, "is_per_unit", false) == true
         return
     end
+
     if get(data, "is_si_units", false) == true
         if _IM.ismultinetwork(data)
             for (i, _) in data["nw"]
@@ -423,9 +409,8 @@ function make_per_unit!(data::Dict{String,<:Any})
         #     rescale_time = x -> x / get_base_time(data)
         #     data["time_step"] = rescale_time(data["time_step"])
         # end
-
         data["is_si_units"] = 0
-        data["per_unit"] = 1
+        data["is_per_unit"] = 1
     end
 end
 
@@ -676,15 +661,12 @@ end
 
 function add_pump_fields!(data::Dict{String,<:Any})
     is_si_units = get(data, "is_si_units", 0)
-    is_english_units = get(data, "is_english_units", 0)
     is_per_unit = get(data, "is_per_unit", false)
     for (i, pump) in data["pump"]
         if is_si_units == true
             # pump["Q_pump_dim"] = 3600
         end
-        if is_english_units == true
 
-        end
         if is_per_unit == true
 
         end
@@ -694,17 +676,14 @@ end
 
 function add_pipe_fields!(data::Dict{String,:Any})
     is_si_units = get(data, "is_si_units", 0)
-    is_english_units = get(data, "is_english_units", 0)
     is_per_unit = get(data, "is_per_unit", false)
     for (i, pipe) in data["pipe"]
         if is_si_units == true
-            pump["Q_pipe_dim"] = 1
-        end
-        if is_english_units == true
 
         end
+
         if is_per_unit == true
-
+            pump["Q_pipe_dim"] = 1
         end
     end
 
@@ -751,7 +730,6 @@ function calc_connected_components(data::Dict{String,<:Any}; edges = _pm_edge_ty
 
     return ccs
 end
-println("check")
 
 "perModels DFS on a graph"
 function _dfs(i, neighbors, component_lookup, touched)

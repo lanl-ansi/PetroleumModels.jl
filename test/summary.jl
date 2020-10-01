@@ -42,7 +42,7 @@ q_pump_values =[]
     for i=1:1
         data_new = deepcopy(data)
 
-         pm = instantiate_model(data_new, MISOCPPetroleumModel, build_ls)
+         pm = instantiate_model(data_new, MISOCPPetroleumModel, build_pf)
          # ipopt = JuMP.with_optimizer(Ipopt.Optimizer, print_level = 5)
          ipopt = JuMP.optimizer_with_attributes(Ipopt.Optimizer)
           # solution = pm.optimize_model!(pm, ipopt)
@@ -413,7 +413,7 @@ end
 # @testset "test misocp ls" begin
 #     @testset "case 2" begin
 #         println("Test 1")
-#         result = run_ls("../test/data/input2.m",  MISOCPPetroleumModel, cvx_solver)
+#         result = run_pf("../test/data/input2.m",  MISOCPPetroleumModel, cvx_solver)
 #         @test result["status"] == :LocalOptimal || result["status"] == :Optimal
 #         for i in keys(sort((result["solution"]["junction"])))
 #             push!(H_values, result["solution"]["junction"][i]["H"] )
@@ -450,7 +450,7 @@ end
 # @testset "test misocp ls" begin
 #     @testset "case 3" begin
 #         println("Test 1")
-#         result = run_ls("../test/data/input3.m",  MISOCPPetroleumModel, cvx_solver)
+#         result = run_pf("../test/data/input3.m",  MISOCPPetroleumModel, cvx_solver)
 #         @test result["status"] == :LocalOptimal || result["status"] == :Optimal
 #         for i in keys(sort((result["solution"]["junction"])))
 #             push!(H_values, result["solution"]["junction"][i]["H"] )
@@ -465,7 +465,7 @@ end
 # @testset "test misocp ls" begin
 #     @testset "case 4" begin
 #         println("Test 1")
-#         result = run_ls("../test/data/input4.m",  MISOCPPetroleumModel, cvx_solver)
+#         result = run_pf("../test/data/input4.m",  MISOCPPetroleumModel, cvx_solver)
 #         @test result["status"] == :LocalOptimal || result["status"] == :Optimal
 #         for i in keys(sort((result["solution"]["junction"])))
 #             push!(H_values, result["solution"]["junction"][i]["H"] )

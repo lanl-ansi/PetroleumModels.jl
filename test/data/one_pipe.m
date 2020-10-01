@@ -18,14 +18,14 @@ mpc.Q_pump_dim = 1; % petroleum pump flow coefficient
 mpc.E_base = 900; % pump base energy, kw*h
 mpc.units    = 'si';
 
-mpc.per_unit = 1;
+mpc.is_per_unit = 1;
 mpc.time_step = 0;
 
 
 %% junction data
 %  junction_i type Hmin Hmax z status
 mpc.junction = [
-1  0  30 800 220 1
+1  1  30 800 220 1
 2  0  30 800 100 1
 
 

@@ -3,7 +3,7 @@
 ##########################################################################################################
 
  function objective_min_expenses_max_benefit(pm::AbstractPetroleumModel, nws=[pm.cnw])
-         # normalization = get(pm.data, "objective_normalization", 1.0)
+         normalization = get(pm.data, "objective_normalization", 1.0)
          # nws = collect(1:length(pm.ref[:nw]))
          nws = [0]
          qg = Dict(n => pm.var[:nw][n][:qg] for n in nws)
@@ -21,6 +21,7 @@
               q_pump[n][i] * (pm.var[:nw][n][:H][pump["to_junction"]] -
               pm.var[:nw][n][:H][pump["fr_junction"]]) /3600/ (0.966 * 0.95 * pm.var[:nw][n][:eta][i])  / 1000
                    for (i, pump) in pm.ref[:nw][n][:pump] )
-                                           for n in nws))
+                                           for n in nws)
+            )
 
  end

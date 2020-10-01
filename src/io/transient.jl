@@ -57,7 +57,7 @@ function parse_files(
     check_non_negativity(static_data)
     correct_p_mins!(static_data)
 
-    per_unit_data_field_check!(static_data)
+    is_per_unit_data_field_check!(static_data)
     add_compressor_fields!(static_data)
 
     make_si_units!(static_data)
@@ -81,7 +81,7 @@ function parse_files(
 
     static_data["time_series"] = deepcopy(time_series_block)
     mn_data = _IM.make_multinetwork(static_data, _gm_global_keys)
-    make_per_unit!(mn_data)
+    make_is_per_unit!(mn_data)
     return mn_data
 end
 

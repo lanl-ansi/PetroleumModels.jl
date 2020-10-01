@@ -18,14 +18,14 @@ mpc.Q_pump_dim = 1; % petroleum pump flow coefficient
 mpc.E_base = 900; % pump base energy, kw*h
 mpc.units    = 'si';
 
-mpc.per_unit = 1;
+mpc.is_per_unit = 0;
 mpc.time_step = 0;
 
 %% junction data
 %  junction_i type Hmin Hmax z status
 mpc.junction = [
 
-222  0  30  30   273 1
+222  1  30  30   273 1
 333  0  30 740   273 1
 444  0  30 740   273 1
 88  0  30 740    293 1
@@ -54,7 +54,7 @@ mpc.producer = [
 %% consumer
 % consumer_i junction qlmin qlmax ql status dispatchable price
 mpc.consumer = [
-1	 88	720 4860 1098 1 1 310
+1	 88	360 4860 1098 1 1 310
 ];
 
 %% tank
