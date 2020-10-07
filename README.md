@@ -1,6 +1,6 @@
 # PetroleumModels.jl
 
-<img src="https://lanl-ansi.github.io/PetroleumModels.jl/doc/assets/PetroleumModels.png" align="left" width="200" alt="PetroleumModels logo">
+<img src="https://lanl-ansi.github.io/PetroleumModels.jl/docs/src/assets/PetroleumModels.png" align="left" width="200" alt="PetroleumModels logo">
 
 Release: [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://lanl-ansi.github.io/PetroleumModels.jl/stable)
 
