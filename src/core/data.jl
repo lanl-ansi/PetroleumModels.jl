@@ -134,7 +134,7 @@ const _params_for_unit_conversions = Dict(
 
     "pipe" => ["Qmin", "Qmax",
     "diameter",
-    "length"],
+    "length", "q_pipe"],
 
     "ne_pipe" => ["Qmin", "Qmax",
     "diameter",
@@ -156,15 +156,16 @@ const _params_for_unit_conversions = Dict(
     "a",
     "b",
     "electricity_price",
-    "Q_pump_dim" ],
+    "Q_pump_dim"],
 
     "consumer" => [
         "qlmin",
-        "qlmax"
+        "qlmax", "ql"
     ],
     "producer" => [
         "qgmin",
-        "qgmax"
+        "qgmax",
+        "qg"
     ],
 
     "tank" => [
@@ -199,6 +200,10 @@ function _rescale_functions(
 )::Dict{String,Function}
     Dict{String,Function}(
         "electricity_price" => rescale_electricity_price,
+        "q_pipe" => rescale_q_pipe,
+        "q_pump" => rescale_q_pipe,
+        "ql" => rescale_q_pipe,
+        "qg" => rescale_q_pipe,
         "Hmax" => rescale_H,
         "Hmin" => rescale_H,
         "z" => rescale_z,

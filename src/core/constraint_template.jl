@@ -11,7 +11,7 @@
 # and should never refer to model variables
 
 #################################################################################################
-# Templates for constraints associated with volume flow
+# Templates for constraints associated with volume flow through junctions
 #################################################################################################
 " standard flow balance equation where demand is fixed "
 function constraint_junction_volume_flow_balance_d(pm::AbstractPetroleumModel, i; n::Int=pm.cnw)
@@ -81,12 +81,6 @@ function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, i; 
     constraint_junction_volume_flow_balance(pm, n, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, dispatch_producers, dispatch_consumers)
 
 end
-
-#################################################################################################
-# Templates for constraints associated with junctions
-#################################################################################################
-
-
 
 #################################################################################################
 # Constraints associated with pipes

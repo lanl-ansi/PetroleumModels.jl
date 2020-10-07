@@ -75,7 +75,7 @@ mpc.pump = [
 
 
 %% producer
-% producer_i junction qgmin qgmax qg status dispatchable price
+% producer_i junction qgmin qgmax qg status dispatchable offer_price
 mpc.producer = [
 1  1  300 4200 210 1 1 150
 2  12 100 210 209.7 1 1 150
@@ -83,7 +83,7 @@ mpc.producer = [
 ];
 
 %% consumer
-% consumer_i junction qlmin qlmax ql status dispatchable price
+% consumer_i junction qlmin qlmax ql status dispatchable bid_price
 mpc.consumer = [
 1	 16	4000 5000 1.12 1 1 270
 ];

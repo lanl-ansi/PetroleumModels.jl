@@ -18,7 +18,7 @@ mpc.Q_pump_dim = 1; % petroleum pump flow coefficient
 mpc.E_base = 900; % pump base energy, kw*h
 mpc.units    = 'si';
 
-mpc.is_per_unit = 1;
+mpc.is_per_unit = 0;
 mpc.time_step = 0;
 
 %% junction data
@@ -95,7 +95,7 @@ mpc.pump = [
 1  1  2      1  276.8  7.1e-6  3600  144 217 0.6 0.87  3000 2400  3600 0.12  1
 ];
 %% producer
-% producer_i junction qgmin qgmax qg status dispatchable price
+% producer_i junction qgmin qgmax qg status dispatchable offer_price
 mpc.producer = [
 1  1  360  3000 1440 1 1 300
 2  9  360  3000 1440 1 1 300
@@ -103,7 +103,7 @@ mpc.producer = [
 ];
 
 %% consumer
-% consumer_i junction qlmin qlmax ql status dispatchable price
+% consumer_i junction qlmin qlmax ql status dispatchable bid_price
 mpc.consumer = [
 1	 15	288 3060 1100 1 1 310
 2	 23	288 3060 1100 1 1 310

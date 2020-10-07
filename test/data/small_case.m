@@ -4,7 +4,7 @@ mpc.rho = 827;  % petroleum density, kg per cubic m
 mpc.nu = 4.9e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
 mpc.base_rho = 827; % petroleum base density, kg per m3
-mpc.base_nu       = 4.9e-6;  % base viscosity, m2 / s
+mpc.base_nu  = 4.9e-6;  % base viscosity, m2 / s
 mpc.baseH = 100; % base head, m
 mpc.base_length   = 542; % m
 mpc.baseQ = 3600; % petroleum volume flow rate, m3 per hour
@@ -46,13 +46,13 @@ mpc.pump = [
 
 ];
 %% producer
-% producer_i junction qgmin qgmax qg status dispatchable price
+% producer_i junction qgmin qgmax qg status dispatchable offer_price
 mpc.producer = [
 1	 222	360 4860 1440 1 1 300
 ];
 
 %% consumer
-% consumer_i junction qlmin qlmax ql status dispatchable price
+% consumer_i junction qlmin qlmax ql status dispatchable bid_price
 mpc.consumer = [
 1	 88	360 4860 1098 1 1 310
 ];
