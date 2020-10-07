@@ -42,7 +42,7 @@ The primary constraints related to pumps ensure that the pumps operate within th
 constraint_pump_efficiency_and_rotation
 ```
 
-## Tanks
+## Tank Constraints
 
 ### Flow balance constraints
 
