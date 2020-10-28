@@ -1,4 +1,4 @@
-
+module PetroleumModels
     using InfrastructureModels
     const _IM = InfrastructureModels
 
@@ -38,18 +38,20 @@
 
 const _pm_global_keys = Set(["time_series_block", "is_per_unit", "nu", "rho", "gravitational_acceleration",
 "baseH", "baseQ", "base_a", "base_z", "base_b", "base_length", "base_diameter", "base_rho", "base_nu", "Q_pipe_dim","Q_pump_dim","E_pump"])
+
 include("core/base.jl")
 include("core/data.jl")
-# include("core/types.jl")
 include("core/constraint.jl")
 include("core/constraint_template.jl")
 include("core/objective.jl")
 include("core/solution.jl")
 include("core/variable.jl")
 include("core/common.jl")
-include("io/grail.jl")
 include("core/misocp.jl")
 
 include("io/matl.jl")
 
 include("prob/pf.jl")
+
+    include("core/export.jl")
+end

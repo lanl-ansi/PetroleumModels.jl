@@ -1,11 +1,10 @@
-# using PetroleumModels
-using InfrastructureModels
-using Memento
-using DelimitedFiles
-using JuMP
-using Ipopt
-# using Cbc
-# using Juniper
+using PetroleumModels
+
+import InfrastructureModels
+import Memento
+import JuMP
+import Ipopt
+import LinearAlgebra
 
 
 ipopt_solver = JuMP.with_optimizer(Ipopt.Optimizer, print_level = 5, tol=1e-10)
@@ -15,7 +14,8 @@ ipopt_solver = JuMP.with_optimizer(Ipopt.Optimizer, print_level = 5, tol=1e-10)
 #                         mip_solver=cbc_solver, log_levels=[])
 #                         tol_ipopt_solver = JuMP.with_optimizer(Ipopt.Optimizer, print_level=0, sb="yes", tol=1e-10)
 
-import LinearAlgebra
+
+
 using Test
 
 
