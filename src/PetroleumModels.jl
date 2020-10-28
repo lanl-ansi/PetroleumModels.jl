@@ -47,7 +47,8 @@ module PetroleumModels
     include("core/solution.jl")
     include("core/variable.jl")
     include("core/common.jl")
-    include("core/misocp.jl")
+#    include("core/misocp.jl")
+    include("core/types.jl")
     include("io/matl.jl")
     include("prob/pf.jl")
 

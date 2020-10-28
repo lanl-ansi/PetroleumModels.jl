@@ -16,11 +16,6 @@ end
 function run_model(data::Dict{String,<:Any}, model_type, optimizer, build_method; ref_extensions=[], solution_processors=[], kwargs...)
     pm = instantiate_model(data, model_type, build_method; ref_extensions=ref_extensions, ext=get(kwargs, :ext, Dict{Symbol,Any}()), setting=get(kwargs, :setting, Dict{String,Any}()), jump_model=get(kwargs, :jump_model, JuMP.Model()))
     result = optimize_model!(pm, optimizer=optimizer, solution_processors=solution_processors)
-
-    # if haskey(data, "objective_normalization")
-    #     result["objective"] *= data["objective_normalization"]
-    # end
-
     return result
 end
 
@@ -90,7 +85,6 @@ function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_rho=850, base_nu= 4.9e-6,
         _add_junction_map!(ref[:nondispatchable_consumers_in_junction], ref[:nondispatchable_consumer])
         _add_junction_map!(ref[:dispatchable_producers_in_junction], ref[:dispatchable_producer])
         _add_junction_map!(ref[:nondispatchable_producers_in_junction], ref[:nondispatchable_producer])
-        # _add_junction_map!(ref[:tanks_in_junction], ref[:tank])
 
         ref[:parallel_pipes] = Dict()
         ref[:parallel_pumps] = Dict()
@@ -114,14 +108,13 @@ function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_rho=850, base_nu= 4.9e-6,
         for (idx, pipe) in ref[:pipe]
             i = pipe["fr_junction"]
             j = pipe["to_junction"]
-
         end
 
         for (idx, pump) in ref[:pump]
             i = pump["fr_junction"]
             j = pump["to_junction"]
-
         end
+
         for (idx, tank) in ref[:tank]
             i = tank["fr_junction"]
             j = tank["to_junction"]
