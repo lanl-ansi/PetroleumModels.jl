@@ -4,11 +4,11 @@ module PetroleumModels
 
     import InfrastructureModels: ids, ref, var, con, sol, nw_ids, nws, optimize_model!, @im_fields, ismultinetwork
 
-    using JSON
-    using JuMP
-    using Memento
-    using Printf
-    using MathOptInterface
+    import JSON
+    import JuMP
+    import Memento
+    import Printf
+    import MathOptInterface
 
     using Dates
     using Dierckx
@@ -36,22 +36,20 @@ module PetroleumModels
     end
 
 
-const _pm_global_keys = Set(["time_series_block", "is_per_unit", "nu", "rho", "gravitational_acceleration",
-"baseH", "baseQ", "base_a", "base_z", "base_b", "base_length", "base_diameter", "base_rho", "base_nu", "Q_pipe_dim","Q_pump_dim","E_pump"])
+    const _pm_global_keys = Set(["time_series_block", "is_per_unit", "nu", "rho", "gravitational_acceleration",
+        "baseH", "baseQ", "base_a", "base_z", "base_b", "base_length", "base_diameter", "base_rho", "base_nu", "Q_pipe_dim","Q_pump_dim","E_pump"])
 
-include("core/base.jl")
-include("core/data.jl")
-include("core/constraint.jl")
-include("core/constraint_template.jl")
-include("core/objective.jl")
-include("core/solution.jl")
-include("core/variable.jl")
-include("core/common.jl")
-include("core/misocp.jl")
-
-include("io/matl.jl")
-
-include("prob/pf.jl")
+    include("core/base.jl")
+    include("core/data.jl")
+    include("core/constraint.jl")
+    include("core/constraint_template.jl")
+    include("core/objective.jl")
+    include("core/solution.jl")
+    include("core/variable.jl")
+    include("core/common.jl")
+    include("core/misocp.jl")
+    include("io/matl.jl")
+    include("prob/pf.jl")
 
     include("core/export.jl")
 end
