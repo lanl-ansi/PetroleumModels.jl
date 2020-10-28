@@ -33,8 +33,8 @@ These components model pipelines which connect two junctions.
 | to_junction                       | Int     | To Junction id    |                     |                               | Y | Unique id of the junction on the to side                                                                                                |
 | diameter                          | Float64 | Diameter          | m              | ft                        | Y | Pipe diameter                                                                                                                           |
 | length                            | Float64 | Length            | m              | ft                         | Y | Pipe Length                                                                                                                             |
-| Qmin                             | Float64 | Flow Rate Minimum  | m3/h              | ft3/h                           | Y | Minimum allowable operating flow rate, usually depends on pipe diameter |
-| Qmax                             | Float64 | Flow Rate Maximum  | m3/h              | ft3/h                           | Y | Maximum allowable operating flow rate, usually depends on pipe diameter                                                          |
+| q_min                             | Float64 | Flow Rate Minimum  | m3/h              | ft3/h                           | Y | Minimum allowable operating flow rate, usually depends on pipe diameter |
+| q_max                             | Float64 | Flow Rate Maximum  | m3/h              | ft3/h                           | Y | Maximum allowable operating flow rate, usually depends on pipe diameter                                                          |
 | status                            | Int     | Pipe status       |                     |                               | Y | Determines if the component is active in the model                                                                                      |
 
 ## Pumps (mpc.pump)

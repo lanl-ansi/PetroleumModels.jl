@@ -27,40 +27,11 @@ const _mlab_pipe_columns =  Vector{Tuple{String,Type}}([
 ("to_junction", Int),
 ("diameter", Float64),
 ("length", Float64),
-("Qmin", Float64),
-("Qmax", Float64),
+("q_min", Float64),
+("q_max", Float64),
 ("status", Int)
 ])
 
-const _mlab_ne_pipe_columns =  Vector{Tuple{String,Type}}([
-("pipline_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("diameter", Float64),
-("length", Float64),
-("Qmin", Float64),
-("Qmax", Float64),
-("status", Int)
-])
-
-# const _mlab_booster_pump_columns =  Vector{Tuple{String,Type}}([
-# ("pump_i", Int),
-# ("fr_junction", Int),
-# ("to_junction", Int),
-# ("station_i", Int),
-# ("a", Float64),
-# ("b", Float64),
-# ("q_nom", Float64),
-# ("delta_Hmax", Float64),
-# ("delta_Hmin", Float64),
-# ("min_pump_efficiency", Float64),
-# ("max_pump_efficiency", Float64),
-# ("w_nom", Float64),
-# ("min_w", Float64),
-# ("max_w", Float64),
-# ("electricity_price", Float64),
-# ("status", Int)
-# ])
 
 const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
 ("pump_i", Int),
@@ -72,24 +43,6 @@ const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
 ("q_nom", Float64),
 ("delta_Hmax", Float64),
 ("delta_Hmin", Float64),
-("min_pump_efficiency", Float64),
-("max_pump_efficiency", Float64),
-("w_nom", Float64),
-("min_w", Float64),
-("max_w", Float64),
-("electricity_price", Float64),
-("status", Int)
-])
-
-const _mlab_ne_pump_columns =  Vector{Tuple{String,Type}}([
-("pump_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("station_i", Int),
-("a", Float64),
-("b", Float64),
-("q_nom", Float64),
-("delta_Hmax", Float64), ("delta_Hmin", Float64),
 ("min_pump_efficiency", Float64),
 ("max_pump_efficiency", Float64),
 ("w_nom", Float64),
@@ -146,23 +99,6 @@ const _mlab_tank_columns =  Vector{Tuple{String,Type}}([
 ("p_price", Float64)
 ])
 
-const _mlab_ne_tank_columns =  Vector{Tuple{String,Type}}([
-("tank_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("vessel_pressure_head", Float64),
-("radius", Float64),
-("Min_Capacity_Limitation", Float64),
-("Max_Capacity_Limitation", Float64),
-("Initial_Volume", Float64),
-("Min_Unload_Flow_Rate", Float64),
-("Max_Unload_Flow_Rate", Float64),
-("Cd", Float64),
-("status", Int),
-("price", Float64),
-("p_price", Float64)
-])
-
 
 const _mlab_dtype_lookup = Dict{String,Dict{String,Type}}(
     "mpc.junction" => Dict{String,Type}(_mlab_junction_columns),
@@ -171,9 +107,6 @@ const _mlab_dtype_lookup = Dict{String,Dict{String,Type}}(
     "mpc.producer" => Dict{String,Type}(_mlab_producer_columns),
     "mpc.consumer" => Dict{String,Type}(_mlab_consumer_columns),
     "mpc.tank" => Dict{String,Type}(_mlab_tank_columns),
-    "mpc.ne_tank" => Dict{String,Type}(_mlab_ne_tank_columns),
-    "mpc.ne_pipe" => Dict{String,Type}(_mlab_ne_pipe_columns),
-    "mpc.ne_pump" => Dict{String,Type}(_mlab_ne_pump_columns),
 )
 
 
@@ -373,19 +306,6 @@ function parse_m_string(data_string::String)
             The file seems to be missing \"mpc.pipe = [...];\""))
     end
 
-    if haskey(matlab_data, "mpc.ne_pipe")
-        ne_pipes = []
-        for pipe_row in matlab_data["mpc.ne_pipe"]
-            pipe_data = _IM.row_to_typed_dict(pipe_row, get(_colnames, "mpc.ne_pipe", _mlab_ne_pipe_columns))
-            pipe_data["index"] = _IM.check_type(Int, pipe_row[1])
-            pipe_data["is_si_units"] = case["is_si_units"]
-            pipe_data["is_english_units"] = case["is_english_units"]
-            pipe_data["is_per_unit"] = case["is_per_unit"]
-            push!(ne_pipes, pipe_data)
-        end
-        case["ne_pipe"] = ne_pipes
-    end
-
     if haskey(matlab_data, "mpc.pump")
         pumps = []
         for pump_row in matlab_data["mpc.pump"]
@@ -397,19 +317,6 @@ function parse_m_string(data_string::String)
             push!(pumps, pump_data)
         end
         case["pump"] = pumps
-    end
-
-    if haskey(matlab_data, "mpc.ne_pump")
-        ne_pumps = []
-        for pump_row in matlab_data["mpc.ne_pump"]
-            pump_data = _IM.row_to_typed_dict(pump_row, get(_colnames, "mpc.ne_pump", _mlab_ne_pump_columns))
-            pump_data["index"] = _IM.check_type(Int, pump_row[1])
-            pump_data["is_si_units"] = case["is_si_units"]
-            pump_data["is_english_units"] = case["is_english_units"]
-            pump_data["is_per_unit"] = case["is_per_unit"]
-            push!(ne_pumps, pump_data)
-        end
-        case["ne_pump"] = ne_pumps
     end
 
     if haskey(matlab_data, "mpc.producer")
@@ -449,19 +356,6 @@ function parse_m_string(data_string::String)
             push!(tanks, tank_data)
         end
         case["tank"] = tanks
-    end
-
-    if haskey(matlab_data, "mpc.ne_tank")
-        tanks = []
-        for tank_row in matlab_data["mpc.ne_tank"]
-            tank_data = _IM.row_to_typed_dict(tank_row, get(_colnames, "mpc.ne_tank", _mlab_ne_tank_columns))
-            tank_data["index"] = _IM.check_type(Int, tank_row[1])
-            tank_data["is_si_units"] = case["is_si_units"]
-            tank_data["is_english_units"] = case["is_english_units"]
-            tank_data["is_per_unit"] = case["is_per_unit"]
-            push!(ne_tanks, tank_data)
-        end
-        case["ne_tank"] = ne_tanks
     end
 
 
@@ -563,7 +457,7 @@ end
 
 
 "order data types should appear in matlab format"
-const _matlab_data_order = ["junction", "pipe", "pump", "short_pipe", "producer", "consumer", "tank", "ne_pipe", "ne_pump", "ne_tank"]
+const _matlab_data_order = ["junction", "pipe", "pump", "short_pipe", "producer", "consumer", "tank"]
 
 "order data fields should appear in matlab format"
 const _matlab_field_order = Dict{String,Array}(
@@ -573,9 +467,6 @@ const _matlab_field_order = Dict{String,Array}(
     "producer"      => [key for (key, dtype) in _mlab_producer_columns],
     "consumer"      => [key for (key, dtype) in _mlab_consumer_columns],
     "tank"          => [key for (key, dtype) in _mlab_tank_columns],
-    "ne_pipe"       => [key for (key, dtype) in _mlab_ne_pipe_columns],
-    "ne_pump"       => [key for (key, dtype) in _mlab_ne_pump_columns],
-    "ne_tank"       => [key for (key, dtype) in _mlab_ne_tank_columns]
 )
 
 

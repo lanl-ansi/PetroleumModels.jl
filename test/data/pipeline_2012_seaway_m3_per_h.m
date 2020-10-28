@@ -51,7 +51,7 @@ mpc.junction = [
 ];
 
 %% pipeline data
-% pipeline_i fr_junction to_junction diameter length Qmin Qmax status
+% pipeline_i fr_junction to_junction diameter length q_min q_max status
 mpc.pipe = [
 22 22 23  0.75  13.62e3 500 5000  1
 

@@ -97,8 +97,8 @@ function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::
         "q_pipe",
         "q_pump",
         "q_nom",
-        "Qmin",
-        "Qmax",
+        "q_min",
+        "q_max",
         "qg",
         "ql",
         "qgmin",
@@ -132,24 +132,11 @@ const _params_for_unit_conversions = Dict(
     #
     # "original_junction" => ["p_min", "p_max", "p_nominal", "p"],
 
-    "pipe" => ["Qmin", "Qmax",
+    "pipe" => ["q_min", "q_max",
     "diameter",
     "length", "q_pipe"],
 
-    "ne_pipe" => ["Qmin", "Qmax",
-    "diameter",
-    "length"],
-
     "pump" => [
-    "q_nom",
-    "delta_Hmax",
-    "delta_Hmin",
-    "a",
-    "b",
-    "electricity_price",
-    "Q_pump_dim"],
-
-    "ne_pump" => [
     "q_nom",
     "delta_Hmax",
     "delta_Hmin",
@@ -211,8 +198,8 @@ function _rescale_functions(
         "qlmax" => rescale_q_pipe,
         "qgmin" => rescale_q_pipe,
         "qgmax" => rescale_q_pipe,
-        "Qmin" => rescale_q_pipe,
-        "Qmax" => rescale_q_pipe,
+        "q_min" => rescale_q_pipe,
+        "q_max" => rescale_q_pipe,
         "q_nom" => rescale_q_pump_nom,
         "delta_Hmax" => rescale_H,
         "delta_Hmin" => rescale_H,
@@ -516,105 +503,6 @@ function _calc_parallel_connections(
 end
 
 
-"calculates connections in parallel with one another and their orientation"
-function _calc_parallel_ne_connections(
-    pm::AbstractPetroleumModel,
-    n::Int,
-    connection::Dict{String,Any},
-)
-    i = min(connection["fr_junction"], connection["to_junction"])
-    j = max(connection["fr_junction"], connection["to_junction"])
-
-    parallel_pipes = haskey(ref(pm, n, :parallel_pipes), (i, j)) ?
-        ref(pm, n, :parallel_pipes, (i, j)) : []
-    parallel_pumps = haskey(ref(pm, n, :parallel_pumps), (i, j)) ?
-        ref(pm, n, :parallel_pumps, (i, j)) : []
-    parallel_tanks = haskey(ref(pm, n, :parallel_tanks), (i, j)) ?
-        ref(pm, n, :parallel_tanks, (i, j)) : []
-
-    parallel_ne_pipes = haskey(ref(pm, n, :parallel_ne_pipes), (i, j)) ?
-        ref(pm, n, :parallel_ne_pipes, (i, j)) : []
-    parallel_ne_pumps = haskey(ref(pm, n, :parallel_ne_pumps), (i, j)) ?
-        ref(pm, n, :parallel_ne_pumps, (i, j)) : []
-    parallel_ne_tanks = haskey(ref(pm, n, :parallel_ne_tanks), (i, j)) ?
-        ref(pm, n, :parallel_ne_tanks, (i, j)) : []
-
-    num_connections =
-        length(parallel_pipes) +
-        length(parallel_pumps) +
-        length(parallel_tanks) +
-        length(parallel_ne_pipes) +
-        length(parallel_ne_pumps) +
-        length(parallel_ne_tanks)
-
-    pipes = ref(pm, n, :pipe)
-    pumps = ref(pm, n, :pump)
-    tank = ref(pm, n, :tank)
-    ne_pipes = ref(pm, n, :ne_pipe)
-    ne_pumps = ref(pm, n, :ne_pump)
-    ne_tanks = ref(pm, n, :ne_tank)
-
-    aligned_pipes = filter(
-        i -> pipes[i]["fr_junction"] == connection["fr_junction"], parallel_pipes
-    )
-    opposite_pipes = filter(
-        i -> pipes[i]["fr_junction"] != connection["fr_junction"], parallel_pipes
-    )
-    aligned_pumps = filter(
-        i -> pumps[i]["fr_junction"] == connection["fr_junction"],
-        parallel_pumps,
-    )
-    opposite_pumps = filter(
-        i -> pumps[i]["fr_junction"] != connection["fr_junction"],
-        parallel_pumps,
-    )
-    aligned_tanks = filter(
-        i -> tanks[i]["fr_junction"] == connection["fr_junction"],
-        parallel_tanks,
-    )
-    opposite_tanks = filter(
-        i -> tanks[i]["fr_junction"] != connection["fr_junction"],
-        parallel_tanks,
-    )
-    aligned_ne_pipes = filter(
-        i -> ne_pipes[i]["fr_junction"] == connection["fr_junction"],
-        parallel_ne_pipes,
-    )
-    opposite_ne_pipes = filter(
-        i -> ne_pipes[i]["fr_junction"] != connection["fr_junction"],
-        parallel_ne_pipes,
-    )
-    aligned_ne_pumps = filter(
-        i -> ne_pumps[i]["fr_junction"] == connection["fr_junction"],
-        parallel_ne_pumps,
-    )
-    opposite_ne_pumps = filter(
-        i -> ne_pumps[i]["fr_junction"] != connection["fr_junction"],
-        parallel_ne_pumps,
-    )
-    aligned_ne_tanks = filter(
-        i -> ne_tanks[i]["fr_junction"] == connection["fr_junction"],
-        parallel_ne_tanks,
-    )
-    opposite_ne_tanks = filter(
-        i -> ne_tanks[i]["fr_junction"] != connection["fr_junction"],
-        parallel_ne_tanks,
-    )
-
-    return num_connections,
-    aligned_pipes,
-    opposite_pipes,
-    aligned_pumps,
-    opposite_pumps,
-    aligned_tanks,
-    opposite_tanks,
-    aligned_ne_pipes,
-    opposite_ne_pipes,
-    aligned_ne_pumps,
-    opposite_ne_pumps,
-    aligned_ne_tanks,
-    opposite_ne_tanks
-end
 
 
 "prints the text summary for a data file to IO"
@@ -644,8 +532,8 @@ const _pm_component_parameter_order = Dict(
     "to_junction" => 12.0,
     "length" => 13.0,
     "diameter" => 14.0,
-    "Qmin" => 16.0,
-    "Qmax" => 17.0,
+    "q_min" => 16.0,
+    "q_max" => 17.0,
     "delta_Hmin" => 18.0,
     "delta_Hmax" => 19.0,
     "junction_id" => 51.0,
