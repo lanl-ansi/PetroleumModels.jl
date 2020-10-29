@@ -15,8 +15,8 @@ const _mlab_data_names = Vector{String}([
 const _mlab_junction_columns = Vector{Tuple{String,Type}}([
 ("id", Int),
 ("junction_type", Int),
-("Hmin", Float64),
-("Hmax", Float64),
+("head_min", Float64),
+("head_max", Float64),
 ("z", Float64),
 ("status", Int)
 ])
@@ -27,8 +27,8 @@ const _mlab_pipe_columns =  Vector{Tuple{String,Type}}([
 ("to_junction", Int),
 ("diameter", Float64),
 ("length", Float64),
-("q_min", Float64),
-("q_max", Float64),
+("flow_min", Float64),
+("flow_max", Float64),
 ("status", Int)
 ])
 
@@ -40,14 +40,14 @@ const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
 ("station_i", Int),
 ("a", Float64),
 ("b", Float64),
-("q_nom", Float64),
-("delta_Hmax", Float64),
-("delta_Hmin", Float64),
-("min_pump_efficiency", Float64),
-("max_pump_efficiency", Float64),
+("flow_nom", Float64),
+("delta_head_max", Float64),
+("delta_head_min", Float64),
+("pump_efficiency_min", Float64),
+("pump_efficiency_max", Float64),
 ("w_nom", Float64),
-("min_w", Float64),
-("max_w", Float64),
+("rotation_min", Float64),
+("rotation_max", Float64),
 ("electricity_price", Float64),
 ("status", Int)
 ])
@@ -56,8 +56,8 @@ const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
 const _mlab_producer_columns =  Vector{Tuple{String,Type}}([
 ("producer_i", Int),
 ("junction_id", Int),
-("qgmin", Float64),
-("qgmax", Float64),
+("injection_min", Float64),
+("injection_max", Float64),
 ("qg", Float64),
 ("status", Int),
 ("is_dispatchable", Int),
@@ -67,8 +67,8 @@ const _mlab_producer_columns =  Vector{Tuple{String,Type}}([
 const _mlab_consumer_columns =  Vector{Tuple{String,Type}}([
 ("consumer_i", Int),
 ("junction_id", Int),
-("qlmin", Float64),
-("qlmax", Float64),
+("withdrawal_min", Float64),
+("withdrawal_max", Float64),
 ("ql", Float64),
 ("status", Float64),
 ("is_dispatchable", Int),
@@ -89,10 +89,10 @@ const _mlab_tank_columns =  Vector{Tuple{String,Type}}([
 ("Min_Capacity_Limitation", Float64),
 ("Max_Capacity_Limitation", Float64),
 ("Initial_Volume", Float64),
-("Min_Load_Flow_Rate", Float64),
-("Max_Load_Flow_Rate", Float64),
-("Min_Unload_Flow_Rate", Float64),
-("Max_Unload_Flow_Rate", Float64),
+("intake_min", Float64),
+("intake_max", Float64),
+("offtake_min", Float64),
+("offtake_max", Float64),
 ("Cd", Float64),
 ("status", Int),
 ("price", Float64),

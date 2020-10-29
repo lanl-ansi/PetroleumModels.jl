@@ -111,18 +111,18 @@ function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::
     pump    = ref(pm, n, :pump, k)
     i       = pump["fr_junction"]
     j       = pump["to_junction"]
-    eta_min = pm.ref[:nw][n][:pump][k]["min_pump_efficiency"]
-    eta_max = pm.ref[:nw][n][:pump][k]["max_pump_efficiency"]
-    w_min = pm.ref[:nw][n][:pump][k]["min_w"]
-    w_max = pm.ref[:nw][n][:pump][k]["max_w"]
-    q_nom = pm.ref[:nw][n][:pump][k]["q_nom"]
+    eta_min = pm.ref[:nw][n][:pump][k]["pump_efficiency_min"]
+    eta_max = pm.ref[:nw][n][:pump][k]["pump_efficiency_max"]
+    w_min = pm.ref[:nw][n][:pump][k]["rotation_min"]
+    w_max = pm.ref[:nw][n][:pump][k]["rotation_max"]
+    flow_nom = pm.ref[:nw][n][:pump][k]["flow_nom"]
     w_nom = pm.ref[:nw][n][:pump][k]["w_nom"]
     a = pm.ref[:nw][n][:pump][k]["a"]
     b = pm.ref[:nw][n][:pump][k]["b"]
-    delta_Hmax = pm.ref[:nw][n][:pump][k]["delta_Hmax"]
-    delta_Hmin = pm.ref[:nw][n][:pump][k]["delta_Hmin"]
+    delta_head_max = pm.ref[:nw][n][:pump][k]["delta_head_max"]
+    delta_head_min = pm.ref[:nw][n][:pump][k]["delta_head_min"]
     Q_pump_dim = pm.data["Q_pump_dim"]
-    constraint_pump_efficiency_and_rotation(pm, n, k, i, j, eta_min, eta_max, w_min, w_max, q_nom, w_nom, a, b, delta_Hmin, delta_Hmax, Q_pump_dim)
+    constraint_pump_efficiency_and_rotation(pm, n, k, i, j, eta_min, eta_max, w_min, w_max, flow_nom, w_nom, a, b, delta_head_min, delta_head_max, Q_pump_dim)
 end
 constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, k::Int) = constraint_pump_efficiency_and_rotation(pm, pm.cnw, k)
 
@@ -141,8 +141,8 @@ constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, k::Int) = co
 #         Initial_Volume = ref(pm,n,:tank, k)["Initial_Volume"]
 #         # Min_Capacity_Limitation = ref(pm,n,:tank, k)["Min_Capacity_Limitation"]
 #         # Max_Capacity_Limitation = ref(pm,n,:tank, k)["Max_Capacity_Limitation"]
-#         # Min_Unload_Flow_Rate = ref(pm,n,:tank, k)["Min_Unload_Flow_Rate"]
-#         # Max_Unload_Flow_Rate = ref(pm,n,:tank, k)["Max_Unload_Flow_Rate"]
+#         # offtake_min = ref(pm,n,:tank, k)["offtake_min"]
+#         # offtake_max = ref(pm,n,:tank, k)["offtake_max"]
 #         # Time = ref(pm,n,:tank, k)["time"]
 #         Cd   = ref(pm,n,:tank, k)["Cd"]
 #         Hi   = ref(pm,n,:tank, k)["vessel_pressure_head"]

@@ -9,8 +9,8 @@ qg_value         = []
 ql_value         = []
 w_values         = []
 eta_values       = []
-pump_deltaHmax_dual       = []
-pump_deltaHmin_dual       = []
+pump_deltahead_max_dual       = []
+pump_deltahead_min_dual       = []
 H_dual_up = []
 H_dual_low = []
 q_dual_node = []
@@ -20,12 +20,12 @@ w_dual_up = []
 w_dual_low = []
 eta_dual_up = []
 eta_dual_low = []
-min_pump_efficiency = []
-max_pump_efficiency = []
-min_w = []
-max_w = []
-Hmax = []
-Hmin = []
+pump_efficiency_min = []
+pump_efficiency_max = []
+rotation_min = []
+rotation_max = []
+head_max = []
+head_min = []
 q_max = []
 q_min = []
 q_pump_values =[]
@@ -151,8 +151,8 @@ q_pump_values =[]
      # for i in sort(collect(ids(pm, :junction)))
      #     push!( q_dual_node, JuMP.dual(pm.con[:nw][n][:junction_volume_flow_balance][i]) )
      #     push!(H_dual_up, (JuMP.dual(UpperBoundRef(pm.var[:nw][n][:H][i]))) * pm.data["baseH"] )
-     #     push!(Hmax,  pm.ref[:nw][n][:junction][i]["Hmax"] * pm.data["baseH"] )
-     #     push!(Hmin,  pm.ref[:nw][n][:junction][i]["Hmin"] * pm.data["baseH"] )
+     #     push!(head_max,  pm.ref[:nw][n][:junction][i]["head_max"] * pm.data["baseH"] )
+     #     push!(head_min,  pm.ref[:nw][n][:junction][i]["head_min"] * pm.data["baseH"] )
      #     push!(H_dual_low, (JuMP.dual(LowerBoundRef(pm.var[:nw][n][:H][i]))) * pm.data["baseH"] )
      # end
 
@@ -200,8 +200,8 @@ q_pump_values =[]
          push!(w_dual_up, (JuMP.dual(UpperBoundRef(pm.var[:nw][n][:w][i]))) )
          push!(Eta_con, JuMP.dual(pm.con[:nw][n][:eta_con][i]) )
          push!(Pump_head_con, JuMP.dual(pm.con[:nw][n][:pump_head_con][i]) )
-         push!(pump_deltaHmax_dual, JuMP.dual(pm.con[:nw][n][:delta_Hmax_con][i]) )
-         push!(pump_deltaHmin_dual, JuMP.dual(pm.con[:nw][n][:delta_Hmin_con][i]) )
+         push!(pump_deltahead_max_dual, JuMP.dual(pm.con[:nw][n][:delta_head_max_con][i]) )
+         push!(pump_deltahead_min_dual, JuMP.dual(pm.con[:nw][n][:delta_head_min_con][i]) )
          push!(w_dual_low, (JuMP.dual(LowerBoundRef(pm.var[:nw][n][:w][i]))) )
          push!(eta_dual_up, (JuMP.dual(UpperBoundRef(pm.var[:nw][n][:eta][i]))) )
 
@@ -213,10 +213,10 @@ q_pump_values =[]
      # for i in sort(collect(ids(pm, :pump)))
      #
      #     push!(eta_dual_low, (JuMP.dual(LowerBoundRef(pm.var[:nw][n][:eta][i]))))
-     #     push!(min_pump_efficiency, pm.ref[:nw][n][:pump][i]["min_pump_efficiency"] )
-     #     push!(max_pump_efficiency, pm.ref[:nw][n][:pump][i]["max_pump_efficiency"] )
-     #     push!(max_w, pm.ref[:nw][n][:pump][i]["max_w"] )
-     #     push!(min_w, pm.ref[:nw][n][:pump][i]["min_w"] )
+     #     push!(pump_efficiency_min, pm.ref[:nw][n][:pump][i]["pump_efficiency_min"] )
+     #     push!(pump_efficiency_max, pm.ref[:nw][n][:pump][i]["pump_efficiency_max"] )
+     #     push!(rotation_max, pm.ref[:nw][n][:pump][i]["rotation_max"] )
+     #     push!(rotation_min, pm.ref[:nw][n][:pump][i]["rotation_min"] )
      #
      # end
      # println(sort(collect(ids(pm, :pipe))))
@@ -237,11 +237,11 @@ q_pump_values =[]
      #                      "" "" "" "" "" "";
      #                     "Economic term" "Power term" "Objective" "" "" "";
      #                     A B A-B "" "" ""; "" "" "" "" "" "";
-     #                       "" "" "Head values" "" "" ""; "Node #" "Dual low head value" "Low boundary" "Variable" "Up boundary" "Dual up head value"; sort(collect(ids(pm, :junction))) round.(H_dual_low) Hmin round.(H_values) Hmax round.(H_dual_up);
+     #                       "" "" "Head values" "" "" ""; "Node #" "Dual low head value" "Low boundary" "Variable" "Up boundary" "Dual up head value"; sort(collect(ids(pm, :junction))) round.(H_dual_low) head_min round.(H_values) head_max round.(H_dual_up);
      #                       "" "" "" "" "" "";
-     #                     "" "" "Pump efficiency" "" "" ""; "Pump id" "Dual low" "Low boundary" "Variable" "Up boundary" "Dual up"; sort(collect(ids(pm, :pump))) round.(eta_dual_low) min_pump_efficiency eta_values max_pump_efficiency round.(eta_dual_up);
+     #                     "" "" "Pump efficiency" "" "" ""; "Pump id" "Dual low" "Low boundary" "Variable" "Up boundary" "Dual up"; sort(collect(ids(pm, :pump))) round.(eta_dual_low) pump_efficiency_min eta_values pump_efficiency_max round.(eta_dual_up);
      #                     "" "" "" "" "" ""; "" "" "Rotation speed" "" "" "";
-     #                       "Pump id" "Dual low" "Low boundary" "Variable" "Up boundary" "Dual up"; sort(collect(ids(pm, :pump))) round.(w_dual_low) min_w round.(w_values) max_w round.(w_dual_up);
+     #                       "Pump id" "Dual low" "Low boundary" "Variable" "Up boundary" "Dual up"; sort(collect(ids(pm, :pump))) round.(w_dual_low) rotation_min round.(w_values) rotation_max round.(w_dual_up);
      #                       "" "" "" "" "" ""; "" "" "Flow rate" "" "" ""; "Element id" "Dual low" "Low boundary" "Variable" "Up boundary" "Dual up"; sort(collect(ids(pm, :pipe))) q_dual_low q_min q_values q_max q_dual_up]
      #
 
@@ -252,12 +252,12 @@ q_pump_values =[]
     # #                           pm.ref[:nw][0][:producer][1]["price"] pm.ref[:nw][0][:producer][2]["price"] pm.ref[:nw][0][:producer][3]["price"] pm.ref[:nw][0][:consumer][1]["price"]  pm.ref[:nw][0][:consumer][2]["price"] ""]
     #
     # Head_values             = ["Node #" "Dual low head value" "Low boundary" "Variable" "Up boundary" "Dual up head value";
-    #                           sort(collect(ids(pm, :junction))) round.(H_dual_low) Hmin round.(H_values) Hmax round.(H_dual_up)]
+    #                           sort(collect(ids(pm, :junction))) round.(H_dual_low) head_min round.(H_values) head_max round.(H_dual_up)]
     #
     # Pump_efficiency         = ["Pump id" "Dual low" "Low boundary" "Variable" "Up boundary" "Dual up";
-    #                           sort(collect(ids(pm, :pump))) round.(eta_dual_low) min_pump_efficiency eta_values max_pump_efficiency round.(eta_dual_up)]
+    #                           sort(collect(ids(pm, :pump))) round.(eta_dual_low) pump_efficiency_min eta_values pump_efficiency_max round.(eta_dual_up)]
     # Rotation_speed          = ["Pump id" "Dual low" "Low boundary" "Variable" "Up boundary" "Dual up";
-    #                           sort(collect(ids(pm, :pump))) round.(w_dual_low) min_w round.(w_values) max_w round.(w_dual_up)]
+    #                           sort(collect(ids(pm, :pump))) round.(w_dual_low) rotation_min round.(w_values) rotation_max round.(w_dual_up)]
     # Pipe_flow_rate          = ["Element id" "Dual low" "Low boundary" "Variable" "Up boundary" "Dual up";
     #                           sort(collect(ids(pm, :pipe))) q_dual_low q_min round.(q_values) q_max q_dual_up]
 
@@ -275,7 +275,7 @@ q_pump_values =[]
                               # round.(q_dual_node[1])  round.(q_dual_node[9])  round.(q_dual_node[18])  round.(q_dual_node[15])  round.(q_dual_node[23])]
 
     # pump_constraint_dual_values    = ["Pump id " "min delta H dual" "max delta H dual" "Pump head dual" "Pump efficiency dual";
-    #                                 sort(collect(ids(pm, :pump))) round.(pump_deltaHmin_dual) round.(pump_deltaHmax_dual) round.(Pump_head_con) round.(Eta_con)]
+    #                                 sort(collect(ids(pm, :pump))) round.(pump_deltahead_min_dual) round.(pump_deltahead_max_dual) round.(Pump_head_con) round.(Eta_con)]
     # writedlm("all_values_$i.csv", dual_values, ",")
     # writedlm("Consumer_producer_flow_rate_$n.csv",  CP_q_values, ",")
 
@@ -294,18 +294,18 @@ q_pump_values =[]
 #     global eta_dual_low     = zeros(Float64,0)
 #     global H_values         = zeros(Float64,0)
 #     global delta_H_values   = zeros(Float64,0)
-#     global pump_deltaHmax_dual = zeros(Float64,0)
+#     global pump_deltahead_max_dual = zeros(Float64,0)
 #     global Eta_con          = zeros(Float64,0)
 #     global Pump_head_con    = zeros(Float64,0)
-#     global pump_deltaHmin_dual = zeros(Float64,0)
+#     global pump_deltahead_min_dual = zeros(Float64,0)
 #     global qg_value         = zeros(Float64,0)
 #     global ql_value         = zeros(Float64,0)
-#     global min_pump_efficiency = zeros(Float64,0)
-#     global max_pump_efficiency = zeros(Float64,0)
-#     global min_w               = zeros(Float64,0)
-#     global max_w               = zeros(Float64,0)
-#     global Hmax                = zeros(Float64,0)
-#     global Hmin                = zeros(Float64,0)
+#     global pump_efficiency_min = zeros(Float64,0)
+#     global pump_efficiency_max = zeros(Float64,0)
+#     global rotation_min               = zeros(Float64,0)
+#     global rotation_max               = zeros(Float64,0)
+#     global head_max                = zeros(Float64,0)
+#     global head_min                = zeros(Float64,0)
 #     global q_max               = zeros(Float64,0)
 #     global q_min               = zeros(Float64,0)
 # end
@@ -324,8 +324,8 @@ q_pump_values =[]
      # println(H_dual_values)
      # writedlm("head_values_$i.csv", node_values, ",")
      # deleteat!(H_values, H_values .>= 0)
-     # deleteat!(Hmax, Hmax .>= 0)
-     # deleteat!(Hmin, Hmin .>= 0)
+     # deleteat!(head_max, head_max .>= 0)
+     # deleteat!(head_min, head_min .>= 0)
      #
 
      # writedlm(" Prices_$i.csv",  Prices, ",")
@@ -360,12 +360,12 @@ q_pump_values =[]
      #
      # # writedlm("pump_values_$i.csv", pump_values, ",")
      # deleteat!(eta_values, eta_values .>= 0)
-     # deleteat!(max_pump_efficiency, max_pump_efficiency .>= 0)
-     # deleteat!(min_pump_efficiency, min_pump_efficiency .>= 0)
+     # deleteat!(pump_efficiency_max, pump_efficiency_max .>= 0)
+     # deleteat!(pump_efficiency_min, pump_efficiency_min .>= 0)
      #
      # deleteat!(w_values, w_values .>= 0)
-     # deleteat!(max_w, max_w .>= 0)
-     # deleteat!(min_w, min_w .>= 0)
+     # deleteat!(rotation_max, rotation_max .>= 0)
+     # deleteat!(rotation_min, rotation_min .>= 0)
 
 
 

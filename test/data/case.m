@@ -24,7 +24,7 @@ mpc.time_step = 0;
 
 
 %% junction data
-%  id type Hmin Hmax z status
+%  id type head_min head_max z status
 mpc.junction = [
 111  1  30  740 273 1
 222  0  30  740 273 1
@@ -35,7 +35,7 @@ mpc.junction = [
 ];
 
 %% pipeline data
-% pipeline_i fr_junction to_junction diameter length q_min q_max status
+% pipeline_i fr_junction to_junction diameter length flow_min flow_max status
 mpc.pipe = [
 
 33  444  88 0.75  154e3   500 5000 1
@@ -43,26 +43,26 @@ mpc.pipe = [
 
 
 %% pump data
-% pump_i fr_junction to_junction station_i a b q_nom delta_Hmax delta_Hmin min_pump_efficiency max_pump_efficiency w_nom min_w max_w electricity_price status
+% pump_i fr_junction to_junction station_i a b flow_nom delta_head_max delta_head_min pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status
 mpc.pump = [
 22  333   444  1  276.8  7.1e-6  3600  144 217 0.6 0.87  3000 2400  3600 0.12 1
 15  222   333  1  276.8  7.1e-6  3600  144 217 0.6 0.87  3000 2400  3600 0.12 1
 ];
 %% producer
-% producer_i junction_id qgmin qgmax qg status is_dispatchable offer_price
+% producer_i junction_id injection_min injection_max qg status is_dispatchable offer_price
 mpc.producer = [
 1	 111	360 4860 1440 1 1 300
 ];
 
 %% consumer
-% consumer_i junction_id qlmin qlmax ql status is_dispatchable bid_price
+% consumer_i junction_id withdrawal_min withdrawal_max ql status is_dispatchable bid_price
 mpc.consumer = [
 1	 88	360 4860 0.305 1 1 310
 ];
 
 
 %% tank
-% tank_i fr_junction to_junction vessel_pressure_head radius Min_Capacity_Limitation Max_Capacity_Limitation Initial_Volume Min_Load_Flow_Rate Max_Load_Flow_Rate Min_Unload_Flow_Rate Max_Unload_Flow_Rate Cd status price p_price
+% tank_i fr_junction to_junction vessel_pressure_head radius Min_Capacity_Limitation Max_Capacity_Limitation Initial_Volume intake_min intake_max offtake_min offtake_max Cd status price p_price
 mpc.tank = [
 31  111 222 0 14.25 459 10283 10000 0.138 1.138 0.01 1.35 0.94 1 0.00800458 300
 ];

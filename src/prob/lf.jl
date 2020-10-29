@@ -27,7 +27,7 @@ function build_lf(pm::AbstractPetroleumModel)
     variable_pump_efficiency(pm)
     variable_production_volume_flow(pm)
     variable_demand_volume_flow(pm)
-    variable_tank_in(pm)
+    variable_tank_intake(pm)
     variable_tank_out(pm)
 
     objective_min_expenses_max_benefit(pm)

@@ -104,21 +104,6 @@ function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_rho=850, base_nu= 4.9e-6,
         _add_edges_to_junction_map!(ref[:tanks_fr], ref[:tanks_to], ref[:tank])
 
         ref_degree!(ref)
-
-        for (idx, pipe) in ref[:pipe]
-            i = pipe["fr_junction"]
-            j = pipe["to_junction"]
-        end
-
-        for (idx, pump) in ref[:pump]
-            i = pump["fr_junction"]
-            j = pump["to_junction"]
-        end
-
-        for (idx, tank) in ref[:tank]
-            i = tank["fr_junction"]
-            j = tank["to_junction"]
-        end
     end
 
 end

@@ -11,14 +11,10 @@ function build_pf(pm::AbstractPetroleumModel)
     variable_pump_efficiency(pm)
     variable_production_volume_flow(pm)
     variable_demand_volume_flow(pm)
-    variable_tank_in(pm)
+    variable_tank_intake(pm)
     variable_tank_out(pm)
 
     objective_min_expenses_max_benefit(pm)
-
-    # for i in ids(pm, :junction)
-    #     constraint_node_head(pm, i)
-    # end
 
     for i in ids(pm, :pipe)
         constraint_nodal_volume_balance(pm, i)
@@ -32,9 +28,6 @@ function build_pf(pm::AbstractPetroleumModel)
         constraint_junction_volume_flow_balance(pm, i)
     end
 
-    # for i in ids(pm, :tank)
-    #     constraint_tank_volume_balance(pm, i)
-    # end
 
 
 end
@@ -51,19 +44,12 @@ for (n, data) in nws(pm)
     variable_pump_efficiency(pm, n=n)
     variable_production_volume_flow(pm, n=n)
     variable_demand_volume_flow(pm, n=n)
-    variable_tank_in(pm, n=n)
+    variable_tank_intake(pm, n=n)
     variable_tank_out(pm, n=n)
-    # @show var(pm, n, :q)
-# network_ids = sort(collect(nw_ids(pm)))
 
     for i in ids(pm, n, :junction)
         constraint_junction_volume_flow_balance(pm, n, i)
     end
-    #
-    # for i in ids(pm, n, :junction)
-    #     constraint_node_head(pm, n, i)
-    #
-    # end
 
     for i in ids(pm, n, :pipe)
         constraint_nodal_volume_balance(pm, n, i)
@@ -73,9 +59,7 @@ for (n, data) in nws(pm)
         constraint_pump_efficiency_and_rotation(pm, n, i)
     end
 
-    # for i in ids(pm, n, :tank)
-    #     constraint_tank_volume_balance(pm, n, i)
-    # end
+
 end
 
 objective_min_expenses_max_benefit(pm)

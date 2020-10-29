@@ -84,8 +84,8 @@ function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::
     mmscfd_to_kgps = x -> x * get_mmscfd_to_kgps_conversion_factor(static_data)
     inv_mmscfd_to_kgps = x -> x / get_mmscfd_to_kgps_conversion_factor(static_data)
     head_params = [
-        "Hmin",
-        "Hmax",
+        "head_min",
+        "head_max",
         "H"
     ]
     flow_params = [
@@ -96,17 +96,17 @@ function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::
         "Q_pump_dim",
         "q_pipe",
         "q_pump",
-        "q_nom",
-        "q_min",
-        "q_max",
+        "flow_nom",
+        "flow_min",
+        "flow_max",
         "qg",
         "ql",
-        "qgmin",
-        "qgmax",
-        "qlmin",
-        "qlmax",
-        "q_tank_in",
-        "q_tank_out",
+        "injection_min",
+        "injection_max",
+        "withdrawal_min",
+        "withdrawal_max",
+        "qin",
+        "qoff",
         "electricity_price"
 
     ]
@@ -128,40 +128,38 @@ end
 const _params_for_unit_conversions = Dict(
 
     "junction" =>
-        ["Hmax", "Hmin",  "z"],
-    #
-    # "original_junction" => ["p_min", "p_max", "p_nominal", "p"],
+        ["head_max", "head_min",  "z"],
 
-    "pipe" => ["q_min", "q_max",
+    "pipe" => ["flow_min", "flow_max",
     "diameter",
     "length", "q_pipe"],
 
     "pump" => [
-    "q_nom",
-    "delta_Hmax",
-    "delta_Hmin",
+    "flow_nom",
+    "delta_head_max",
+    "delta_head_min",
     "a",
     "b",
     "electricity_price",
     "Q_pump_dim"],
 
     "consumer" => [
-        "qlmin",
-        "qlmax", "ql"
+        "withdrawal_min",
+        "withdrawal_max", "ql"
     ],
     "producer" => [
-        "qgmin",
-        "qgmax",
+        "injection_min",
+        "injection_max",
         "qg"
     ],
 
     "tank" => [
     "Min_Capacity_Limitation",
     "Max_Capacity_Limitation",
-    "Min_Load_Flow_Rate",
-    "Max_Load_Flow_Rate",
-    "Min_Unload_Flow_Rate",
-    "Max_Unload_Flow_Rate"
+    "intake_min",
+    "intake_max",
+    "offtake_min",
+    "offtake_max"
     ],
 )
 
@@ -170,8 +168,8 @@ function _rescale_functions(
     rescale_q_pipe::Function,
     rescale_q_pump::Function,
     rescale_q_pump_nom::Function,
-    rescale_q_tank_in::Function,
-    rescale_q_tank_out::Function,
+    rescale_qin::Function,
+    rescale_qoff::Function,
     rescale_rho::Function,
     rescale_nu::Function,
     rescale_gravitational_acceleration::Function,
@@ -191,18 +189,18 @@ function _rescale_functions(
         "q_pump" => rescale_q_pipe,
         "ql" => rescale_q_pipe,
         "qg" => rescale_q_pipe,
-        "Hmax" => rescale_H,
-        "Hmin" => rescale_H,
+        "head_max" => rescale_H,
+        "head_min" => rescale_H,
         "z" => rescale_z,
-        "qlmin" => rescale_q_pipe,
-        "qlmax" => rescale_q_pipe,
-        "qgmin" => rescale_q_pipe,
-        "qgmax" => rescale_q_pipe,
-        "q_min" => rescale_q_pipe,
-        "q_max" => rescale_q_pipe,
-        "q_nom" => rescale_q_pump_nom,
-        "delta_Hmax" => rescale_H,
-        "delta_Hmin" => rescale_H,
+        "withdrawal_min" => rescale_q_pipe,
+        "withdrawal_max" => rescale_q_pipe,
+        "injection_min" => rescale_q_pipe,
+        "injection_max" => rescale_q_pipe,
+        "flow_min" => rescale_q_pipe,
+        "flow_max" => rescale_q_pipe,
+        "flow_nom" => rescale_q_pump_nom,
+        "delta_head_max" => rescale_H,
+        "delta_head_min" => rescale_H,
         "a" => rescale_a,
         "b" => rescale_b,
         "rho" => rescale_rho,
@@ -215,10 +213,10 @@ function _rescale_functions(
 
         "Min_Capacity_Limitation" => rescale_volume,
         "Max_Capacity_Limitation" => rescale_volume,
-        "Min_Load_Flow_Rate" => rescale_q_pipe,
-        "Max_Load_Flow_Rate" => rescale_q_pipe,
-        "Min_Unload_Flow_Rate" => rescale_q_pipe,
-        "Max_Unload_Flow_Rate" => rescale_q_pipe
+        "intake_min" => rescale_q_pipe,
+        "intake_max" => rescale_q_pipe,
+        "offtake_min" => rescale_q_pipe,
+        "offtake_max" => rescale_q_pipe
     )
 end
 "Transforms data to si units"
@@ -229,8 +227,8 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_Q_pump_dim = x ->  x*3600
     rescale_q_pump   = x -> x/q_base(data)
     rescale_q_pump_nom   = x -> x/q_base(data)
-    rescale_q_tank_in = x -> x/q_base(data)
-    rescale_q_tank_out = x -> x/q_base(data)
+    rescale_qin = x -> x/q_base(data)
+    rescale_qoff = x -> x/q_base(data)
     rescale_rho = x -> x/base_rho(data)
     rescale_nu = x -> x/base_nu(data)
     rescale_gravitational_acceleration = x -> x/9.8
@@ -247,8 +245,8 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pipe,
     rescale_q_pump,
     rescale_q_pump_nom,
-    rescale_q_tank_in,
-    rescale_q_tank_out,
+    rescale_qin,
+    rescale_qoff,
     rescale_rho,
     rescale_nu,
     rescale_gravitational_acceleration,
@@ -298,8 +296,8 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_Q_pump_dim      = x -> x/3600
     rescale_q_pump          = x -> x*q_base(data)
     rescale_q_pump_nom      = x -> x*q_base(data)
-    rescale_q_tank_in       = x -> x*q_base(data)
-    rescale_q_tank_out      = x -> x*q_base(data)
+    rescale_qin       = x -> x*q_base(data)
+    rescale_qoff      = x -> x*q_base(data)
     rescale_rho             = x -> x*base_rho(data)
     rescale_nu              = x -> x*base_nu(data)
     rescale_gravitational_acceleration = x -> x*9.8
@@ -316,8 +314,8 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pipe,
     rescale_q_pump,
     rescale_q_pump_nom,
-    rescale_q_tank_in,
-    rescale_q_tank_out,
+    rescale_qin,
+    rescale_qoff,
     rescale_rho,
     rescale_nu,
     rescale_gravitational_acceleration,
@@ -526,16 +524,16 @@ const _pm_component_types_order = Dict(
 const _pm_component_parameter_order = Dict(
     "id" => 1.0,
     "junction_type" => 2.0,
-    "Hmin" => 3.0,
-    "Hmax" => 4.0,
+    "head_min" => 3.0,
+    "head_max" => 4.0,
     "fr_junction" => 11.0,
     "to_junction" => 12.0,
     "length" => 13.0,
     "diameter" => 14.0,
-    "q_min" => 16.0,
-    "q_max" => 17.0,
-    "delta_Hmin" => 18.0,
-    "delta_Hmax" => 19.0,
+    "flow_min" => 16.0,
+    "flow_max" => 17.0,
+    "delta_head_min" => 18.0,
+    "delta_head_max" => 19.0,
     "junction_id" => 51.0,
     "status" => 500.0,
 )
