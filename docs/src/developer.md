@@ -4,12 +4,11 @@
 
 ### Suffixes
 
-- `_ne`: used to denote a concept specific to network expansion problems
 - `_pf`: used to denote a concept specific to implementations where production and consumption are variables.
 
 ### Head
 
-- `H`: head
+- `h`: head
 
 ### Flow
 

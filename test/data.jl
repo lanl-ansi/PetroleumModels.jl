@@ -13,7 +13,6 @@
         @test InfrastructureModels.ismultinetwork(mn_data)
         @test !haskey(mn_data, "time_series")
         @test length(mn_data["nw"]) == ts_length
-        # num_time_points = length(keys(pm.ref[:nw]))
 
 
         @test isapprox(mn_data["nw"]["1"]["consumer"]["1"]["price"][1], 310, rtol=1.0e-4)

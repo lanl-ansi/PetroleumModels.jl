@@ -41,6 +41,7 @@ const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
 ("a", Float64),
 ("b", Float64),
 ("flow_nom", Float64),
+("flow_max", Float64),
 ("delta_head_max", Float64),
 ("delta_head_min", Float64),
 ("pump_efficiency_min", Float64),

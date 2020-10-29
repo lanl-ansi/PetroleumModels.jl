@@ -136,6 +136,7 @@ const _params_for_unit_conversions = Dict(
 
     "pump" => [
     "flow_nom",
+    "flow_max",
     "delta_head_max",
     "delta_head_min",
     "a",

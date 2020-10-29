@@ -43,11 +43,12 @@ mpc.pipe = [
 
 
 %% pump data
-% pump_i fr_junction to_junction station_i a b flow_nom delta_head_max delta_head_min pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status
+% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_max delta_head_min pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status
 mpc.pump = [
-22  333   444  1  276.8  7.1e-6  3600  144 217 0.6 0.87  3000 2400  3600 0.12 1
-15  222   333  1  276.8  7.1e-6  3600  144 217 0.6 0.87  3000 2400  3600 0.12 1
+22  333   444  1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12 1
+15  222   333  1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12 1
 ];
+
 %% producer
 % producer_i junction_id injection_min injection_max qg status is_dispatchable offer_price
 mpc.producer = [
