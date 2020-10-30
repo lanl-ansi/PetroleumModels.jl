@@ -157,7 +157,7 @@ function variable_tank_intake(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounde
 end
 
 " variables associated with tank offtake: ``qoff`` "
-function variable_tank_out(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
+function variable_tank_offtake(pm::AbstractPetroleumModel, nw::Int=pm.cnw; bounded::Bool=true, report::Bool=true)
 
     qoff = pm.var[:nw][nw][:qoff] = JuMP.@variable(pm.model,
         [i in ids(pm,nw,:tank)],

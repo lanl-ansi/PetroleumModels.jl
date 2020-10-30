@@ -49,7 +49,7 @@ module PetroleumModels
     include("core/types.jl")
     include("io/matl.jl")
     include("io/common.jl")
-    include("prob/pf.jl")
+    include("prob/opf.jl")
 
     include("core/export.jl")
 end

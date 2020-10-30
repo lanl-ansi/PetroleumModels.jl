@@ -26,7 +26,7 @@ Once PetroleumModels is installed, a optimizer is installed, and a network data 
 using PetroleumModels
 using <solver_package>
 
-run_pf("foo.m", FooPetroleumModel, FooSolver())
+run_opf("foo.m", FooPetroleumModel, FooSolver())
 ```
 
 Similarly, an expansion optimizer can be executed with,
