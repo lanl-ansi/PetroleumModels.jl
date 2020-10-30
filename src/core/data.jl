@@ -12,8 +12,8 @@
 @inline base_elevation(data::Dict{String,Any}) = data["base_elevation"]
 @inline a_base(data::Dict{String,Any}) = data["base_a"]
 @inline b_base(data::Dict{String,Any}) = data["base_b"]
-@inline volume_base(data::Dict{String,Any}) = data["base_volume"]
-@inline E_base(data::Dict{String,Any}) = data["E_base"]
+@inline volumbase_energy(data::Dict{String,Any}) = data["base_volume"]
+@inline base_energy(data::Dict{String,Any}) = data["base_energy"]
 
 # @inline get_base_time(data::Dict{String,Any}) = data["base_time"]
 
@@ -222,7 +222,7 @@ function _rescale_functions(
 end
 "Transforms data to si units"
 function si_to_pu!(data::Dict{String,<:Any}; id = "0")
-    rescale_electricity_price   = x -> x*E_base(data)
+    rescale_electricity_price   = x -> x*base_energy(data)
     rescale_q_pipe   = x -> x/q_base(data)
     rescale_Q_pipe_dim = x -> x/3600
     rescale_Q_pump_dim = x ->  x*3600
@@ -239,7 +239,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_elevation      = x -> x/base_elevation(data)
     rescale_a      = x -> x/a_base(data)
     rescale_b      = x -> x/b_base(data)
-    rescale_volume  = x -> x/volume_base(data)
+    rescale_volume  = x -> x/volumbase_energy(data)
 
     functions = _rescale_functions(
     rescale_electricity_price,
@@ -291,7 +291,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
 end
 
 function pu_to_si!(data::Dict{String,<:Any}; id = "0")
-    rescale_electricity_price   = x -> x/E_base(data)
+    rescale_electricity_price   = x -> x/base_energy(data)
     rescale_q_pipe          = x -> x*q_base(data)
     rescale_Q_pipe_dim      = x -> x*3600
     rescale_Q_pump_dim      = x -> x/3600
@@ -308,7 +308,7 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_elevation      = x -> x*base_elevation(data)
     rescale_a      = x -> x*a_base(data)
     rescale_b      = x -> x*b_base(data)
-    rescale_volume = x -> x*volume_base(data)
+    rescale_volume = x -> x*volumbase_energy(data)
 
     functions = _rescale_functions(
     rescale_electricity_price,

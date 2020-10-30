@@ -9,7 +9,7 @@ const _mlab_data_names = Vector{String}([
 "mpc.beta","mpc.density", "mpc.viscosity", "mpc.gravitational_acceleration",
  "mpc.base_density", "mpc.base_viscosity", "mpc.base_diameter", "mpc.base_length", "mpc.base_flow", "mpc.base_head", "mpc.base_elevation", "mpc.base_a",
  "mpc.base_b",  "mpc.base_volume","mpc.units","mpc.is_per_unit","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
- "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"
+ "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.base_energy"
 ])
 
 const _mlab_junction_columns = Vector{Tuple{String,Type}}([
@@ -163,7 +163,7 @@ function parse_m_string(data_string::String)
     required_metadata_names = ["mpc.beta","mpc.density",
     "mpc.viscosity",
     "mpc.gravitational_acceleration",
-     "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
+     "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.base_energy"]
 
     optional_metadata_names = [ "mpc.base_density", "mpc.base_viscosity", "mpc.base_diameter", "mpc.base_length",
     "mpc.base_head", "mpc.base_elevation", "mpc.base_a",
@@ -480,7 +480,7 @@ const _matlab_global_params_order_required = ["beta", "density",
 "order of optional global parameters"
 const _matlab_global_params_order_optional = ["base_density", "base_viscosity", "base_diameter",
 "base_length","base_head", "base_elevation", "base_a",
-"base_b", "base_volume", "base_flow", "is_per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
+"base_b", "base_volume", "base_flow", "is_per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.base_energy"]
 
 
 "list of units of meta data fields"

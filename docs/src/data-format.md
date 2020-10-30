@@ -99,7 +99,7 @@ These components model producers of product.
 | viscosity                    | Float64 | Viscosity              | m2/s                | ft2/s                         |          | Liquid kinematic viscosity                                         |
 | gravitational_acceleration   | Float64 | Gravity                | m/s2                | ft/s2                         |          | Gravitational acceleration                                         |
 | base_density                 | Float64 | Base Density           | kg/m3               | lbm/ft3                       |          | Base liquid density                                                |
-| base_viscosity                      | Float64 | Base Viscosity         | m2/s                | ft2/s                         |          | Base liquid kinematic viscosity                                    |
+| base_viscosity               | Float64 | Base Viscosity         | m2/s                | ft2/s                         |          | Base liquid kinematic viscosity                                    |
 | base_head                    | Float64 | Base Head              | m                   | ft                            |          | Base head                                                          |
 | base_length                  | Float64 | Base Length            | m                   | ft                            |          | Base length                                                        |
 | base_flow                    | Float64 | Base Flow Rate         | m3/h                | ft3/h                         |          | Base flow rate                                                     |
@@ -110,7 +110,7 @@ These components model producers of product.
 | base_diameter                | Float64 | Base Diameter          | m                   | ft                            |          | Base Diameter                                                      |
 | Q_pipe_dim                   | Int     | Pipe coefficient       |                     |                               |          | Petroleum pipe flow coefficient                                    |
 | Q_pump_dim                   | Int     | Pump coefficient       |                     |                               |          | Petroleum pump flow coefficient                                    |
-| E_base                       | Float64 | Base energy            | kW*h                | kW*h                          | Y        | Base pump energy                                                   |
+| base_energy                       | Float64 | Base energy            | kW*h                | kW*h                          | Y        | Base pump energy                                                   |
 | units                        | String  | Units                  |                     |                               |          | 'si' for standard units or 'usc' for United States customary units |
 | is_per_unit                  | Int     | Per-unit               |                     |                               |          | If data is already in per-unit (non-dimensionalized)               |
 
