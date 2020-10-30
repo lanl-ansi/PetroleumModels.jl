@@ -9,6 +9,6 @@ function _IM.solution_preprocessor(pm::AbstractPetroleumModel, solution::Dict)
     solution["base_b"]         = pm.ref[:base_b]
     solution["base_length"]    = pm.ref[:base_length]
     solution["base_diameter"]  = pm.ref[:base_diameter]
-    solution["base_density"]       = pm.ref[:base_density]
-    solution["base_nu"]        = pm.ref[:base_nu]
+    solution["base_density"]   = pm.ref[:base_density]
+    solution["base_viscosity"] = pm.ref[:base_viscosity]
 end

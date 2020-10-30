@@ -11,7 +11,7 @@ function objective_min_expenses_max_benefit(pm::AbstractPetroleumModel, nws=[pm.
          sum(
               -(-sum(pm.ref[:nw][n][:producer][i]["offer_price"] * qg[n][i] for (i, producer) in pm.ref[:nw][n][:producer]) +
               sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * ql[n][i] for (i, consumer) in pm.ref[:nw][n][:consumer]))     +
-              pm.data["rho"] * pm.data["gravitational_acceleration"] * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] *
+              pm.data["density"] * pm.data["gravitational_acceleration"] * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] *
               q_pump[n][i] * (pm.var[:nw][n][:h][pump["to_junction"]] -
               pm.var[:nw][n][:h][pump["fr_junction"]]) /3600/ (0.966 * 0.95 * pm.var[:nw][n][:eta][i])  / 1000
               for (i, pump) in pm.ref[:nw][n][:pump] )

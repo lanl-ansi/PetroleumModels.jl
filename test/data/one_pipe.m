@@ -1,10 +1,10 @@
 function mpc = lib1
 mpc.beta = 0.0246; % s/m2, assume turbulent flow
-mpc.rho = 827;  % petroleum density, kg per cubic m
-mpc.nu = 4.9e-6;  % petroleum viscosity, squared m per second
+mpc.density = 827;  % petroleum density, kg per cubic m
+mpc.viscosity = 4.9e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
 mpc.base_density = 827; % petroleum base density, kg per m3
-mpc.base_nu       = 4.9e-6;  % base viscosity, m2 / s
+mpc.base_viscosity       = 4.9e-6;  % base viscosity, m2 / s
 mpc.base_head = 100; % base head, m
 mpc.base_length   = 542; % m
 mpc.base_flow = 3600; % petroleum volume flow rate, m3 per hour

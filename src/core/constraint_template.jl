@@ -91,7 +91,7 @@ function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k)
         i    = pipe["fr_junction"]
         j    = pipe["to_junction"]
         beta = pm.data["beta"]
-        nu = pm.data["nu"]
+        nu = pm.data["viscosity"]
         D = pipe["diameter"]
         L = pipe["length"]
         zi = ref(pm,n,:junction, i)["elevation"]

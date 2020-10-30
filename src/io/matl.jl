@@ -6,8 +6,8 @@ function parse_matlab(file::Union{IO, String})
 end
 
 const _mlab_data_names = Vector{String}([
-"mpc.beta","mpc.rho", "mpc.nu", "mpc.gravitational_acceleration",
- "mpc.base_density", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length", "mpc.base_flow", "mpc.base_head", "mpc.base_elevation", "mpc.base_a",
+"mpc.beta","mpc.density", "mpc.viscosity", "mpc.gravitational_acceleration",
+ "mpc.base_density", "mpc.base_viscosity", "mpc.base_diameter", "mpc.base_length", "mpc.base_flow", "mpc.base_head", "mpc.base_elevation", "mpc.base_a",
  "mpc.base_b",  "mpc.base_volume","mpc.units","mpc.is_per_unit","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
  "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"
 ])
@@ -160,12 +160,12 @@ function parse_m_string(data_string::String)
         case["source_version"] = "0.0.0+"
     end
 
-    required_metadata_names = ["mpc.beta","mpc.rho",
-    "mpc.nu",
+    required_metadata_names = ["mpc.beta","mpc.density",
+    "mpc.viscosity",
     "mpc.gravitational_acceleration",
      "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
 
-    optional_metadata_names = [ "mpc.base_density", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length",
+    optional_metadata_names = [ "mpc.base_density", "mpc.base_viscosity", "mpc.base_diameter", "mpc.base_length",
     "mpc.base_head", "mpc.base_elevation", "mpc.base_a",
     "mpc.base_b", "mpc.base_flow",  "mpc.base_volume","mpc.is_per_unit"]
 
@@ -218,11 +218,11 @@ function parse_m_string(data_string::String)
             The file seems to be missing \"mpc.base_density = ...\" \n")
     end
 
-    if haskey(matlab_data, "mpc.base_nu")
-        case["base_nu"] = matlab_data["mpc.base_nu"]
+    if haskey(matlab_data, "mpc.base_viscosity")
+        case["base_viscosity"] = matlab_data["mpc.base_viscosity"]
     else
-        Memento.warn(_LOGGER,"no base_nu found in .m file.
-            The file seems to be missing \"mpc.base_nu = ...\" \n")
+        Memento.warn(_LOGGER,"no base_viscosity found in .m file.
+            The file seems to be missing \"mpc.base_viscosity = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.base_diameter")
@@ -472,13 +472,13 @@ const _matlab_field_order = Dict{String,Array}(
 
 
 "order of required global parameters"
-const _matlab_global_params_order_required = ["beta", "rho",
-"nu",
+const _matlab_global_params_order_required = ["beta", "density",
+"viscosity",
 "gravitational_acceleration"]
 
 
 "order of optional global parameters"
-const _matlab_global_params_order_optional = ["base_density", "base_nu", "base_diameter",
+const _matlab_global_params_order_optional = ["base_density", "base_viscosity", "base_diameter",
 "base_length","base_head", "base_elevation", "base_a",
 "base_b", "base_volume", "base_flow", "is_per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
 
@@ -487,7 +487,7 @@ const _matlab_global_params_order_optional = ["base_density", "base_nu", "base_d
 const _units = Dict{String,Dict{String,String}}(
     "si" => Dict{String,String}(
         "base_density" => "kg/m3",
-        "base_nu"  => "m2/s",
+        "base_viscosity"  => "m2/s",
         "base_diameter" => "m",
         "base_length" => "m",
         "base_elevation" => "m",
