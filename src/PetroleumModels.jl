@@ -37,7 +37,7 @@ module PetroleumModels
 
 
     const _pm_global_keys = Set(["time_series_block", "is_per_unit", "nu", "rho", "gravitational_acceleration",
-        "baseH", "baseQ", "base_a", "base_z", "base_b", "base_length", "base_diameter", "base_rho", "base_nu", "Q_pipe_dim","Q_pump_dim","E_pump"])
+        "base_head", "base_flow", "base_a", "base_elevation", "base_b", "base_length", "base_diameter", "base_density", "base_nu", "Q_pipe_dim","Q_pump_dim","E_pump"])
 
     include("core/base.jl")
     include("core/data.jl")

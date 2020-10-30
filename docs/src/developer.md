@@ -23,4 +23,4 @@
 
 ## Developing steady-state problems and formulations
 
-In the current version of `PetroleumModels`, the supported variable space is head (`H`), pump efficiency (`eta`), pump rotational speed (`w`) and volume flow (`q`) for steady-state modeling. Most steady-state models use/assume the single network formulation, that is not discretized in time or space. Thus, petroleum network models are read in and directly used by steady-state specifications.
+In the current version of `PetroleumModels`, the supported variable space is head (`h`), pump efficiency (`eta`), pump rotational speed (`w`) and volume flow (`q`) for steady-state modeling. Most steady-state models use/assume the single network formulation, that is not discretized in time or space. Thus, petroleum network models are read in and directly used by steady-state specifications.

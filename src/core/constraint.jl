@@ -92,10 +92,10 @@ function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::
     Hi       = var(pm,n,:h,i)
     Hj       = var(pm,n,:h,j)
 
-    _add_constraint!(pm, n, :eta_con, i, JuMP.@NLconstraint(pm.model, eta == eta_max - (q_pump / flow_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
-    _add_constraint!(pm, n, :pump_head_con, i, JuMP.@constraint(pm.model, (Hj - Hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim )^2 * b ))
-    _add_constraint!(pm, n, :delta_head_max_con, i, JuMP.@constraint(pm.model, delta_head_max <= (Hj - Hi)))
-    _add_constraint!(pm, n, :delta_head_min_con, i, JuMP.@constraint(pm.model, (Hj - Hi) <= delta_head_min))
+    _add_constraint!(pm, n, :eta_con,            i, JuMP.@NLconstraint(pm.model, eta == eta_max - (q_pump / flow_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
+    _add_constraint!(pm, n, :pump_head_con,      i, JuMP.@constraint(pm.model,   (Hj - Hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim )^2 * b ))
+    _add_constraint!(pm, n, :delta_head_max_con, i, JuMP.@constraint(pm.model,   delta_head_max <= (Hj - Hi)))
+    _add_constraint!(pm, n, :delta_head_min_con, i, JuMP.@constraint(pm.model,   (Hj - Hi) <= delta_head_min))
 end
 
 #################################################################################################

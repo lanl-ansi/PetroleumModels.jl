@@ -94,8 +94,8 @@ function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k)
         nu = pm.data["nu"]
         D = pipe["diameter"]
         L = pipe["length"]
-        zi = ref(pm,n,:junction, i)["z"]
-        zj = ref(pm,n,:junction, j)["z"]
+        zi = ref(pm,n,:junction, i)["elevation"]
+        zj = ref(pm,n,:junction, j)["elevation"]
         Q_pipe_dim = pm.data["Q_pipe_dim"]
         constraint_nodal_volume_balance(pm, n, k, i, j, beta, nu, D, L, zi, zj, Q_pipe_dim)
 

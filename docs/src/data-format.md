@@ -1,10 +1,10 @@
 # MatlabPetroleum Format (.m)
 
-Here we detail the parameters that can be inputted using the matpetroleum format. They can be inputted in the order they appear here, or selectively, in the case where some data is not required, by using the following header format.
+Here we detail the parameters that can be inputted using the matpetroleum format. They can be inputted in the order they appear here, or selectively, in the case where some data is not required, by using the following (example) header format.
 
 ```matlab
 %% junction data
-% junction_i type head_min head_max z status
+% junction_i type head_min head_max elevation status
 ```
 
 See case files in `test/data/` for examples of file syntax.
@@ -13,14 +13,14 @@ See case files in `test/data/` for examples of file syntax.
 
 These components model “point” locations in the system, i.e. locations of withdrawal or injection, or simply connection points between pipes. Each junction may have multiple pipes attached.
 
-| Variable      | Type    | Name             | Standard Units (SI) | United States Customary Units | Required           | Description                                                                                                                                      |
-| ------------- | ------- | ---------------- | ------------------- | ----------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| junction_i            | Int     | Junction id      |                     |                               | Y | Unique id for junctions                                                                                                                          |
-| type | Int     | Junction Type    |                     |                               | Y | Classification of the junction: 0 = standard node, 1 = slack node                                                                                |
-| head_min         | Float64 | Head Minimum | m              | ft                           | Y |  Minimum operating head used in line pack calculations, which is higher than the minimum allowable                                                                                                                          |
-| head_max         | Float64 | Head Maximum | m              | ft                           | Y | Maximum operating head used in line pack calculations, which is lower than the maximum allowable |                                                                           |
-| z           | Float64 | Elevation         | m     | ft               |                    | Elevation of the junction                                                                                                                         |
-| status        | Int     | Junction Status  |                     |                               | Y | Determines if the component is active in the model                                                                                               |
+| Parameter     | Type    | Name             | Standard Units (SI) | United States Customary Units | Required           | Description                                                           |
+| ------------- | ------- | ---------------- | ------------------- | ----------------------------- | ------------------ | --------------------------------------------------------------------- |
+| junction_i    | Int     | Junction id      |                     |                               | Y                  | Unique id for junctions                                               |
+| type          | Int     | Junction Type    |                     |                               | Y                  | Classification of the junction: 0 = standard node, 1 = slack node     |
+| head_min      | Float64 | Head Minimum     | m                   | ft                            | Y                  |  Minimum operating head used in line pack calculations, which is higher than the minimum allowable |
+| head_max      | Float64 | Head Maximum     | m                   | ft                            | Y                  | Maximum operating head used in line pack calculations, which is lower than the maximum allowable |                                                                          
+| elevation     | Float64 | Elevation        | m                   | ft                            |                    | Elevation of the junction                                             |
+| status        | Int     | Junction Status  |                     |                               | Y                  | Determines if the component is active in the model                    |
 
 ## Pipes (mpc.pipe)
   status
@@ -92,27 +92,27 @@ These components model producers of product.
 
 ## Network Parameters (mpc._parameter_)
 
-| Variable                     | Type    | Name                   | Standard Units (SI) | United States Customary Units | Required | Description                                                        |
+| Parameter                    | Type    | Name                   | Standard Units (SI) | United States Customary Units | Required | Description                                                        |
 | ---------------------------- | ------- | ---------------------- | ------------------- | ----------------------------- | -------- | ------------------------------------------------------------------ |
-| beta                         | Float64 | Fixed coefficient  |     s/m2             |            s/ft2                   |          | Coefficient in the Leibenzon equation for turbulent flow                                       |
-| rho                  | Float64 | Density            | kg/m3                 |          lbm/ft3                     |          | Liquid density                                         |
-| nu                  | Float64 | Viscosity            | m2/s                |          ft2/s                     |          | Liquid kinematic viscosity                                         |
-| gravitational_acceleration         | Float64 |  Gravity       |        m/s2             |        ft/s2                       |          | Gravitational acceleration                                                        |
-| base_rho                  | Float64 | Base Density            | kg/m3                 |          lbm/ft3                     |          | Base liquid density                                         |
-| base_nu                  | Float64 | Base Viscosity            | m2/s                |          ft2/s                     |          | Base liquid kinematic viscosity                                         |
-| baseH                | Float64 | Base Head          | m              | ft                           |          | Base head                                        |
-| base_length                  | Float64 | Base Length            | m              | ft                         |          | Base length                                         |
-| baseQ                    | Float64 | Base Flow Rate              | m3/h               | ft3/h                         |          | Base flow rate                                                   |
-| base_z                  | Float64 | Base elevation            | m                 |          ft                     |          | Base elevation                                         |
-| base_a                  | Float64 |Base pump coefficient             | m                |          ft                     |          | Base pump coefficient                                         |
-| base_b                | Float64 | Base pump coefficient           | h2/m5              | h2/ft5                           |          | Base pump coefficient                                         |
-| base_volume                  | Float64 | Base Volume            | m3              | ft3                         |          | Base Volume                                         |
-| base_diameter   | Float64 | Base Diameter             | m              | ft                         |          | Base Diameter                                                   |
-| Q_pipe_dim                  | Int | Pipe coefficient            |              |                          |          | Petroleum pipe flow coefficient                                        |
-| Q_pump_dim   | Int | Pump coefficient              |              |                         |          | Petroleum pump flow coefficient                                                   |
-| E_base    | Float64| Base energy                    |     kW*h         |      kW*h       |         Y           | Base pump energy |
+| beta                         | Float64 | Fixed coefficient      | s/m2                | s/ft2                         |          | Coefficient in the Leibenzon equation for turbulent flow           |
+| rho                          | Float64 | Density                | kg/m3               | lbm/ft3                       |          | Liquid density                                                     |
+| nu                           | Float64 | Viscosity              | m2/s                | ft2/s                         |          | Liquid kinematic viscosity                                         |
+| gravitational_acceleration   | Float64 | Gravity                | m/s2                | ft/s2                         |          | Gravitational acceleration                                         |
+| base_density                 | Float64 | Base Density           | kg/m3               | lbm/ft3                       |          | Base liquid density                                                |
+| base_nu                      | Float64 | Base Viscosity         | m2/s                | ft2/s                         |          | Base liquid kinematic viscosity                                    |
+| base_head                    | Float64 | Base Head              | m                   | ft                            |          | Base head                                                          |
+| base_length                  | Float64 | Base Length            | m                   | ft                            |          | Base length                                                        |
+| base_flow                    | Float64 | Base Flow Rate         | m3/h                | ft3/h                         |          | Base flow rate                                                     |
+| base_elevation               | Float64 | Base elevation         | m                   | ft                            |          | Base elevation                                                     |
+| base_a                       | Float64 | Base pump coefficient  | m                   | ft                            |          | Base pump coefficient                                              |
+| base_b                       | Float64 | Base pump coefficient  | h2/m5               | h2/ft5                        |          | Base pump coefficient                                              |
+| base_volume                  | Float64 | Base Volume            | m3                  | ft3                           |          | Base Volume                                                        |
+| base_diameter                | Float64 | Base Diameter          | m                   | ft                            |          | Base Diameter                                                      |
+| Q_pipe_dim                   | Int     | Pipe coefficient       |                     |                               |          | Petroleum pipe flow coefficient                                    |
+| Q_pump_dim                   | Int     | Pump coefficient       |                     |                               |          | Petroleum pump flow coefficient                                    |
+| E_base                       | Float64 | Base energy            |     kW*h            | kW*h                          | Y        | Base pump energy                                                   |
 | units                        | String  | Units                  |                     |                               |          | 'si' for standard units or 'usc' for United States customary units |
-| is\_per\_unit                  | Int     | Per-unit               |                     |                               |          | If data is already in per-unit (non-dimensionalized)                |
+| is_per_unit                  | Int     | Per-unit               |                     |                               |          | If data is already in per-unit (non-dimensionalized)                |
 
 
 ## Matlab extensions

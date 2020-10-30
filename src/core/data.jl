@@ -2,14 +2,14 @@
 
 
 "data getters"
-@inline h_base(data::Dict{String,Any}) = data["baseH"]
-@inline base_rho(data::Dict{String,Any}) = data["base_rho"]
+@inline h_base(data::Dict{String,Any}) = data["base_head"]
+@inline base_density(data::Dict{String,Any}) = data["base_density"]
 @inline base_nu(data::Dict{String,Any}) = data["base_nu"]
 @inline base_gravitational_acceleration(data::Dict{String,Any}) = data["gravitational_acceleration"]
 @inline base_diameter(data::Dict{String,Any}) = data["base_diameter"]
 @inline base_length(data::Dict{String,Any}) = data["base_length"]
-@inline q_base(data::Dict{String,Any}) = data["baseQ"]
-@inline z_base(data::Dict{String,Any}) = data["base_z"]
+@inline q_base(data::Dict{String,Any}) = data["base_flow"]
+@inline base_elevation(data::Dict{String,Any}) = data["base_elevation"]
 @inline a_base(data::Dict{String,Any}) = data["base_a"]
 @inline b_base(data::Dict{String,Any}) = data["base_b"]
 @inline volume_base(data::Dict{String,Any}) = data["base_volume"]
@@ -51,7 +51,7 @@ end
 "if original data is in per-unit ensure it has base values"
 function is_per_!(data::Dict{String,Any})
     if get(data, "is_per_unit", false) == true
-        if get(data, "baseH", false) == false ||
+        if get(data, "base_head", false) == false ||
            get(data, "base_length", false) == false
             Memento.error(
                 _LOGGER,
@@ -68,10 +68,10 @@ function add_base_values!(data::Dict{String,Any})
     (get(data, "base_head", false) == false) &&
     (data["base_head"] = calc_base_head(data))
     (get(data, "base_nu", false) == false) && (data["base_nu"] = 4.9e-6)
-    # (get(data, "base_rho", false) == false) && (data["base_rho"] = 850)
+    # (get(data, "base_density", false) == false) && (data["base_density"] = 850)
     (get(data, "base_length", false) == false) && (data["base_length"] = 500.0)
     data["base_diameter"] = 0.75
-    (get(data, "baseQ", false) == false) && (data["baseQ"] = calc_base_flow(data))
+    (get(data, "base_flow", false) == false) && (data["base_flow"] = calc_base_flow(data))
 
 end
 
@@ -128,7 +128,7 @@ end
 const _params_for_unit_conversions = Dict(
 
     "junction" =>
-        ["head_max", "head_min",  "z"],
+        ["head_max", "head_min",  "elevation"],
 
     "pipe" => ["flow_min", "flow_max",
     "diameter",
@@ -177,7 +177,7 @@ function _rescale_functions(
     rescale_diameter::Function,
     rescale_length::Function,
     rescale_H::Function,
-    rescale_z::Function,
+    rescale_elevation::Function,
     rescale_a::Function,
     rescale_b::Function,
     rescale_volume::Function,
@@ -192,7 +192,7 @@ function _rescale_functions(
         "qg" => rescale_q_pipe,
         "head_max" => rescale_H,
         "head_min" => rescale_H,
-        "z" => rescale_z,
+        "elevation" => rescale_elevation,
         "withdrawal_min" => rescale_q_pipe,
         "withdrawal_max" => rescale_q_pipe,
         "injection_min" => rescale_q_pipe,
@@ -230,13 +230,13 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pump_nom   = x -> x/q_base(data)
     rescale_qin = x -> x/q_base(data)
     rescale_qoff = x -> x/q_base(data)
-    rescale_rho = x -> x/base_rho(data)
+    rescale_rho = x -> x/base_density(data)
     rescale_nu = x -> x/base_nu(data)
     rescale_gravitational_acceleration = x -> x/9.8
     rescale_diameter = x -> x/base_diameter(data)
     rescale_length = x -> x/base_length(data)
     rescale_H      = x -> x/h_base(data)
-    rescale_z      = x -> x/z_base(data)
+    elevation      = x -> x/base_elevation(data)
     rescale_a      = x -> x/a_base(data)
     rescale_b      = x -> x/b_base(data)
     rescale_volume  = x -> x/volume_base(data)
@@ -254,7 +254,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_diameter,
     rescale_length,
     rescale_H,
-    rescale_z,
+    rescale_elevation,
     rescale_a,
     rescale_b,
     rescale_volume,
@@ -299,13 +299,13 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pump_nom      = x -> x*q_base(data)
     rescale_qin       = x -> x*q_base(data)
     rescale_qoff      = x -> x*q_base(data)
-    rescale_rho             = x -> x*base_rho(data)
+    rescale_rho             = x -> x*base_density(data)
     rescale_nu              = x -> x*base_nu(data)
     rescale_gravitational_acceleration = x -> x*9.8
     rescale_diameter        = x -> x*base_diameter(data)
     rescale_length = x -> x*base_length(data)
     rescale_H      = x -> x
-    rescale_z      = x -> x*z_base(data)
+    rescale_elevation      = x -> x*base_elevation(data)
     rescale_a      = x -> x*a_base(data)
     rescale_b      = x -> x*b_base(data)
     rescale_volume = x -> x*volume_base(data)
@@ -323,7 +323,7 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_diameter,
     rescale_length,
     rescale_H,
-    rescale_z,
+    rescale_elevation,
     rescale_a,
     rescale_b,
     rescale_volume,

@@ -7,7 +7,7 @@ end
 
 const _mlab_data_names = Vector{String}([
 "mpc.beta","mpc.rho", "mpc.nu", "mpc.gravitational_acceleration",
- "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length", "mpc.baseQ", "mpc.baseH", "mpc.base_z", "mpc.base_a",
+ "mpc.base_density", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length", "mpc.base_flow", "mpc.base_head", "mpc.base_elevation", "mpc.base_a",
  "mpc.base_b",  "mpc.base_volume","mpc.units","mpc.is_per_unit","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
  "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"
 ])
@@ -17,7 +17,7 @@ const _mlab_junction_columns = Vector{Tuple{String,Type}}([
 ("junction_type", Int),
 ("head_min", Float64),
 ("head_max", Float64),
-("z", Float64),
+("elevation", Float64),
 ("status", Int)
 ])
 
@@ -165,9 +165,9 @@ function parse_m_string(data_string::String)
     "mpc.gravitational_acceleration",
      "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
 
-    optional_metadata_names = [ "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length",
-    "mpc.baseH", "mpc.base_z", "mpc.base_a",
-    "mpc.base_b", "mpc.baseQ",  "mpc.base_volume","mpc.is_per_unit"]
+    optional_metadata_names = [ "mpc.base_density", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length",
+    "mpc.base_head", "mpc.base_elevation", "mpc.base_a",
+    "mpc.base_b", "mpc.base_flow",  "mpc.base_volume","mpc.is_per_unit"]
 
     for data_name in required_metadata_names
         (data_name == "mpc.units") && (continue)
@@ -197,10 +197,10 @@ function parse_m_string(data_string::String)
     end
 
     # handling optional meta data names
-    if haskey(matlab_data, "mpc.baseH")
-        case["baseH"] = matlab_data["mpc.baseH"]
+    if haskey(matlab_data, "mpc.base_head")
+        case["base_head"] = matlab_data["mpc.base_head"]
     else
-        Memento.warn(_LOGGER, string("no baseH found in .m file.
+        Memento.warn(_LOGGER, string("no base_head found in .m file.
             This value will be auto-assigned based on the head limits provided in the data"))
     end
 
@@ -211,11 +211,11 @@ function parse_m_string(data_string::String)
             This value will be auto-assigned based on the head limits provided in the data"))
     end
 
-    if haskey(matlab_data, "mpc.base_rho")
-        case["base_rho"] = matlab_data["mpc.base_rho"]
+    if haskey(matlab_data, "mpc.base_density")
+        case["base_density"] = matlab_data["mpc.base_density"]
     else
-        Memento.warn(_LOGGER,"no base_rho found in .m file.
-            The file seems to be missing \"mpc.base_rho = ...\" \n")
+        Memento.warn(_LOGGER,"no base_density found in .m file.
+            The file seems to be missing \"mpc.base_density = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.base_nu")
@@ -232,11 +232,11 @@ function parse_m_string(data_string::String)
             The file seems to be missing \"mpc.base_diameter = ...\" \n")
     end
 
-    if haskey(matlab_data, "mpc.baseQ")
-        case["baseQ"] = matlab_data["mpc.baseQ"]
+    if haskey(matlab_data, "mpc.base_flow")
+        case["base_flow"] = matlab_data["mpc.base_flow"]
     else
-        Memento.warn(_LOGGER,"no baseQ found in .m file.
-            The file seems to be missing \"mpc.baseQ = ...\" \n")
+        Memento.warn(_LOGGER,"no base_flow found in .m file.
+            The file seems to be missing \"mpc.base_flow = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.is_per_unit")
@@ -247,11 +247,11 @@ function parse_m_string(data_string::String)
         case["is_per_unit"] = 0
     end
 
-    if haskey(matlab_data, "mpc.base_z")
-        case["base_z"] = matlab_data["mpc.base_z"]
+    if haskey(matlab_data, "mpc.base_elevation")
+        case["base_elevation"] = matlab_data["mpc.base_elevation"]
     else
-        Memento.warn(_LOGGER,"no base_z found in .m file.
-            The file seems to be missing \"mpc.base_z = ...\" \n")
+        Memento.warn(_LOGGER,"no base_elevation found in .m file.
+            The file seems to be missing \"mpc.base_elevation = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.base_a")
@@ -478,24 +478,24 @@ const _matlab_global_params_order_required = ["beta", "rho",
 
 
 "order of optional global parameters"
-const _matlab_global_params_order_optional = ["base_rho", "base_nu", "base_diameter",
-"base_length","baseH", "base_z", "base_a",
-"base_b", "base_volume", "baseQ", "is_per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
+const _matlab_global_params_order_optional = ["base_density", "base_nu", "base_diameter",
+"base_length","base_head", "base_elevation", "base_a",
+"base_b", "base_volume", "base_flow", "is_per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
 
 
 "list of units of meta data fields"
 const _units = Dict{String,Dict{String,String}}(
     "si" => Dict{String,String}(
-        "base_rho" => "kg/m3",
+        "base_density" => "kg/m3",
         "base_nu"  => "m2/s",
         "base_diameter" => "m",
         "base_length" => "m",
-        "base_z" => "m",
+        "base_elevation" => "m",
         "base_a" => "m",
         "base_b" => "m",
-        "baseH" => "m",
+        "base_head" => "m",
         "base_volume" => "m3",
-        "baseQ" => "m3/s",
+        "base_flow" => "m3/s",
     ),
     "english" => Dict{String,String}(
 

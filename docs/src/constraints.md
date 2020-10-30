@@ -13,7 +13,7 @@ These templates should be defined over `AbstractPetroleumModel` and should not r
 
 ### Volume flow balance constraints
 
-The primary constraints related to junctions ensure that volume flow is balanced at these nodes. The specifics of the constraint implementation will change if there are network design options (denoted by `\_ne` in the name of the function).
+The primary constraints related to junctions ensure that volume flow is balanced at these nodes.
 
 ```@docs
 constraint_junction_volume_flow_balance

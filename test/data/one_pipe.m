@@ -3,12 +3,12 @@ mpc.beta = 0.0246; % s/m2, assume turbulent flow
 mpc.rho = 827;  % petroleum density, kg per cubic m
 mpc.nu = 4.9e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
-mpc.base_rho = 827; % petroleum base density, kg per m3
+mpc.base_density = 827; % petroleum base density, kg per m3
 mpc.base_nu       = 4.9e-6;  % base viscosity, m2 / s
-mpc.baseH = 100; % base head, m
+mpc.base_head = 100; % base head, m
 mpc.base_length   = 542; % m
-mpc.baseQ = 3600; % petroleum volume flow rate, m3 per hour
-mpc.base_z = 100; % base elevation, m
+mpc.base_flow = 3600; % petroleum volume flow rate, m3 per hour
+mpc.base_elevation = 100; % base elevation, m
 mpc.base_a = 100 ; % base a coefficient
 mpc.base_b = 100 ; % base b coefficient
 mpc.base_volume = 1000;
@@ -23,7 +23,7 @@ mpc.time_step = 0;
 
 
 %% junction data
-%  junction_i type head_min head_max z status
+%  junction_i type head_min head_max elevation status
 mpc.junction = [
 1  1  30 800 220 1
 2  0  30 800 100 1
