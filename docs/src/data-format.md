@@ -94,7 +94,7 @@ These components model producers of product.
 
 | Parameter                    | Type    | Name                   | Standard Units (SI) | United States Customary Units | Required | Description                                                        |
 | ---------------------------- | ------- | ---------------------- | ------------------- | ----------------------------- | -------- | ------------------------------------------------------------------ |
-| beta                         | Float64 | Fixed coefficient      | s/m2                | s/ft2                         |          | Coefficient in the Leibenzon equation for turbulent flow           |
+| beta                         | Float64 | Friction coefficient   | s^2/m               | s^2/ft                        |          | Coefficient in the Leibenzon equation for turbulent flow           |
 | density                      | Float64 | Density                | kg/m3               | lbm/ft3                       |          | Liquid density                                                     |
 | viscosity                    | Float64 | Viscosity              | m2/s                | ft2/s                         |          | Liquid kinematic viscosity                                         |
 | gravitational_acceleration   | Float64 | Gravity                | m/s2                | ft/s2                         |          | Gravitational acceleration                                         |
@@ -110,7 +110,7 @@ These components model producers of product.
 | base_diameter                | Float64 | Base Diameter          | m                   | ft                            |          | Base Diameter                                                      |
 | Q_pipe_dim                   | Int     | Pipe coefficient       |                     |                               |          | Petroleum pipe flow coefficient                                    |
 | Q_pump_dim                   | Int     | Pump coefficient       |                     |                               |          | Petroleum pump flow coefficient                                    |
-| base_energy                       | Float64 | Base energy            | kW*h                | kW*h                          | Y        | Base pump energy                                                   |
+| base_energy                  | Float64 | Base energy            | kW*h                | kW*h                          | Y        | Base pump energy                                                   |
 | units                        | String  | Units                  |                     |                               |          | 'si' for standard units or 'usc' for United States customary units |
 | is_per_unit                  | Int     | Per-unit               |                     |                               |          | If data is already in per-unit (non-dimensionalized)               |
 

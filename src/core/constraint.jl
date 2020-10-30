@@ -14,38 +14,8 @@ end
 # Constraints associated with volume flow
 ##########################################################################################################
 
-" standard volume flow balance equation where demand is fixed "
-function constraint_junction_volume_flow_balance_d(pm::AbstractPetroleumModel, n::Int, i, f_pipes, t_pipes,  f_tanks, t_tanks, f_pumps, t_pumps, ql, producers, consumers)
-    qg = var(pm,n,:qg)
-    qin  = var(pm,n,:qin)
-    qoff = var(pm,n,:qoff)
-    q_pump = var(pm,n,:q_pump)
-    q_pipe = var(pm,n,:q_pipe)
-    @show( sum(qoff[a] for a in f_tanks))
-    _add_constraint!(pm, n, :junction_volume_flow_balance, i, JuMP.@constraint(pm.model, sum(qg[a] for a in producers) - ql ==
-                                                                          sum(q_pipe[a] for a in f_pipes) - sum(q_pipe[a] for a in t_pipes) +
-                                                                          sum(q_pump[a] for a in f_pumps) - sum(q_pump[a] for a in t_pumps) +
-                                                                          sum(qoff[a] for a in f_tanks) - sum(qin[a] for a in t_tanks)
-                                                                      ))
-end
-
-" standard volume flow balance equation where production is fixed "
-function constraint_junction_volume_flow_balance_p(pm::AbstractPetroleumModel, n::Int, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, qg, producers, consumers)
-
-    qin  = var(pm,n,:qin)
-    qoff = var(pm,n,:qoff)
-    ql = var(pm,n,:ql)
-    q_pump = var(pm,n,:q_pump)
-    q_pipe = var(pm,n,:q_pipe)
-    _add_constraint!(pm, n, :junction_volume_flow_balance, i, JuMP.@constraint(pm.model, qg - sum(ql[a] for a in consumers) ==
-                                                                          sum(q_pipe[a] for a in f_pipes) - sum(q_pipe[a] for a in t_pipes) +
-                                                                          sum(q_pump[a] for a in f_pumps) - sum(q_pump[a] for a in t_pumps) +
-                                                                          sum(qoff[a] for a in f_tanks) - sum(qin[a] for a in t_tanks)
-                                                                      ) )
-end
-
 " standard volume flow balance equation where demand and production are not fixed "
-function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, n::Int, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, producers, consumers)
+function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, n::Int, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, producers, consumers, qg_f, ql_f)
 
     qin  = var(pm,n,:qin)
     qoff = var(pm,n,:qoff)
@@ -53,7 +23,7 @@ function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, n::
     ql = var(pm,n,:ql)
     q_pump = var(pm,n,:q_pump)
     q_pipe = var(pm,n,:q_pipe)
-    _add_constraint!(pm, n, :junction_volume_flow_balance, i, JuMP.@constraint(pm.model, sum(qg[a] for a in producers) - sum(ql[b] for b in consumers) ==
+    _add_constraint!(pm, n, :junction_volume_flow_balance, i, JuMP.@constraint(pm.model, qg_f - ql_f + sum(qg[a] for a in producers) - sum(ql[b] for b in consumers) ==
                                                                           sum(q_pipe[a] for a in f_pipes) - sum(q_pipe[a] for a in t_pipes) +
                                                                           sum(q_pump[a] for a in f_pumps) - sum(q_pump[a] for a in t_pumps)  +
                                                                           sum(qoff[a] for a in f_tanks) - sum(qin[a] for a in t_tanks)

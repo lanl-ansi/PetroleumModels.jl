@@ -2,19 +2,28 @@
 # The purpose of this file is to define commonly used and created objective functions used in models
 ##########################################################################################################
 
+"Economic objective function for petroluem models that takes the form of ``min \\sum_{i \\in producer} c_i - \\sum_{i \\in consumer} c_i + \\rho * g * \\sum_{ij \\in pump} c_{ij} * ``"
 function objective_min_expenses_max_benefit(pm::AbstractPetroleumModel, nws=[pm.cnw])
-    qg = Dict(n => pm.var[:nw][n][:qg] for n in nws)
-    ql = Dict(n => pm.var[:nw][n][:ql] for n in nws)
-    q_pump  = Dict(n => pm.var[:nw][n][:q_pump] for n in nws)
+    qg      = Dict(n => var(pm,n,:qg) for n in nws)
+    ql      = Dict(n => var(pm,n,:ql) for n in nws)
+    q_pump  = Dict(n => var(pm,n,:q_pump) for n in nws)
+    eta     = Dict(n => var(pm,n,:eta) for n in nws)
+    h       = Dict(n => var(pm,n,:h) for n in nws)
 
-    obj = JuMP.@NLobjective(pm.model, Min,
+    seconds_per_hour           = 3600.0
+    watts_per_kw               = 1000.0
+    density                    = pm.data["density"]
+    gravitational_acceleration = pm.data["gravitational_acceleration"]
+
+    obj = JuMP.@NLobjective(pm.model, _IM._MOI.MIN_SENSE,
          sum(
-              -(-sum(pm.ref[:nw][n][:producer][i]["offer_price"] * qg[n][i] for (i, producer) in pm.ref[:nw][n][:producer]) +
-              sum(pm.ref[:nw][n][:consumer][i]["bid_price"] * ql[n][i] for (i, consumer) in pm.ref[:nw][n][:consumer]))     +
-              pm.data["density"] * pm.data["gravitational_acceleration"] * sum(pm.ref[:nw][n][:pump][i]["electricity_price"] *
-              q_pump[n][i] * (pm.var[:nw][n][:h][pump["to_junction"]] -
-              pm.var[:nw][n][:h][pump["fr_junction"]]) /3600/ (0.966 * 0.95 * pm.var[:nw][n][:eta][i])  / 1000
-              for (i, pump) in pm.ref[:nw][n][:pump] )
+              sum(producer["offer_price"] * qg[n][i] for (i, producer) in ref(pm,n,:producer)) -
+              sum(consumer["bid_price"]   * ql[n][i] for (i, consumer) in ref(pm,n,:consumer)) +
+              (density * gravitational_acceleration) / (seconds_per_hour * watts_per_kw) *
+                sum(pump["electricity_price"] * q_pump[n][i] * (h[n][pump["to_junction"]] - h[n][pump["fr_junction"]]) /
+                (pump["electric_motor_efficiency"] * pump["mechanical_transmission_efficiency"] * eta[n][i]
+                )
+              for (i, pump) in ref(pm,n,:pump) )
          for n in nws)
          )
  end

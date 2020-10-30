@@ -2,7 +2,7 @@
 
 
 "data getters"
-@inline h_base(data::Dict{String,Any}) = data["base_head"]
+@inline base_head(data::Dict{String,Any}) = data["base_head"]
 @inline base_density(data::Dict{String,Any}) = data["base_density"]
 @inline base_viscosity(data::Dict{String,Any}) = data["base_viscosity"]
 @inline base_gravitational_acceleration(data::Dict{String,Any}) = data["gravitational_acceleration"]
@@ -15,17 +15,6 @@
 @inline volumbase_energy(data::Dict{String,Any}) = data["base_volume"]
 @inline base_energy(data::Dict{String,Any}) = data["base_energy"]
 
-# @inline get_base_time(data::Dict{String,Any}) = data["base_time"]
-
-"calculates constant flow production"
-function calc_qg(data::Dict{String,Any}, producer::Dict{String,Any})
-    producer["qg"]
-end
-
-"calculates constant flow consumer"
-function calc_ql(data::Dict{String,Any}, consumer::Dict{String,Any})
-    consumer["ql"]
-end
 
 "apply a function on a dict entry"
 function _apply_func!(data::Dict{String,Any}, key::String, func)
@@ -41,7 +30,7 @@ function calc_tank_head_initial(data::Dict{String,Any}, tank::Dict{String,Any})
     head_initial = (volume / (3.14 * radius ^ 2))
 
     if !haskey(data, "is_per_unit") || data["is_per_unit"] == true
-        head_initial  = head_initial / h_base(data)
+        head_initial  = head_initial / base_head(data)
     end
     return head_initial
 end
@@ -103,8 +92,10 @@ function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::
         "ql",
         "injection_min",
         "injection_max",
+        "injection_nominal",
         "withdrawal_min",
         "withdrawal_max",
+        "withdrawl_nominal",
         "qin",
         "qoff",
         "electricity_price"
@@ -146,11 +137,14 @@ const _params_for_unit_conversions = Dict(
 
     "consumer" => [
         "withdrawal_min",
-        "withdrawal_max", "ql"
+        "withdrawal_max",
+        "withdrawal_nominal",
+        "ql"
     ],
     "producer" => [
         "injection_min",
         "injection_max",
+        "injection_nominal",
         "qg"
     ],
 
@@ -195,8 +189,10 @@ function _rescale_functions(
         "elevation" => rescale_elevation,
         "withdrawal_min" => rescale_q_pipe,
         "withdrawal_max" => rescale_q_pipe,
+        "withdrawal_nominal" => rescale_q_pipe,
         "injection_min" => rescale_q_pipe,
         "injection_max" => rescale_q_pipe,
+        "injection_nominal" => rescale_q_pipe,
         "flow_min" => rescale_q_pipe,
         "flow_max" => rescale_q_pipe,
         "flow_nom" => rescale_q_pump_nom,
@@ -235,7 +231,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_gravitational_acceleration = x -> x/9.8
     rescale_diameter = x -> x/base_diameter(data)
     rescale_length = x -> x/base_length(data)
-    rescale_H      = x -> x/h_base(data)
+    rescale_H      = x -> x/base_head(data)
     rescale_elevation      = x -> x/base_elevation(data)
     rescale_a      = x -> x/a_base(data)
     rescale_b      = x -> x/b_base(data)

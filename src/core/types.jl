@@ -1,8 +1,8 @@
 # TODO add references to different models docstrings
 
-"BP models"
+"LP models - Leibenzon Physics"
 abstract type AbstractBPModel <: AbstractPetroleumModel end
 
 
-"BP Model Type"
-mutable struct BPPetroleumModel <: AbstractBPModel @pm_fields end
+"LP Model Type - Leibenzon Physics"
+mutable struct LPPetroleumModel <: AbstractBPModel @pm_fields end

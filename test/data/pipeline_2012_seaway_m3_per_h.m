@@ -69,20 +69,20 @@ mpc.pipe = [
 
 
 %% pump data
-% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_max delta_head_min pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status
+% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_max delta_head_min pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
 mpc.pump = [
-  21  21  22     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.14  1
-  19  19  20     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.08  1
-  13  13  14     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.15  1
-  12  12  13     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.15  1
-  10  10  11     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12  1
-  7   7   8      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.11  1
-  4   4   5      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.13  1
-  2   2   3      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12  1
-  1   1   2      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12  1
+  21  21  22     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.14  1 0.966 0.95
+  19  19  20     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.08  1 0.966 0.95
+  13  13  14     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.15  1 0.966 0.95
+  12  12  13     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.15  1 0.966 0.95
+  10  10  11     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
+  7   7   8      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.11  1 0.966 0.95
+  4   4   5      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.13  1 0.966 0.95
+  2   2   3      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
+  1   1   2      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
 ];
 %% producer
-% producer_i junction injection_min injection_max qg status dispatchable offer_price
+% producer_i junction injection_min injection_max injection_nominal status dispatchable offer_price
 mpc.producer = [
   1  1  360  3000 1440 1 1 300
   2  9  360  3000 1440 1 1 300
@@ -90,7 +90,7 @@ mpc.producer = [
 ];
 
 %% consumer
-% consumer_i junction withdrawal_min withdrawal_max ql status dispatchable bid_price
+% consumer_i junction withdrawal_min withdrawal_max withdrawal_nominal status dispatchable bid_price
 mpc.consumer = [
   1	 15	288 3060 1100 1 1 310
   2	 23	288 3060 1100 1 1 310

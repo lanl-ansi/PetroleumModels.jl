@@ -13,50 +13,6 @@
 #################################################################################################
 # Templates for constraints associated with volume flow through junctions
 #################################################################################################
-" standard flow balance equation where demand is fixed "
-function constraint_junction_volume_flow_balance_d(pm::AbstractPetroleumModel, i; n::Int=pm.cnw)
-
-    producer                = ref(pm,n,:producer)
-    consumer                = ref(pm,n,:consumer)
-    junction                = ref(pm,n,:junction,i)
-    f_tanks                 = ref(pm,n,:tanks_fr,i)
-    t_tanks                 = ref(pm,n,:tanks_to,i)
-    f_pipes                = ref(pm,n,:pipes_fr,i)
-    t_pipes                = ref(pm,n,:pipes_to,i)
-    f_pumps                = ref(pm,n,:pumps_fr,i)
-    t_pumps                = ref(pm,n,:pumps_to,i)
-    dispatch_consumers     = ref(pm,n,:dispatchable_consumers_in_junction,i)
-    nondispatch_consumers  = ref(pm,n,:nondispatchable_consumers_in_junction,i)
-    dispatch_producers     = ref(pm,n,:dispatchable_producers_in_junction,i)
-    nondispatch_producers  = ref(pm,n,:nondispatchable_producers_in_junction,i)
-    dispatch_transfers     = ref(pm,n,:dispatchable_transfers_in_junction,i)
-    qg                      = length(dispatch_producers) > 0 ? sum(producer[j]["qg"] for j in dispatch_producers) : 0
-    ql                      = length(dispatch_consumers) > 0 ? sum(consumer[j]["ql"] for j in dispatch_consumers) : 0
-
-    constraint_junction_volume_flow_balance_d(pm, n, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, ql, dispatch_producers, dispatch_consumers)
-end
-
-" standard flow balance equation where production is fixed "
-function constraint_junction_volume_flow_balance_p(pm::AbstractPetroleumModel, i; n::Int=pm.cnw)
-
-    producer                = ref(pm,n,:producer)
-    consumer                = ref(pm,n,:consumer)
-    junction                = ref(pm,n,:junction,i)
-    f_tanks                 = ref(pm,n,:tanks_fr,i)
-    t_tanks                 = ref(pm,n,:tanks_to,i)
-    f_pipes                 = ref(pm,n,:pipes_fr,i)
-    t_pipes                 = ref(pm,n,:pipes_to,i)
-    f_pumps           = ref(pm,n,:pumps_fr,i)
-    t_pumps           = ref(pm,n,:pumps_to,i)
-    dispatch_consumers       = ref(pm,n,:dispatchable_consumers_in_junction,i)
-    nondispatch_consumers    = ref(pm,n,:nondispatchable_consumers_in_junction,i)
-    dispatch_producers     = ref(pm,n,:dispatchable_producers_in_junction,i)
-    nondispatch_producers  = ref(pm,n,:nondispatchable_producers_in_junction,i)
-    dispatch_transfers      = ref(pm,n,:dispatchable_transfers_in_junction,i)
-    qg                      = length(dispatch_producers) > 0 ? sum(producer[j]["qg"] for j in dispatch_producers) : 0
-    ql                      = length(dispatch_consumers) > 0 ? sum(consumer[j]["ql"] for j in dispatch_consumers) : 0
-    constraint_junction_volume_flow_balance_p(pm, n, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, qg, dispatch_producers, dispatch_consumers)
-end
 
 
 " standard flow balance equation where demand and production are not fixed "
@@ -73,13 +29,12 @@ function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, i; 
     t_pumps                 = ref(pm,n,:pumps_to,i)
     dispatch_consumers      = ref(pm,n,:dispatchable_consumers_in_junction,i)
     nondispatch_consumers   = ref(pm,n,:nondispatchable_consumers_in_junction,i)
-    dispatch_producers     = ref(pm,n,:dispatchable_producers_in_junction,i)
-    nondispatch_producers  = ref(pm,n,:nondispatchable_producers_in_junction,i)
-    qg                      = length(dispatch_producers) > 0 ? sum(producer[j]["qg"] for j in dispatch_producers) : 0
-    ql                      = length(dispatch_consumers) > 0 ? sum(consumer[j]["ql"] for j in dispatch_consumers) : 0
+    dispatch_producers      = ref(pm,n,:dispatchable_producers_in_junction,i)
+    nondispatch_producers   = ref(pm,n,:nondispatchable_producers_in_junction,i)
+    qg                      = length(nondispatch_producers) > 0 ? sum(producer[j]["injection_nominal"] for j in nondispatch_producers) : 0
+    ql                      = length(nondispatch_consumers) > 0 ? sum(consumer[j]["withdrawal_nominal"] for j in nondispatch_consumers) : 0
 
-    constraint_junction_volume_flow_balance(pm, n, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, dispatch_producers, dispatch_consumers)
-
+    constraint_junction_volume_flow_balance(pm, n, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, dispatch_producers, dispatch_consumers, qg, ql)
 end
 
 #################################################################################################

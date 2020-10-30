@@ -25,7 +25,7 @@ function instantiate_model(file::String,  model_type, build_method; kwargs...)
     return instantiate_model(data, model_type, build_method; kwargs...)
 end
 
-
+""
 function instantiate_model(data::Dict{String,<:Any}, model_type::Type, build_method; kwargs...)
     pm = _IM.instantiate_model(data, model_type, build_method, ref_add_core!, _pm_global_keys; kwargs...)
     return pm
@@ -108,6 +108,7 @@ function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_density=850, base_viscosi
 
 end
 
+""
 function _add_junction_map!(junction_map::Dict, collection::Dict)
     for (i, component) in collection
         junction_id = component["junction_id"]
@@ -115,7 +116,7 @@ function _add_junction_map!(junction_map::Dict, collection::Dict)
     end
 end
 
-
+""
 function _add_parallel_edges!(parallel_ref::Dict, collection::Dict)
     for (idx, connection) in collection
         i = connection["fr_junction"]
@@ -131,6 +132,7 @@ function _add_parallel_edges!(parallel_ref::Dict, collection::Dict)
     end
 end
 
+""
 function _add_edges_to_junction_map!(fr_ref::Dict, to_ref::Dict, collection::Dict)
     for (idx, connection) in collection
         i = connection["fr_junction"]

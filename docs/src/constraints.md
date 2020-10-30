@@ -17,9 +17,6 @@ The primary constraints related to junctions ensure that volume flow is balanced
 
 ```@docs
 constraint_junction_volume_flow_balance
-constraint_junction_volume_flow_balance_d
-constraint_junction_volume_flow_balance_p
-
 ```
 
 ## Pipe Constraints

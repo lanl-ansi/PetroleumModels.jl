@@ -36,13 +36,13 @@ mpc.pipe = [
 ];
 
 %% producer
-% producer_i junction injection_min injection_max qg status dispatchable offer_price
+% producer_i junction injection_min injection_max injection_nominal status dispatchable offer_price
 mpc.producer = [
   1  1  360 3600 0.3 1 1 300
 ];
 
 %% consumer
-% consumer_i junction wthdrawal_min withdrawal_max ql status dispatchable bid_price
+% consumer_i junction wthdrawal_min withdrawal_max withdrawal_nominal status dispatchable bid_price
 mpc.consumer = [
   1	 2	360 3600 0.302 1 1 350
 ];

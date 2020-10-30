@@ -57,26 +57,26 @@ mpc.pipe = [
 ];
 
 %% pump data
-% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_max delta_head_min pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status
+% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_max delta_head_min pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
 mpc.pump = [
-  13  13  14     3  319.1 5.43e-6  4500  5400 160 280 0.6 0.87  3000 2400  3600 0.07  1
-  8   8   9      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.12  1
-  7   7   8      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.12  1
-  3   3   4      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.1   1
-  1   1   3      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.1   1
+  13  13  14     3  319.1 5.43e-6  4500  5400 160 280 0.6 0.87  3000 2400  3600 0.07  1 0.966 0.95
+  8   8   9      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
+  7   7   8      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
+  3   3   4      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.1   1 0.966 0.95
+  1   1   3      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.1   1 0.966 0.95
 ];
 
 
 %% producer
-% producer_i junction injection_min injection_max qg status dispatchable offer_price
+% producer_i junction injection_min injection_max injection_nominal status dispatchable offer_price
 mpc.producer = [
-  1  1  300 4200 210  1 1 150
-  2  12 100 210 209.7 1 1 150
-  3  13 100 150 139.8 1 1 150
+  1  1  300 4200 210   1 1 150
+  2  12 100 210  209.7 1 1 150
+  3  13 100 150  139.8 1 1 150
 ];
 
 %% consumer
-% consumer_i junction withdrawal_min withdrawal_max ql status dispatchable bid_price
+% consumer_i junction withdrawal_min withdrawal_max withdrawal_nominal status dispatchable bid_price
 mpc.consumer = [
   1	 16	4000 5000 1.12 1 1 270
 ];

@@ -6,98 +6,122 @@ function parse_matlab(file::Union{IO, String})
 end
 
 const _mlab_data_names = Vector{String}([
-"mpc.beta","mpc.density", "mpc.viscosity", "mpc.gravitational_acceleration",
- "mpc.base_density", "mpc.base_viscosity", "mpc.base_diameter", "mpc.base_length", "mpc.base_flow", "mpc.base_head", "mpc.base_elevation", "mpc.base_a",
- "mpc.base_b",  "mpc.base_volume","mpc.units","mpc.is_per_unit","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
- "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.base_energy"
+    "mpc.beta",
+    "mpc.density",
+    "mpc.viscosity",
+    "mpc.gravitational_acceleration",
+    "mpc.base_density",
+    "mpc.base_viscosity",
+    "mpc.base_diameter",
+    "mpc.base_length",
+    "mpc.base_flow",
+    "mpc.base_head",
+    "mpc.base_elevation",
+    "mpc.base_a",
+    "mpc.base_b",
+    "mpc.base_volume",
+    "mpc.units",
+    "mpc.is_per_unit",
+    "mpc.junction",
+    "mpc.pipe",
+    "mpc.pump",
+    "mpc.producer",
+    "mpc.consumer",
+    "mpc.tank",
+    "mpc.time_step",
+    "mpc.Q_pipe_dim",
+    "mpc.Q_pump_dim",
+    "mpc.base_energy"
 ])
 
 const _mlab_junction_columns = Vector{Tuple{String,Type}}([
-("id", Int),
-("junction_type", Int),
-("head_min", Float64),
-("head_max", Float64),
-("elevation", Float64),
-("status", Int)
+    ("id", Int),
+    ("junction_type", Int),
+    ("head_min", Float64),
+    ("head_max", Float64),
+    ("elevation", Float64),
+    ("status", Int)
 ])
 
 const _mlab_pipe_columns =  Vector{Tuple{String,Type}}([
-("pipline_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("diameter", Float64),
-("length", Float64),
-("flow_min", Float64),
-("flow_max", Float64),
-("status", Int)
+    ("pipline_i", Int),
+    ("fr_junction", Int),
+    ("to_junction", Int),
+    ("diameter", Float64),
+    ("length", Float64),
+    ("flow_min", Float64),
+    ("flow_max", Float64),
+    ("status", Int)
 ])
 
 
 const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
-("pump_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("station_i", Int),
-("a", Float64),
-("b", Float64),
-("flow_nom", Float64),
-("flow_max", Float64),
-("delta_head_max", Float64),
-("delta_head_min", Float64),
-("pump_efficiency_min", Float64),
-("pump_efficiency_max", Float64),
-("w_nom", Float64),
-("rotation_min", Float64),
-("rotation_max", Float64),
-("electricity_price", Float64),
-("status", Int)
+    ("pump_i", Int),
+    ("fr_junction", Int),
+    ("to_junction", Int),
+    ("station_i", Int),
+    ("a", Float64),
+    ("b", Float64),
+    ("flow_nom", Float64),
+    ("flow_max", Float64),
+    ("delta_head_max", Float64),
+    ("delta_head_min", Float64),
+    ("pump_efficiency_min", Float64),
+    ("pump_efficiency_max", Float64),
+    ("w_nom", Float64),
+    ("rotation_min", Float64),
+    ("rotation_max", Float64),
+    ("electricity_price", Float64),
+    ("status", Int),
+    ("electric_motor_efficiency", Float64),
+    ("mechanical_transmission_efficiency", Float64)
 ])
 
 
 const _mlab_producer_columns =  Vector{Tuple{String,Type}}([
-("producer_i", Int),
-("junction_id", Int),
-("injection_min", Float64),
-("injection_max", Float64),
-("qg", Float64),
-("status", Int),
-("is_dispatchable", Int),
-("offer_price", Float64)
+    ("producer_i", Int),
+    ("junction_id", Int),
+    ("injection_min", Float64),
+    ("injection_max", Float64),
+    ("injection_nominal", Float64),
+    ("status", Int),
+    ("is_dispatchable", Int),
+    ("offer_price", Float64)
 ])
 
 const _mlab_consumer_columns =  Vector{Tuple{String,Type}}([
-("consumer_i", Int),
-("junction_id", Int),
-("withdrawal_min", Float64),
-("withdrawal_max", Float64),
-("ql", Float64),
-("status", Float64),
-("is_dispatchable", Int),
-("bid_price", Float64)
+    ("consumer_i", Int),
+    ("junction_id", Int),
+    ("withdrawal_min", Float64),
+    ("withdrawal_max", Float64),
+    ("withdrawal_nominal", Float64),
+    ("status", Float64),
+    ("is_dispatchable", Int),
+    ("bid_price", Float64)
 ])
 
 const _mlab_time_series_columns =  Vector{Tuple{String,Type}}([
-("consumer_price", Float64),
-("producer_price", Float64)
+    ("consumer_price", Float64),
+    ("producer_price", Float64)
 ])
 
 const _mlab_tank_columns =  Vector{Tuple{String,Type}}([
-("tank_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("vessel_pressure_head", Float64),
-("radius", Float64),
-("Min_Capacity_Limitation", Float64),
-("Max_Capacity_Limitation", Float64),
-("Initial_Volume", Float64),
-("intake_min", Float64),
-("intake_max", Float64),
-("offtake_min", Float64),
-("offtake_max", Float64),
-("Cd", Float64),
-("status", Int),
-("price", Float64),
-("p_price", Float64)
+    ("tank_i", Int),
+    ("fr_junction", Int),
+    ("to_junction", Int),
+    ("vessel_pressure_head", Float64),
+    ("radius", Float64),
+    ("Min_Capacity_Limitation", Float64),
+    ("Max_Capacity_Limitation", Float64),
+    ("Initial_Volume", Float64),
+    ("intake_min", Float64),
+    ("intake_max", Float64),
+    ("offtake_min", Float64),
+    ("offtake_max", Float64),
+    ("Cd", Float64),
+    ("status", Int),
+    ("price", Float64),
+    ("p_price", Float64)
 ])
 
 
