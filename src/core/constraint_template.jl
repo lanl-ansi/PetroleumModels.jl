@@ -15,7 +15,10 @@
 #################################################################################################
 
 
-" standard flow balance equation where demand and production are not fixed "
+" Constraint for balancing volumetric flow at junctions (nodes) in the pipeline system.  Given junction ``i``, this constraint takes the form of
+``\\sum_{j \\in Producers_i} qg_j - \\sum_{j \\in Consumers_i} ql_j = \\sum_{ij \\in Pipes^f_{ij}} q_{ij} - \\sum_{ij \\in Pipes^t_{ji}} q_{ji} +
+  \\sum_{ij \\in Pumps^f_{ij}} q_{ij} - \\sum_{ij \\in Pumps^t_{ji}} q_{ji} + \\sum_{ij \\in Tanks^f_{ij}} q_{ij} - \\sum_{ij \\in Tanks^t_{ji}} q_{ji} ``
+ where ``qg`` and ``ql`` includes variable and constant demand and production as defined by the ``is\\_dispatchable`` flag"
 function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, i; n::Int=pm.cnw)
 
     producer                = ref(pm,n,:producer)
@@ -40,23 +43,26 @@ end
 #################################################################################################
 # Constraints associated with pipes
 #################################################################################################
+" Constraint for computing the relationship between volumetric flow and head difference at either end of a pipe.  For a pipe ``(i,j)``, this constraint is computed as
+`` (h_i - h_j) == (z_j - z_i) + \\frac{\\beta * \\nu^m}{D_{ij}^(5.0-m)} * L_{ij} * 1.02 * \frac{q}{Q_pipe_dim}^{2.0-m} ``.
+The constraint adopts the Leibenzon model
+"
+function constraint_leibenzon(pm::AbstractPetroleumModel, n::Int, k)
+    pipe = ref(pm,n,:pipe,k)
+    i    = pipe["fr_junction"]
+    j    = pipe["to_junction"]
+    nu = pm.data["viscosity"]
+    zi = ref(pm,n,:junction, i)["elevation"]
+    zj = ref(pm,n,:junction, j)["elevation"]
+    Q_pipe_dim = pm.data["Q_pipe_dim"]
+    m  = leibenzon_exponent(pm.data)
+    lc = leibenzon_constant(pm.data)
 
-function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k)
-        pipe = ref(pm,n,:pipe,k)
-        i    = pipe["fr_junction"]
-        j    = pipe["to_junction"]
-        beta = pm.data["beta"]
-        nu = pm.data["viscosity"]
-        D = pipe["diameter"]
-        L = pipe["length"]
-        zi = ref(pm,n,:junction, i)["elevation"]
-        zj = ref(pm,n,:junction, j)["elevation"]
-        Q_pipe_dim = pm.data["Q_pipe_dim"]
-        constraint_nodal_volume_balance(pm, n, k, i, j, beta, nu, D, L, zi, zj, Q_pipe_dim)
+    lambda = _calc_pipe_resistance_leibenzon(pipe, nu, m, lc, Q_pipe_dim)
 
-
+    constraint_leibenzon(pm, n, k, i, j, lambda, zi, zj, m)
 end
-constraint_nodal_volume_balance(pm::AbstractPetroleumModel, k::Int) = constraint_nodal_volume_balance(pm, pm.cnw, k)
+constraint_leibenzon(pm::AbstractPetroleumModel, k::Int) = constraint_leibenzon(pm, pm.cnw, k)
 
 #################################################################################################
 # Constraints associated with pumps

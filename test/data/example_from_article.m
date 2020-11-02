@@ -1,6 +1,5 @@
 function mpc = lib1
 
-mpc.beta                       = 0.0246;   % s/m2, assume turbulent flow
 mpc.density                    = 851.5;    % petroleum density, kg per cubic m
 mpc.viscosity                  = 11.6e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
@@ -43,21 +42,21 @@ mpc.junction = [
 ];
 
 %% pipeline data
-% pipeline_i fr_junction to_junction diameter length flow_min flow_max status
+% pipeline_i fr_junction to_junction diameter length flow_min flow_max friction_factor status
 mpc.pipe = [
-  15  15 16    1.04  137.5e3 500 5000  1
-  14  14 15    1.04  96.1e3  500 5000  1
-  12  12 13    1.04  133.3e3 500 5000  1
-  11  11 12    1.04  126.5e3 500 5000  1
-  10  10 11    1.04  111.9e3 500 5000  1
-  9   9  10    1.04  123.9e3 500 5000  1
-  6   6  7     1.04  126.9e3 500 5000  1
-  5   5  6     1.04  107.7e3 500 5000  1
-  4   4  5     1.04  128e3   500 5000  1
+  15  15 16    1.04  137.5e3 500 5000  0.0246 1
+  14  14 15    1.04  96.1e3  500 5000  0.0246 1
+  12  12 13    1.04  133.3e3 500 5000  0.0246 1
+  11  11 12    1.04  126.5e3 500 5000  0.0246 1
+  10  10 11    1.04  111.9e3 500 5000  0.0246 1
+  9   9  10    1.04  123.9e3 500 5000  0.0246 1
+  6   6  7     1.04  126.9e3 500 5000  0.0246 1
+  5   5  6     1.04  107.7e3 500 5000  0.0246 1
+  4   4  5     1.04  128e3   500 5000  0.0246 1
 ];
 
 %% pump data
-% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_max delta_head_min pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
+% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_min delta_head_max pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
 mpc.pump = [
   13  13  14     3  319.1 5.43e-6  4500  5400 160 280 0.6 0.87  3000 2400  3600 0.07  1 0.966 0.95
   8   8   9      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95

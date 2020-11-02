@@ -26,7 +26,7 @@ constraint_junction_volume_flow_balance
 The primary constraints related to pipes ensure that that head change and flow across a pipe is represented by Bernoulli equation. In this constraint head loss across a pipe is related through the Leibenzon relationship. Here, the naming convention `ne` is used to denote the form of the constraint used for expansion pipes.
 
 ```@docs
-constraint_nodal_volume_balance
+constraint_leibenzon
 ```
 
 ## Pump Constraints

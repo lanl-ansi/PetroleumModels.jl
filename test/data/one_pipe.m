@@ -1,6 +1,5 @@
 function mpc = lib1
 
-mpc.beta                       = 0.0246;  % s/m2, assume turbulent flow
 mpc.density                    = 827;     % petroleum density, kg per cubic m
 mpc.viscosity                  = 4.9e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
@@ -30,9 +29,9 @@ mpc.junction = [
 ];
 
 %% pipeline data
-% pipeline_i fr_junction to_junction diameter length flow_min flow_max status
+% pipeline_i fr_junction to_junction diameter length flow_min flow_max friction_factor status
 mpc.pipe = [
-  30  1  2  0.8  10.0e3 360 5000 1
+  30  1  2  0.8  10.0e3 360 5000 0.0246 1
 ];
 
 %% producer

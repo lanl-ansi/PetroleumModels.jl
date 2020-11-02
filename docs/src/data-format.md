@@ -26,16 +26,17 @@ These components model “point” locations in the system, i.e. locations of wi
 
 These components model pipelines which connect two junctions.
 
-| Parameter                         | Type    | Name              | Standard Units (SI) | United States Customary Units | Required | Description                                                 |
-| --------------------------------- | ------- | ----------------- | ------------------- | ----------------------------- | -------- | ----------------------------------------------------------- |
-| pipeline_i                        | Int     | Pipe id           |                     |                               | Y        | Unique id for pipes                                         |
-| fr_junction                       | Int     | From Junction id  |                     |                               | Y        | Unique id of the junction on the from side                  |
-| to_junction                       | Int     | To Junction id    |                     |                               | Y        | Unique id of the junction on the to side                    |
-| diameter                          | Float64 | Diameter          | m                   | ft                            | Y        | Pipe diameter                                               |
-| length                            | Float64 | Length            | m                   | ft                            | Y        | Pipe Length                                                 |
-| flow_min                          | Float64 | Flow Rate Minimum | m3/h                | ft3/h                         | Y        | Minimum allowable operating flow rate, usually depends on pipe diameter |
-| flow_max                          | Float64 | Flow Rate Maximum | m3/h                | ft3/h                         | Y        | Maximum allowable operating flow rate, usually depends on pipe diameter |
-| status                            | Int     | Pipe status       |                     |                               | Y        | Determines if the component is active in the model          |
+| Parameter                         | Type    | Name                 | Standard Units (SI) | United States Customary Units | Required | Description                                                 |
+| --------------------------------- | ------- | -------------------  | ------------------- | ----------------------------- | -------- | ----------------------------------------------------------- |
+| pipeline_i                        | Int     | Pipe id              |                     |                               | Y        | Unique id for pipes                                         |
+| fr_junction                       | Int     | From Junction id     |                     |                               | Y        | Unique id of the junction on the from side                  |
+| to_junction                       | Int     | To Junction id       |                     |                               | Y        | Unique id of the junction on the to side                    |
+| diameter                          | Float64 | Diameter             | m                   | ft                            | Y        | Pipe diameter                                               |
+| length                            | Float64 | Length               | m                   | ft                            | Y        | Pipe Length                                                 |
+| fiction_factor                    | Float64 | Friction coefficient | s^2/m               | s^2/ft                        |          | Coefficient in the Leibenzon equation for turbulent flow    |
+| flow_min                          | Float64 | Flow Rate Minimum    | m3/h                | ft3/h                         | Y        | Minimum allowable operating flow rate, usually depends on pipe diameter |
+| flow_max                          | Float64 | Flow Rate Maximum    | m3/h                | ft3/h                         | Y        | Maximum allowable operating flow rate, usually depends on pipe diameter |
+| status                            | Int     | Pipe status          |                     |                               | Y        | Determines if the component is active in the model          |
 
 ## Pumps (mpc.pump)
 
@@ -94,7 +95,6 @@ These components model producers of product.
 
 | Parameter                    | Type    | Name                   | Standard Units (SI) | United States Customary Units | Required | Description                                                        |
 | ---------------------------- | ------- | ---------------------- | ------------------- | ----------------------------- | -------- | ------------------------------------------------------------------ |
-| beta                         | Float64 | Friction coefficient   | s^2/m               | s^2/ft                        |          | Coefficient in the Leibenzon equation for turbulent flow           |
 | density                      | Float64 | Density                | kg/m3               | lbm/ft3                       |          | Liquid density                                                     |
 | viscosity                    | Float64 | Viscosity              | m2/s                | ft2/s                         |          | Liquid kinematic viscosity                                         |
 | gravitational_acceleration   | Float64 | Gravity                | m/s2                | ft/s2                         |          | Gravitational acceleration                                         |

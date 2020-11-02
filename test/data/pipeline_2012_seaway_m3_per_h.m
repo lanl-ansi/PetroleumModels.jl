@@ -1,6 +1,5 @@
 function mpc = lib1
 
-mpc.beta                       = 0.0246;  % s/m2, assume turbulent flow
 mpc.density                    = 827;     % petroleum density, kg per cubic m
 mpc.viscosity                  = 4.9e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
@@ -50,26 +49,26 @@ mpc.junction = [
 ];
 
 %% pipeline data
-% pipeline_i fr_junction to_junction diameter length flow_min flow_max status
+% pipeline_i fr_junction to_junction diameter length flow_min flow_max friction_factor status
 mpc.pipe = [
-  22 22 23  0.75  13.62e3 500 5000  1
-  20 20 21  0.75  173.6e3 500 5000  1
-  18 18 19  0.75  87e3    500 5000  1
-  17 17 18  0.75  10.7e3  500 5000  1
-  16 16 17  0.75  83.2e3  500 5000  1
-  15 15 16  0.75  0.87e3  500 5000  1
-  14 14 15  0.75  2.94e3  500 5000  1
-  11 11 12  0.75  165e3   500 5000  1
-  9  9  10  0.75  36e3    500 5000  1
-  8  8  9   0.75  106.3e3 500 5000  1
-  6  6  7   0.75  132e3   500 5000  1
-  5  5  6   0.75  3.8e3   500 5000  1
-  3  3  4   0.75  154e3   500 5000  1
+  22 22 23  0.75  13.62e3 500 5000  0.0246 1
+  20 20 21  0.75  173.6e3 500 5000  0.0246 1
+  18 18 19  0.75  87e3    500 5000  0.0246 1
+  17 17 18  0.75  10.7e3  500 5000  0.0246 1
+  16 16 17  0.75  83.2e3  500 5000  0.0246 1
+  15 15 16  0.75  0.87e3  500 5000  0.0246 1
+  14 14 15  0.75  2.94e3  500 5000  0.0246 1
+  11 11 12  0.75  165e3   500 5000  0.0246 1
+  9  9  10  0.75  36e3    500 5000  0.0246 1
+  8  8  9   0.75  106.3e3 500 5000  0.0246 1
+  6  6  7   0.75  132e3   500 5000  0.0246 1
+  5  5  6   0.75  3.8e3   500 5000  0.0246 1
+  3  3  4   0.75  154e3   500 5000  0.0246 1
 ];
 
 
 %% pump data
-% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_max delta_head_min pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
+% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_min delta_head_max pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
 mpc.pump = [
   21  21  22     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.14  1 0.966 0.95
   19  19  20     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.08  1 0.966 0.95

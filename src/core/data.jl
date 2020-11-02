@@ -8,12 +8,14 @@
 @inline base_gravitational_acceleration(data::Dict{String,Any}) = data["gravitational_acceleration"]
 @inline base_diameter(data::Dict{String,Any}) = data["base_diameter"]
 @inline base_length(data::Dict{String,Any}) = data["base_length"]
-@inline q_base(data::Dict{String,Any}) = data["base_flow"]
+@inline base_flow(data::Dict{String,Any}) = data["base_flow"]
 @inline base_elevation(data::Dict{String,Any}) = data["base_elevation"]
 @inline a_base(data::Dict{String,Any}) = data["base_a"]
 @inline b_base(data::Dict{String,Any}) = data["base_b"]
 @inline volumbase_energy(data::Dict{String,Any}) = data["base_volume"]
 @inline base_energy(data::Dict{String,Any}) = data["base_energy"]
+@inline leibenzon_exponent(data::Dict{String,Any}) = 0.25
+@inline leibenzon_constant(data::Dict{String,Any}) = 1.02
 
 
 "apply a function on a dict entry"
@@ -45,9 +47,7 @@ function is_per_!(data::Dict{String,Any})
             Memento.error(
                 _LOGGER,
                 "data in .m file is in per unit but no base_head (in m) value is provided")
-
         end
-
     end
 end
 
@@ -57,16 +57,13 @@ function add_base_values!(data::Dict{String,Any})
     (get(data, "base_head", false) == false) &&
     (data["base_head"] = calc_base_head(data))
     (get(data, "base_viscosity", false) == false) && (data["base_viscosity"] = 4.9e-6)
-    # (get(data, "base_density", false) == false) && (data["base_density"] = 850)
     (get(data, "base_length", false) == false) && (data["base_length"] = 500.0)
     data["base_diameter"] = 0.75
     (get(data, "base_flow", false) == false) && (data["base_flow"] = calc_base_flow(data))
-
 end
 
 "make transient data to si units"
-function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::Dict{String,Any},
-)
+function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::Dict{String,Any})
     if static_data["units"] == "si"
         return
     end
@@ -77,6 +74,7 @@ function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::
         "head_max",
         "H"
     ]
+
     flow_params = [
         "density",
         "viscosity",
@@ -99,8 +97,8 @@ function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::
         "qin",
         "qoff",
         "electricity_price"
-
     ]
+
     inv_flow_params = ["bid_price", "offer_price"]
     for line in transient_data
         param = line["parameter"]
@@ -118,12 +116,19 @@ end
 
 const _params_for_unit_conversions = Dict(
 
-    "junction" =>
-        ["head_max", "head_min",  "elevation"],
+    "junction" => [
+        "head_max",
+        "head_min",
+        "elevation"
+    ],
 
-    "pipe" => ["flow_min", "flow_max",
-    "diameter",
-    "length", "q_pipe"],
+    "pipe" => [
+        "flow_min",
+        "flow_max",
+        "diameter",
+        "length",
+        "q_pipe"
+    ],
 
     "pump" => [
     "flow_nom",
@@ -133,7 +138,8 @@ const _params_for_unit_conversions = Dict(
     "a",
     "b",
     "electricity_price",
-    "Q_pump_dim"],
+    "Q_pump_dim"
+    ],
 
     "consumer" => [
         "withdrawal_min",
@@ -141,6 +147,7 @@ const _params_for_unit_conversions = Dict(
         "withdrawal_nominal",
         "ql"
     ],
+
     "producer" => [
         "injection_min",
         "injection_max",
@@ -219,13 +226,13 @@ end
 "Transforms data to si units"
 function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_electricity_price   = x -> x*base_energy(data)
-    rescale_q_pipe   = x -> x/q_base(data)
+    rescale_q_pipe   = x -> x/base_flow(data)
     rescale_Q_pipe_dim = x -> x/3600
     rescale_Q_pump_dim = x ->  x*3600
-    rescale_q_pump   = x -> x/q_base(data)
-    rescale_q_pump_nom   = x -> x/q_base(data)
-    rescale_qin = x -> x/q_base(data)
-    rescale_qoff = x -> x/q_base(data)
+    rescale_q_pump   = x -> x/base_flow(data)
+    rescale_q_pump_nom   = x -> x/base_flow(data)
+    rescale_qin = x -> x/base_flow(data)
+    rescale_qoff = x -> x/base_flow(data)
     rescale_density = x -> x/base_density(data)
     rescale_viscosity = x -> x/base_viscosity(data)
     rescale_gravitational_acceleration = x -> x/9.8
@@ -288,13 +295,13 @@ end
 
 function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_electricity_price   = x -> x/base_energy(data)
-    rescale_q_pipe          = x -> x*q_base(data)
+    rescale_q_pipe          = x -> x*base_flow(data)
     rescale_Q_pipe_dim      = x -> x*3600
     rescale_Q_pump_dim      = x -> x/3600
-    rescale_q_pump          = x -> x*q_base(data)
-    rescale_q_pump_nom      = x -> x*q_base(data)
-    rescale_qin       = x -> x*q_base(data)
-    rescale_qoff      = x -> x*q_base(data)
+    rescale_q_pump          = x -> x*base_flow(data)
+    rescale_q_pump_nom      = x -> x*base_flow(data)
+    rescale_qin       = x -> x*base_flow(data)
+    rescale_qoff      = x -> x*base_flow(data)
     rescale_density             = x -> x*base_density(data)
     rescale_viscosity              = x -> x*base_viscosity(data)
     rescale_gravitational_acceleration = x -> x*9.8
@@ -631,4 +638,13 @@ function _dfs(i, neighbors, component_lookup, touched)
             _dfs(j, neighbors, component_lookup, touched)
         end
     end
+end
+
+
+"Calculates pipeline \"resistance\" using the leibenzon formulation"
+function _calc_pipe_resistance_leibenzon(pipe::Dict{String,Any}, nu, m, lc, Q_pipe_dim)
+    beta = pipe["friction_factor"]
+    D    = pipe["diameter"]
+    L    = pipe["length"]
+    return (beta * L * lc) / (D^(5.0-m) *  Q_pipe_dim^(2.0-m))
 end

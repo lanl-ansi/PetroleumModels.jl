@@ -11,10 +11,10 @@ function _add_constraint!(pm::AbstractPetroleumModel, n::Int, key, i, constraint
 end
 
 ##########################################################################################################
-# Constraints associated with volume flow
+# Constraints associated with junctions
 ##########################################################################################################
 
-" standard volume flow balance equation where demand and production are not fixed "
+" Constraint for balancing volumetric flow a function (nodes) "
 function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, n::Int, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, producers, consumers, qg_f, ql_f)
 
     qin  = var(pm,n,:qin)
@@ -26,29 +26,22 @@ function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, n::
     _add_constraint!(pm, n, :junction_volume_flow_balance, i, JuMP.@constraint(pm.model, qg_f - ql_f + sum(qg[a] for a in producers) - sum(ql[b] for b in consumers) ==
                                                                           sum(q_pipe[a] for a in f_pipes) - sum(q_pipe[a] for a in t_pipes) +
                                                                           sum(q_pump[a] for a in f_pumps) - sum(q_pump[a] for a in t_pumps)  +
-                                                                          sum(qoff[a] for a in f_tanks) - sum(qin[a] for a in t_tanks)
-                                                                      ) )
+                                                                          sum(qoff[a] for a in f_tanks) - sum(qin[a] for a in t_tanks))
+                    )
 end
-
-##########################################################################################################
-# Constraints associated with junctions
-##########################################################################################################
-
 
 
 #################################################################################################
 # Constraints associated with pipes
 #################################################################################################
 
-"Pipe volume flow balance equation "
-function constraint_nodal_volume_balance(pm::AbstractPetroleumModel, n::Int, k, i, j, beta, nu, D, L, zi, zj, Q_pipe_dim)
-        elevation_i = zi
-        elevation_j = zj
-        Hi = var(pm,n,:h,i)
-        Hj = var(pm,n,:h,j)
-        q  = var(pm,n,:q_pipe,k)
-        _add_constraint!(pm, n, :nodal_volume_balance, k, JuMP.@NLconstraint(pm.model, (Hi - Hj) == (elevation_j - elevation_i) + (beta * nu^0.25 / D^4.75 * L * 1.02) * (q / Q_pipe_dim)^1.75))
-    end
+" Leibenzon model for pipeline physics "
+function constraint_leibenzon(pm::AbstractPetroleumModel, n::Int, k, i, j, lambda, zi, zj, m)
+    hi = var(pm,n,:h,i)
+    hj = var(pm,n,:h,j)
+    q  = var(pm,n,:q_pipe,k)
+    _add_constraint!(pm, n, :leibenzon, k, JuMP.@NLconstraint(pm.model, (hi - hj) == (zj - zi) + (lambda * q^(2.0-m))))
+end
 
 #################################################################################################
 # Constraints associated with pumps
@@ -59,13 +52,13 @@ function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::
     q_pump   = var(pm,n,:q_pump,k)
     w_pump   = var(pm,n,:w,k)
     eta      = var(pm,n,:eta,k)
-    Hi       = var(pm,n,:h,i)
-    Hj       = var(pm,n,:h,j)
+    hi       = var(pm,n,:h,i)
+    hj       = var(pm,n,:h,j)
 
     _add_constraint!(pm, n, :eta_con,            i, JuMP.@NLconstraint(pm.model, eta == eta_max - (q_pump / flow_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
-    _add_constraint!(pm, n, :pump_head_con,      i, JuMP.@constraint(pm.model,   (Hj - Hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim )^2 * b ))
-    _add_constraint!(pm, n, :delta_head_max_con, i, JuMP.@constraint(pm.model,   delta_head_max <= (Hj - Hi)))
-    _add_constraint!(pm, n, :delta_head_min_con, i, JuMP.@constraint(pm.model,   (Hj - Hi) <= delta_head_min))
+    _add_constraint!(pm, n, :pump_head_con,      i, JuMP.@constraint(pm.model,   (hj - hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim )^2 * b ))
+    _add_constraint!(pm, n, :delta_head_max_con, i, JuMP.@constraint(pm.model,   delta_head_min <= (hj - hi)))
+    _add_constraint!(pm, n, :delta_head_min_con, i, JuMP.@constraint(pm.model,   (hj - hi) <= delta_head_max))
 end
 
 #################################################################################################

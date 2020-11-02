@@ -19,7 +19,7 @@ function build_opf(pm::AbstractPetroleumModel)
     objective_min_expenses_max_benefit(pm)
 
     for i in ids(pm, :pipe)
-        constraint_nodal_volume_balance(pm, i)
+        constraint_leibenzon(pm, i)
     end
 
     for i in ids(pm, :pump)

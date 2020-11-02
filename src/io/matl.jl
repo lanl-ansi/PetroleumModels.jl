@@ -6,7 +6,6 @@ function parse_matlab(file::Union{IO, String})
 end
 
 const _mlab_data_names = Vector{String}([
-    "mpc.beta",
     "mpc.density",
     "mpc.viscosity",
     "mpc.gravitational_acceleration",
@@ -51,6 +50,7 @@ const _mlab_pipe_columns =  Vector{Tuple{String,Type}}([
     ("length", Float64),
     ("flow_min", Float64),
     ("flow_max", Float64),
+    ("friction_factor", Float64),
     ("status", Int)
 ])
 
@@ -64,8 +64,8 @@ const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
     ("b", Float64),
     ("flow_nom", Float64),
     ("flow_max", Float64),
-    ("delta_head_max", Float64),
     ("delta_head_min", Float64),
+    ("delta_head_max", Float64),
     ("pump_efficiency_min", Float64),
     ("pump_efficiency_max", Float64),
     ("w_nom", Float64),
@@ -184,14 +184,30 @@ function parse_m_string(data_string::String)
         case["source_version"] = "0.0.0+"
     end
 
-    required_metadata_names = ["mpc.beta","mpc.density",
-    "mpc.viscosity",
-    "mpc.gravitational_acceleration",
-     "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.base_energy"]
+    required_metadata_names = [
+        "mpc.density",
+        "mpc.viscosity",
+        "mpc.gravitational_acceleration",
+        "mpc.units",
+        "mpc.time_step",
+        "mpc.Q_pipe_dim",
+        "mpc.Q_pump_dim",
+        "mpc.base_energy"
+    ]
 
-    optional_metadata_names = [ "mpc.base_density", "mpc.base_viscosity", "mpc.base_diameter", "mpc.base_length",
-    "mpc.base_head", "mpc.base_elevation", "mpc.base_a",
-    "mpc.base_b", "mpc.base_flow",  "mpc.base_volume","mpc.is_per_unit"]
+    optional_metadata_names = [
+        "mpc.base_density",
+        "mpc.base_viscosity",
+        "mpc.base_diameter",
+        "mpc.base_length",
+        "mpc.base_head",
+        "mpc.base_elevation",
+        "mpc.base_a",
+        "mpc.base_b",
+        "mpc.base_flow",
+        "mpc.base_volume",
+        "mpc.is_per_unit"
+    ]
 
     for data_name in required_metadata_names
         (data_name == "mpc.units") && (continue)
@@ -496,15 +512,31 @@ const _matlab_field_order = Dict{String,Array}(
 
 
 "order of required global parameters"
-const _matlab_global_params_order_required = ["beta", "density",
-"viscosity",
-"gravitational_acceleration"]
+const _matlab_global_params_order_required = [
+    "density",
+    "viscosity",
+    "gravitational_acceleration"
+]
 
 
 "order of optional global parameters"
-const _matlab_global_params_order_optional = ["base_density", "base_viscosity", "base_diameter",
-"base_length","base_head", "base_elevation", "base_a",
-"base_b", "base_volume", "base_flow", "is_per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.base_energy"]
+const _matlab_global_params_order_optional = [
+    "base_density",
+    "base_viscosity",
+    "base_diameter",
+    "base_length",
+    "base_head",
+    "base_elevation",
+    "base_a",
+    "base_b",
+    "base_volume",
+    "base_flow",
+    "is_per_unit",
+    "mpc.time_step",
+    "mpc.Q_pipe_dim",
+    "mpc.Q_pump_dim",
+    "mpc.base_energy"
+]
 
 
 "list of units of meta data fields"
