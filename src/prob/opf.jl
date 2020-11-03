@@ -23,7 +23,9 @@ function build_opf(pm::AbstractPetroleumModel)
     end
 
     for i in ids(pm, :pump)
-        constraint_pump_efficiency_and_rotation(pm, i)
+        constraint_pump_head_difference_bounds(pm, i)
+        constraint_pump_efficiency(pm, i)
+        constraint_pump_head_difference(pm,i)
     end
 
     for i in ids(pm, :junction)

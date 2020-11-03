@@ -48,18 +48,34 @@ end
 # Constraints associated with pumps
 #################################################################################################
 
-" constraints on pump efficiency and rotation"
-function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::Int, k, i, j, eta_min, eta_max, w_min, w_max, flow_nom, w_nom, a, b, delta_head_min, delta_head_max, Q_pump_dim)
-    q_pump   = var(pm,n,:q_pump,k)
-    w_pump   = var(pm,n,:w,k)
-    eta      = var(pm,n,:eta,k)
+" constraints that limit pump head difference"
+function constraint_pump_head_difference_bounds(pm::AbstractPetroleumModel, n::Int, k, i, j, delta_head_min, delta_head_max)
     hi       = var(pm,n,:h,i)
     hj       = var(pm,n,:h,j)
 
-    _add_constraint!(pm, n, :eta_con,            i, JuMP.@NLconstraint(pm.model, eta == eta_max - (q_pump / flow_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
-    _add_constraint!(pm, n, :pump_head_con,      i, JuMP.@constraint(pm.model,   (hj - hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim )^2 * b ))
-    _add_constraint!(pm, n, :delta_head_max_con, i, JuMP.@constraint(pm.model,   delta_head_min <= (hj - hi)))
-    _add_constraint!(pm, n, :delta_head_min_con, i, JuMP.@constraint(pm.model,   (hj - hi) <= delta_head_max))
+    _add_constraint!(pm, n, :delta_head_max_con, k, JuMP.@constraint(pm.model, delta_head_min <= (hj - hi)))
+    _add_constraint!(pm, n, :delta_head_min_con, k, JuMP.@constraint(pm.model, (hj - hi) <= delta_head_max))
+end
+
+
+" Constraints for computing the head difference for a pump "
+function constraint_pump_head_difference(pm::AbstractPetroleumModel, n::Int, k, i, j, w_nom, a, b, Q_pump_dim)
+    q_pump   = var(pm,n,:q_pump,k)
+    w_pump   = var(pm,n,:w,k)
+    hi       = var(pm,n,:h,i)
+    hj       = var(pm,n,:h,j)
+
+    _add_constraint!(pm, n, :pump_head_con, k, JuMP.@constraint(pm.model, (hj - hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim )^2 * b))
+end
+
+
+" constraint for computing the efficiency of the pump"
+function constraint_pump_efficiency(pm::AbstractPetroleumModel, n::Int, k, eta_max, flow_nom, w_nom)
+    q_pump   = var(pm,n,:q_pump,k)
+    w_pump   = var(pm,n,:w,k)
+    eta      = var(pm,n,:eta,k)
+
+    _add_constraint!(pm, n, :eta_con, k, JuMP.@NLconstraint(pm.model, eta == eta_max - (q_pump / flow_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
 end
 
 #################################################################################################

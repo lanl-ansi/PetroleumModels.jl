@@ -67,24 +67,49 @@ constraint_leibenzon(pm::AbstractPetroleumModel, k::Int) = constraint_leibenzon(
 # Constraints associated with pumps
 #################################################################################################
 
-function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::Int, k)
+"
+Constraints that bound the head difference when fluids are pushed through a pump
+``\\underline{h}_{ij} \\le hj - hi \\le \\overline{h}_{ij}``
+"
+function constraint_pump_head_difference_bounds(pm::AbstractPetroleumModel, n::Int, k)
     pump           = ref(pm, n, :pump, k)
     i              = pump["fr_junction"]
     j              = pump["to_junction"]
-    eta_min        = pump["pump_efficiency_min"]
+    delta_head_max = pump["delta_head_max"]
+    delta_head_min = pump["delta_head_min"]
+    constraint_pump_head_difference_bounds(pm, n, k, i, j, delta_head_min, delta_head_max)
+end
+constraint_pump_head_difference_bounds(pm::AbstractPetroleumModel, k::Int) = constraint_pump_head_difference_bounds(pm, pm.cnw, k)
+
+
+" Constraint for computing the efficiency of a pump
+``\\eta == \\overline{\\eta} - (\\frac{q_{ij}}{\\hat{q_{ij}}} -  \frac{w_{ij}}{\\hat{w}_ij})^2 * (\\frac{\\hat{w}}{w_{ij}})^2 * \\overline{\\eta})``
+"
+function constraint_pump_efficiency(pm::AbstractPetroleumModel, n::Int, k)
+    pump           = ref(pm, n, :pump, k)
     eta_max        = pump["pump_efficiency_max"]
-    w_min          = pump["rotation_min"]
-    w_max          = pump["rotation_max"]
     flow_nom       = pump["flow_nom"]
+    w_nom          = pump["w_nom"]
+    constraint_pump_efficiency(pm, n, k, eta_max, flow_nom, w_nom)
+end
+constraint_pump_efficiency(pm::AbstractPetroleumModel, k::Int) = constraint_pump_efficiency(pm, pm.cnw, k)
+
+"Constraint for computing the head difference when pushing fluids through a pump
+``h_j - h_i == \\frac{w_{ij}}{\\hat{w}_{ij}}^2 * a -  q_{ij}^2 * b``
+"
+function constraint_pump_head_difference(pm::AbstractPetroleumModel, n, k)
+    pump           = ref(pm, n, :pump, k)
+    i              = pump["fr_junction"]
+    j              = pump["to_junction"]
     w_nom          = pump["w_nom"]
     a              = pump["a"]
     b              = pump["b"]
-    delta_head_max = pump["delta_head_max"]
-    delta_head_min = pump["delta_head_min"]
     Q_pump_dim     = pm.data["Q_pump_dim"]
-    constraint_pump_efficiency_and_rotation(pm, n, k, i, j, eta_min, eta_max, w_min, w_max, flow_nom, w_nom, a, b, delta_head_min, delta_head_max, Q_pump_dim)
+
+    constraint_pump_head_difference(pm, n, k, i, j, w_nom, a, b, Q_pump_dim)
 end
-constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, k::Int) = constraint_pump_efficiency_and_rotation(pm, pm.cnw, k)
+constraint_pump_head_difference(pm::AbstractPetroleumModel, k::Int) = constraint_pump_head_difference(pm, pm.cnw, k)
+
 
 #################################################################################################
 # Constraints associated with tanks
