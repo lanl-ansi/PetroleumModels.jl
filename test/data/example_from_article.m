@@ -50,13 +50,13 @@ mpc.pipe = [
 ];
 
 %% pump data
-% pump_i fr_junction to_junction station_i rotation_coefficient flow_coefficient flow_nom flow_max delta_head_min delta_head_max pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
+% pump_i fr_junction to_junction station_i rotation_coefficient flow_coefficient flow_nom flow_max delta_head_min delta_head_max pump_efficiency_min pump_efficiency_max rotation_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
 mpc.pump = [
-  13  13  14     3  319.1 5.43e-6  4500  5400 160 280 0.6 0.87  3000 2400  3600 0.07  1 0.966 0.95
-  8   8   9      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
-  7   7   8      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
-  3   3   4      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.1   1 0.966 0.95
-  1   1   3      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  3000 2400  3600 0.1   1 0.966 0.95
+  13  13  14     3  319.1 5.43e-6  4500  5400 160 280 0.6 0.87  50 40  60 0.07  1 0.966 0.95
+  8   8   9      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  50 40  60 0.12  1 0.966 0.95
+  7   7   8      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  50 40  60 0.12  1 0.966 0.95
+  3   3   4      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  50 40  60 0.1   1 0.966 0.95
+  1   1   3      1  371   14.9e-6  3125  3750 161 277 0.6 0.87  50 40  60 0.1   1 0.966 0.95
 ];
 
 

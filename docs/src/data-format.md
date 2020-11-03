@@ -56,9 +56,9 @@ These components model infrastructure used to boost pressure between two nodes.
 | delta_head_min                 | Float64 | Minimum head difference          | m                   | ft                            | Y        | Minimum pump head difference                     |
 | pump_efficiency_min            | Float64 | Minimum inlet pressure           |                     |                               | Y        | Minimum pump efficiency inlet                    |
 | pump_efficiency_max            | Float64 | Maximum inlet pressure           |                     |                               | Y        | Maximum pump efficiency inlet                    |
-| w_nom                          | Int     | Nominal rotational speed         | rpm                 | rpm                           | Y        | Nominal pump rotational speed                    |
-| rotation_min                   | Int     | Minimum rotational speed         | rpm                 | rpm                           | Y        | Minimum pump rotational speed                    |
-| rotation_max                   | Int     | Maximum rotational speed         | rpm                 | rpm                           | Y        | Maximum pump rotational speed                    |
+| rotation_nom                   | Int     | Nominal rotational speed         | rotations/s         | rotations/minute              | Y        | Nominal pump rotational speed                    |
+| rotation_min                   | Int     | Minimum rotational speed         | rotations/s         | rotations/minute              | Y        | Minimum pump rotational speed                    |
+| rotation_max                   | Int     | Maximum rotational speed         | rotations/s         | rotations/minute              | Y        | Maximum pump rotational speed                    |
 | electricity_price              | Float64 | Electricity price                | $/(kW*h)            | $/(kW*h)                      | Y        | Electricity price for every pump maintain        |
 | status                         | Int     | pump status                      |                     |                               | Y        | Determines if the component is active in the model |
                                                                                                                                                                    |

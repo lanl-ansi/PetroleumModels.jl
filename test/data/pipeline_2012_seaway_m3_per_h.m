@@ -62,17 +62,17 @@ mpc.pipe = [
 
 
 %% pump data
-% pump_i fr_junction to_junction station_i rotation_coefficient flow_coefficient flow_nom flow_max delta_head_min delta_head_max pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
+% pump_i fr_junction to_junction station_i rotation_coefficient flow_coefficient flow_nom flow_max delta_head_min delta_head_max pump_efficiency_min pump_efficiency_max rotation_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
 mpc.pump = [
-  21  21  22     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.14  1 0.966 0.95
-  19  19  20     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.08  1 0.966 0.95
-  13  13  14     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.15  1 0.966 0.95
-  12  12  13     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.15  1 0.966 0.95
-  10  10  11     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
-  7   7   8      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.11  1 0.966 0.95
-  4   4   5      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.13  1 0.966 0.95
-  2   2   3      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
-  1   1   2      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.12  1 0.966 0.95
+  21  21  22     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  50 40  60 0.14  1 0.966 0.95
+  19  19  20     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  50 40  60 0.08  1 0.966 0.95
+  13  13  14     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  50 40  60 0.15  1 0.966 0.95
+  12  12  13     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  50 40  60 0.15  1 0.966 0.95
+  10  10  11     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  50 40  60 0.12  1 0.966 0.95
+  7   7   8      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  50 40  60 0.11  1 0.966 0.95
+  4   4   5      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  50 40  60 0.13  1 0.966 0.95
+  2   2   3      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  50 40  60 0.12  1 0.966 0.95
+  1   1   2      1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  50 40  60 0.12  1 0.966 0.95
 ];
 %% producer
 % producer_i junction injection_min injection_max injection_nominal status dispatchable offer_price

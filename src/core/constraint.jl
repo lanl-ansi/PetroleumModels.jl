@@ -69,12 +69,12 @@ end
 
 
 " constraint for computing the efficiency of the pump"
-function constraint_pump_efficiency(pm::AbstractPetroleumModel, n::Int, k, eta_max, flow_nom, w_nom)
+function constraint_pump_efficiency(pm::AbstractPetroleumModel, n::Int, k, eta_max, q_nom, w_nom)
     q_pump   = var(pm,n,:q_pump,k)
     w_pump   = var(pm,n,:w,k)
     eta      = var(pm,n,:eta,k)
 
-    _add_constraint!(pm, n, :eta_con, k, JuMP.@NLconstraint(pm.model, eta == eta_max - (q_pump / flow_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
+    _add_constraint!(pm, n, :eta_con, k, JuMP.@NLconstraint(pm.model, eta == eta_max - (q_pump / q_nom -  w_pump / w_nom)^2 * (w_nom / w_pump)^2 * eta_max))
 end
 
 #################################################################################################

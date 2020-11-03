@@ -87,7 +87,7 @@ function constraint_pump_efficiency(pm::AbstractPetroleumModel, n::Int, k)
     pump           = ref(pm, n, :pump, k)
     eta_max        = pump["pump_efficiency_max"]
     flow_nom       = pump["flow_nom"]
-    w_nom          = pump["w_nom"]
+    w_nom          = pump["rotation_nom"]
     constraint_pump_efficiency(pm, n, k, eta_max, flow_nom, w_nom)
 end
 constraint_pump_efficiency(pm::AbstractPetroleumModel, k::Int) = constraint_pump_efficiency(pm, pm.cnw, k)
@@ -99,7 +99,7 @@ function constraint_pump_head_difference(pm::AbstractPetroleumModel, n, k)
     pump           = ref(pm, n, :pump, k)
     i              = pump["fr_junction"]
     j              = pump["to_junction"]
-    w_nom          = pump["w_nom"]
+    w_nom          = pump["rotation_nom"]
     a              = pump["rotation_coefficient"]
     b              = pump["flow_coefficient"]
 

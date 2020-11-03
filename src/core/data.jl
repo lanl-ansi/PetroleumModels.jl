@@ -2,16 +2,16 @@
 
 
 "data getters"
-@inline base_head(data::Dict{String,Any}) = data["base_head"]
-@inline base_density(data::Dict{String,Any}) = data["base_density"]
-@inline base_viscosity(data::Dict{String,Any}) = data["base_viscosity"]
+@inline base_head(data::Dict{String,Any})                       = data["base_head"]
+@inline base_density(data::Dict{String,Any})                    = data["base_density"]
+@inline base_viscosity(data::Dict{String,Any})                  = data["base_viscosity"]
 @inline base_gravitational_acceleration(data::Dict{String,Any}) = data["gravitational_acceleration"]
-@inline base_diameter(data::Dict{String,Any}) = data["base_diameter"]
-@inline base_length(data::Dict{String,Any}) = data["base_length"]
-@inline base_flow(data::Dict{String,Any}) = data["base_flow"]
-@inline base_energy(data::Dict{String,Any}) = data["base_energy"]
-@inline leibenzon_exponent(data::Dict{String,Any}) = 0.25
-@inline leibenzon_constant(data::Dict{String,Any}) = 1.02
+@inline base_diameter(data::Dict{String,Any})                   = data["base_diameter"]
+@inline base_length(data::Dict{String,Any})                     = data["base_length"]
+@inline base_flow(data::Dict{String,Any})                       = data["base_flow"]
+@inline base_energy(data::Dict{String,Any})                     = data["base_energy"]
+@inline leibenzon_exponent(data::Dict{String,Any})              = 0.25
+@inline leibenzon_constant(data::Dict{String,Any})              = 1.02
 
 
 "apply a function on a dict entry"
@@ -96,7 +96,7 @@ function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::
     for line in transient_data
         param = line["parameter"]
         if param in head_params
-            line["value"] = psi_to_pascal(line["value"])
+            line["value"] = ft_to_m(line["value"])
         end
         if param in flow_params
             line["value"] = mmscfd_to_kgps(line["value"])
