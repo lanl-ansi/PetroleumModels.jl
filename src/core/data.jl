@@ -171,7 +171,6 @@ function _rescale_functions(
     rescale_qoff::Function,
     rescale_density::Function,
     rescale_viscosity::Function,
-    rescale_gravitational_acceleration::Function,
     rescale_diameter::Function,
     rescale_length::Function,
     rescale_head::Function,
@@ -204,7 +203,6 @@ function _rescale_functions(
         "b"                          => rescale_b,
         "density"                    => rescale_density,
         "viscosity"                  => rescale_viscosity,
-        "gravitational_acceleration" => rescale_gravitational_acceleration,
         "diameter"                   => rescale_diameter,
         "length"                     => rescale_length,
         "capacity_min"               => rescale_volume,
@@ -227,7 +225,6 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_qoff                       = x -> x/base_flow(data)
     rescale_density                    = x -> x/base_density(data)
     rescale_viscosity                  = x -> x/base_viscosity(data)
-    rescale_gravitational_acceleration = x -> x/9.8
     rescale_diameter                   = x -> x/base_diameter(data)
     rescale_length                     = x -> x/base_length(data)
     rescale_head                       = x -> x/base_head(data)
@@ -245,7 +242,6 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
         rescale_qoff,
         rescale_density,
         rescale_viscosity,
-        rescale_gravitational_acceleration,
         rescale_diameter,
         rescale_length,
         rescale_head,
@@ -258,7 +254,6 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     nw_data = (id == "0") ? data : data["nw"][id]
     _apply_func!(nw_data, "viscosity", rescale_viscosity)
     _apply_func!(nw_data, "density", rescale_density)
-    _apply_func!(nw_data, "gravitational_acceleration", rescale_gravitational_acceleration)
 
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
@@ -291,7 +286,6 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_qoff                       = x -> x*base_flow(data)
     rescale_density                    = x -> x*base_density(data)
     rescale_viscosity                  = x -> x*base_viscosity(data)
-    rescale_gravitational_acceleration = x -> x*9.8
     rescale_diameter                   = x -> x*base_diameter(data)
     rescale_length                     = x -> x*base_length(data)
     rescale_head                       = x -> x*base_head(data)
@@ -309,7 +303,6 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
         rescale_qoff,
         rescale_density,
         rescale_viscosity,
-        rescale_gravitational_acceleration,
         rescale_diameter,
         rescale_length,
         rescale_head,
