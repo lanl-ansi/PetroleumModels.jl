@@ -9,7 +9,6 @@
 @inline base_diameter(data::Dict{String,Any}) = data["base_diameter"]
 @inline base_length(data::Dict{String,Any}) = data["base_length"]
 @inline base_flow(data::Dict{String,Any}) = data["base_flow"]
-@inline volumbase_energy(data::Dict{String,Any}) = data["base_volume"]
 @inline base_energy(data::Dict{String,Any}) = data["base_energy"]
 @inline leibenzon_exponent(data::Dict{String,Any}) = 0.25
 @inline leibenzon_constant(data::Dict{String,Any}) = 1.02
@@ -228,7 +227,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_elevation                  = x -> x/base_head(data)
     rescale_rotation_coefficient       = x -> x/base_head(data)
     rescale_flow_coefficient           = x -> x/base_head(data)*base_flow(data)^2 # head/flow^2 - s^2/m^5
-    rescale_volume                     = x -> x/volumbase_energy(data)
+    rescale_volume                     = x -> x/base_head(data)^3
 
     functions = _rescale_functions(
         rescale_electricity_price,
@@ -289,7 +288,7 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_elevation                  = x -> x*base_head(data)
     rescale_rotation_coefficient       = x -> x*base_head(data)
     rescale_flow_coefficient           = x -> x*base_head(data) / base_flow(data)^2 # head/flow^2 - s^2/m^5
-    rescale_volume                     = x -> x*volumbase_energy(data)
+    rescale_volume                     = x -> x*base_head(data)^3
 
     functions = _rescale_functions(
         rescale_electricity_price,

@@ -103,7 +103,6 @@ These components model producers of product.
 | base_head                    | Float64 | Base Head              | m                   | ft                            |          | Base head                                                          |
 | base_length                  | Float64 | Base Length            | m                   | ft                            |          | Base length                                                        |
 | base_flow                    | Float64 | Base Flow Rate         | m3/h                | ft3/h                         |          | Base flow rate                                                     |
-| base_volume                  | Float64 | Base Volume            | m3                  | ft3                           |          | Base Volume                                                        |
 | base_diameter                | Float64 | Base Diameter          | m                   | ft                            |          | Base Diameter                                                      |
 | base_energy                  | Float64 | Base energy            | kW*h                | kW*h                          | Y        | Base pump energy                                                   |
 | units                        | String  | Units                  |                     |                               |          | 'si' for standard units or 'usc' for United States customary units |

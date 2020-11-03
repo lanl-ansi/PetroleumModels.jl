@@ -15,7 +15,6 @@ const _mlab_data_names = Vector{String}([
     "mpc.base_length",
     "mpc.base_flow",
     "mpc.base_head",
-    "mpc.base_volume",
     "mpc.units",
     "mpc.is_per_unit",
     "mpc.junction",
@@ -195,7 +194,6 @@ function parse_m_string(data_string::String)
         "mpc.base_length",
         "mpc.base_head",
         "mpc.base_flow",
-        "mpc.base_volume",
         "mpc.is_per_unit"
     ]
 
@@ -275,13 +273,6 @@ function parse_m_string(data_string::String)
         Memento.warn(_LOGGER, string("no is_per_unit found in .m file.
             Auto assigning a value of 0 (false) for the is_per_unit field"))
         case["is_per_unit"] = 0
-    end
-
-    if haskey(matlab_data, "mpc.base_volume")
-        case["base_volume"] = matlab_data["mpc.base_volume"]
-    else
-        Memento.warn(_LOGGER,"no base_volume found in .m file.
-            The file seems to be missing \"mpc.base_volume = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.junction")
@@ -495,7 +486,6 @@ const _matlab_global_params_order_optional = [
     "base_diameter",
     "base_length",
     "base_head",
-    "base_volume",
     "base_flow",
     "is_per_unit",
     "mpc.time_step",
@@ -511,7 +501,6 @@ const _units = Dict{String,Dict{String,String}}(
         "base_diameter" => "m",
         "base_length" => "m",
         "base_head" => "m",
-        "base_volume" => "m3",
         "base_flow" => "m3/s",
     ),
     "english" => Dict{String,String}(
