@@ -28,8 +28,6 @@ const _mlab_data_names = Vector{String}([
     "mpc.consumer",
     "mpc.tank",
     "mpc.time_step",
-    "mpc.Q_pipe_dim",
-    "mpc.Q_pump_dim",
     "mpc.base_energy"
 ])
 
@@ -190,8 +188,6 @@ function parse_m_string(data_string::String)
         "mpc.gravitational_acceleration",
         "mpc.units",
         "mpc.time_step",
-        "mpc.Q_pipe_dim",
-        "mpc.Q_pump_dim",
         "mpc.base_energy"
     ]
 
@@ -533,8 +529,6 @@ const _matlab_global_params_order_optional = [
     "base_flow",
     "is_per_unit",
     "mpc.time_step",
-    "mpc.Q_pipe_dim",
-    "mpc.Q_pump_dim",
     "mpc.base_energy"
 ]
 

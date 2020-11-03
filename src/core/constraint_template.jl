@@ -43,21 +43,19 @@ end
 # Constraints associated with pipes
 #################################################################################################
 " Constraint for computing the relationship between volumetric flow and head difference at either end of a pipe.  For a pipe ``(i,j)``, this constraint is computed as
-`` (h_i - h_j) == (z_j - z_i) + \\frac{\\beta * \\nu^m}{D_{ij}^(5.0-m)} * L_{ij} * 1.02 * \frac{q}{Q_pipe_dim}^{2.0-m} ``.
+`` (h_i - h_j) == (z_j - z_i) + \\frac{\\beta * \\nu^m}{D_{ij}^(5.0-m)} * L_{ij} * 1.02 * q_{ij}^{2.0-m} ``.
 The constraint adopts the Leibenzon model
 "
 function constraint_leibenzon(pm::AbstractPetroleumModel, n::Int, k)
-    pipe = ref(pm,n,:pipe,k)
-    i    = pipe["fr_junction"]
-    j    = pipe["to_junction"]
-    nu = pm.data["viscosity"]
-    zi = ref(pm,n,:junction, i)["elevation"]
-    zj = ref(pm,n,:junction, j)["elevation"]
-    Q_pipe_dim = pm.data["Q_pipe_dim"]
-    m  = leibenzon_exponent(pm.data)
-    lc = leibenzon_constant(pm.data)
-
-    lambda = _calc_pipe_resistance_leibenzon(pipe, nu, m, lc, Q_pipe_dim)
+    pipe   = ref(pm,n,:pipe,k)
+    i      = pipe["fr_junction"]
+    j      = pipe["to_junction"]
+    nu     = pm.data["viscosity"]
+    zi     = ref(pm,n,:junction, i)["elevation"]
+    zj     = ref(pm,n,:junction, j)["elevation"]
+    m      = leibenzon_exponent(pm.data)
+    lc     = leibenzon_constant(pm.data)
+    lambda = _calc_pipe_resistance_leibenzon(pipe, nu, m, lc)
 
     constraint_leibenzon(pm, n, k, i, j, lambda, zi, zj, m)
 end
@@ -104,9 +102,8 @@ function constraint_pump_head_difference(pm::AbstractPetroleumModel, n, k)
     w_nom          = pump["w_nom"]
     a              = pump["a"]
     b              = pump["b"]
-    Q_pump_dim     = pm.data["Q_pump_dim"]
 
-    constraint_pump_head_difference(pm, n, k, i, j, w_nom, a, b, Q_pump_dim)
+    constraint_pump_head_difference(pm, n, k, i, j, w_nom, a, b)
 end
 constraint_pump_head_difference(pm::AbstractPetroleumModel, k::Int) = constraint_pump_head_difference(pm, pm.cnw, k)
 

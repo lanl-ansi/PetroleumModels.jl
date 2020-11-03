@@ -108,8 +108,6 @@ These components model producers of product.
 | base_b                       | Float64 | Base pump coefficient  | h2/m5               | h2/ft5                        |          | Base pump coefficient                                              |
 | base_volume                  | Float64 | Base Volume            | m3                  | ft3                           |          | Base Volume                                                        |
 | base_diameter                | Float64 | Base Diameter          | m                   | ft                            |          | Base Diameter                                                      |
-| Q_pipe_dim                   | Int     | Pipe coefficient       |                     |                               |          | Petroleum pipe flow coefficient                                    |
-| Q_pump_dim                   | Int     | Pump coefficient       |                     |                               |          | Petroleum pump flow coefficient                                    |
 | base_energy                  | Float64 | Base energy            | kW*h                | kW*h                          | Y        | Base pump energy                                                   |
 | units                        | String  | Units                  |                     |                               |          | 'si' for standard units or 'usc' for United States customary units |
 | is_per_unit                  | Int     | Per-unit               |                     |                               |          | If data is already in per-unit (non-dimensionalized)               |

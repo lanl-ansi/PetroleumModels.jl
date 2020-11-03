@@ -16,7 +16,6 @@ end
 
 " Constraint for balancing volumetric flow a function (nodes) "
 function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, n::Int, i, f_pipes, t_pipes, f_tanks, t_tanks, f_pumps, t_pumps, producers, consumers, qg_f, ql_f)
-
     qin  = var(pm,n,:qin)
     qoff = var(pm,n,:qoff)
     qg = var(pm,n,:qg)
@@ -59,13 +58,13 @@ end
 
 
 " Constraints for computing the head difference for a pump "
-function constraint_pump_head_difference(pm::AbstractPetroleumModel, n::Int, k, i, j, w_nom, a, b, Q_pump_dim)
+function constraint_pump_head_difference(pm::AbstractPetroleumModel, n::Int, k, i, j, w_nom, a, b)
     q_pump   = var(pm,n,:q_pump,k)
     w_pump   = var(pm,n,:w,k)
     hi       = var(pm,n,:h,i)
     hj       = var(pm,n,:h,j)
 
-    _add_constraint!(pm, n, :pump_head_con, k, JuMP.@constraint(pm.model, (hj - hi) == (w_pump / w_nom)^2 * a -  (q_pump * Q_pump_dim )^2 * b))
+    _add_constraint!(pm, n, :pump_head_con, k, JuMP.@constraint(pm.model, (hj - hi) == (w_pump / w_nom)^2 * a -  (q_pump)^2 * b))
 end
 
 

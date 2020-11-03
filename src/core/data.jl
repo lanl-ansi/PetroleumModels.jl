@@ -78,8 +78,6 @@ function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::
         "density",
         "viscosity",
         "gravitational_acceleration",
-        "Q_pipe_dim",
-        "Q_pump_dim",
         "q_pipe",
         "q_pump",
         "flow_nom",
@@ -136,8 +134,7 @@ const _params_for_unit_conversions = Dict(
         "delta_head_min",
         "a",
         "b",
-        "electricity_price",
-        "Q_pump_dim"
+        "electricity_price"
     ],
 
     "consumer" => [
@@ -181,9 +178,7 @@ function _rescale_functions(
     rescale_elevation::Function,
     rescale_a::Function,
     rescale_b::Function,
-    rescale_volume::Function,
-    rescale_Q_pipe_dim::Function,
-    rescale_Q_pump_dim::Function
+    rescale_volume::Function
 )::Dict{String,Function}
     Dict{String,Function}(
         "electricity_price"          => rescale_electricity_price,
@@ -212,8 +207,6 @@ function _rescale_functions(
         "gravitational_acceleration" => rescale_gravitational_acceleration,
         "diameter"                   => rescale_diameter,
         "length"                     => rescale_length,
-        "Q_pipe_dim"                 => rescale_Q_pipe_dim,
-        "Q_pump_dim"                 => rescale_Q_pump_dim,
         "capacity_min"               => rescale_volume,
         "capacity_max"               => rescale_volume,
         "initial_volume"             => rescale_volume,
@@ -228,8 +221,6 @@ end
 function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_electricity_price          = x -> x*base_energy(data)
     rescale_q_pipe                     = x -> x/base_flow(data)
-    rescale_Q_pipe_dim                 = x -> x/3600
-    rescale_Q_pump_dim                 = x -> x*3600
     rescale_q_pump                     = x -> x/base_flow(data)
     rescale_q_pump_nom                 = x -> x/base_flow(data)
     rescale_qin                        = x -> x/base_flow(data)
@@ -239,10 +230,10 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_gravitational_acceleration = x -> x/9.8
     rescale_diameter                   = x -> x/base_diameter(data)
     rescale_length                     = x -> x/base_length(data)
-    rescale_head                          = x -> x/base_head(data)
+    rescale_head                       = x -> x/base_head(data)
     rescale_elevation                  = x -> x/base_elevation(data)
     rescale_a                          = x -> x/a_base(data)
-    rescale_b                          = x -> x/b_base(data)
+    rescale_b                          = x -> x/b_base(data)*base_flow(data)^2
     rescale_volume                     = x -> x/volumbase_energy(data)
 
     functions = _rescale_functions(
@@ -261,17 +252,13 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
         rescale_elevation,
         rescale_a,
         rescale_b,
-        rescale_volume,
-        rescale_Q_pipe_dim,
-        rescale_Q_pump_dim
+        rescale_volume
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
     _apply_func!(nw_data, "viscosity", rescale_viscosity)
     _apply_func!(nw_data, "density", rescale_density)
     _apply_func!(nw_data, "gravitational_acceleration", rescale_gravitational_acceleration)
-    _apply_func!(nw_data, "Q_pipe_dim", rescale_Q_pipe_dim)
-    _apply_func!(nw_data, "Q_pump_dim", rescale_Q_pump_dim)
 
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
@@ -298,8 +285,6 @@ end
 function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_electricity_price          = x -> x/base_energy(data)
     rescale_q_pipe                     = x -> x*base_flow(data)
-    rescale_Q_pipe_dim                 = x -> x*3600
-    rescale_Q_pump_dim                 = x -> x/3600
     rescale_q_pump                     = x -> x*base_flow(data)
     rescale_q_pump_nom                 = x -> x*base_flow(data)
     rescale_qin                        = x -> x*base_flow(data)
@@ -312,7 +297,7 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_head                       = x -> x*base_head(data)
     rescale_elevation                  = x -> x*base_elevation(data)
     rescale_a                          = x -> x*a_base(data)
-    rescale_b                          = x -> x*b_base(data)
+    rescale_b                          = x -> x*b_base(data) / base_flow(data)^2
     rescale_volume                     = x -> x*volumbase_energy(data)
 
     functions = _rescale_functions(
@@ -331,9 +316,7 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
         rescale_elevation,
         rescale_a,
         rescale_b,
-        rescale_volume,
-        rescale_Q_pipe_dim,
-        rescale_Q_pump_dim
+        rescale_volume
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
@@ -563,7 +546,6 @@ function add_pipe_fields!(data::Dict{String,:Any})
         end
 
         if is_per_unit == true
-            pump["Q_pipe_dim"] = 1
         end
     end
 
@@ -627,9 +609,9 @@ end
 
 
 "Calculates pipeline \"resistance\" using the leibenzon formulation"
-function _calc_pipe_resistance_leibenzon(pipe::Dict{String,Any}, nu, m, lc, Q_pipe_dim)
+function _calc_pipe_resistance_leibenzon(pipe::Dict{String,Any}, nu, m, lc)
     beta = pipe["friction_factor"]
     D    = pipe["diameter"]
     L    = pipe["length"]
-    return (beta * L * lc * nu^m) / (D^(5.0-m) *  Q_pipe_dim^(2.0-m))
+    return (beta * L * lc * nu^m) / (D^(5.0-m))
 end
