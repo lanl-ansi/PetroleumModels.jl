@@ -100,7 +100,7 @@ function constraint_pump_head_difference(pm::AbstractPetroleumModel, n, k)
     i              = pump["fr_junction"]
     j              = pump["to_junction"]
     w_nom          = pump["w_nom"]
-    a              = pump["a"]
+    a              = pump["rotation_coefficient"]
     b              = pump["b"]
 
     constraint_pump_head_difference(pm, n, k, i, j, w_nom, a, b)

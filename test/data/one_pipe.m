@@ -9,7 +9,6 @@ mpc.base_head                  = 100;     % base head, m
 mpc.base_length                = 542;     % m
 mpc.base_flow                  = 3600;    % petroleum volume flow rate, m3 per hour
 mpc.base_elevation             = 100;     % base elevation, m
-mpc.base_a                     = 100 ;    % base a coefficient
 mpc.base_b                     = 100 ;    % base b coefficient
 mpc.base_volume                = 1000;
 mpc.base_diameter              = 0.8;     % m

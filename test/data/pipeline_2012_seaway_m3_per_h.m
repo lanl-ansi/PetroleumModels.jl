@@ -9,7 +9,6 @@ mpc.base_head                  = 100;     % base head, m
 mpc.base_length                = 542;     % m
 mpc.base_flow                  = 3600;    % petroleum volume flow rate, m3 per hour
 mpc.base_elevation             = 100;     % base elevation, m
-mpc.base_a                     = 100 ;    % base a coefficient
 mpc.base_b                     = 100 ;    % base b coefficient
 mpc.base_volume                = 1000;
 mpc.base_diameter              = 0.75;    % m
@@ -66,7 +65,7 @@ mpc.pipe = [
 
 
 %% pump data
-% pump_i fr_junction to_junction station_i a b flow_nom flow_max delta_head_min delta_head_max pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
+% pump_i fr_junction to_junction station_i rotation_coefficient b flow_nom flow_max delta_head_min delta_head_max pump_efficiency_min pump_efficiency_max w_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
 mpc.pump = [
   21  21  22     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.14  1 0.966 0.95
   19  19  20     1  276.8  7.1e-6  3600  4320 144 217 0.6 0.87  3000 2400  3600 0.08  1 0.966 0.95

@@ -10,7 +10,6 @@
 @inline base_length(data::Dict{String,Any}) = data["base_length"]
 @inline base_flow(data::Dict{String,Any}) = data["base_flow"]
 @inline base_elevation(data::Dict{String,Any}) = data["base_elevation"]
-@inline a_base(data::Dict{String,Any}) = data["base_a"]
 @inline b_base(data::Dict{String,Any}) = data["base_b"]
 @inline volumbase_energy(data::Dict{String,Any}) = data["base_volume"]
 @inline base_energy(data::Dict{String,Any}) = data["base_energy"]
@@ -132,7 +131,7 @@ const _params_for_unit_conversions = Dict(
         "flow_max",
         "delta_head_max",
         "delta_head_min",
-        "a",
+        "rotation_coefficient",
         "b",
         "electricity_price"
     ],
@@ -175,7 +174,7 @@ function _rescale_functions(
     rescale_length::Function,
     rescale_head::Function,
     rescale_elevation::Function,
-    rescale_a::Function,
+    rescale_rotation_coefficient::Function,
     rescale_b::Function,
     rescale_volume::Function
 )::Dict{String,Function}
@@ -199,7 +198,7 @@ function _rescale_functions(
         "flow_nom"                   => rescale_q_pump_nom,
         "delta_head_max"             => rescale_head,
         "delta_head_min"             => rescale_head,
-        "a"                          => rescale_a,
+        "rotation_coefficient"       => rescale_rotation_coefficient,
         "b"                          => rescale_b,
         "density"                    => rescale_density,
         "viscosity"                  => rescale_viscosity,
@@ -229,7 +228,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_length                     = x -> x/base_length(data)
     rescale_head                       = x -> x/base_head(data)
     rescale_elevation                  = x -> x/base_elevation(data)
-    rescale_a                          = x -> x/a_base(data)
+    rescale_rotation_coefficient       = x -> x/base_head(data)
     rescale_b                          = x -> x/b_base(data)*base_flow(data)^2
     rescale_volume                     = x -> x/volumbase_energy(data)
 
@@ -246,7 +245,7 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
         rescale_length,
         rescale_head,
         rescale_elevation,
-        rescale_a,
+        rescale_rotation_coefficient,
         rescale_b,
         rescale_volume
     )
@@ -290,7 +289,7 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_length                     = x -> x*base_length(data)
     rescale_head                       = x -> x*base_head(data)
     rescale_elevation                  = x -> x*base_elevation(data)
-    rescale_a                          = x -> x*a_base(data)
+    rescale_rotation_coefficient       = x -> x*base_head(data)
     rescale_b                          = x -> x*b_base(data) / base_flow(data)^2
     rescale_volume                     = x -> x*volumbase_energy(data)
 
@@ -307,7 +306,7 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
         rescale_length,
         rescale_head,
         rescale_elevation,
-        rescale_a,
+        rescale_rotation_coefficient,
         rescale_b,
         rescale_volume
     )
