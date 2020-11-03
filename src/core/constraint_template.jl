@@ -20,7 +20,6 @@
   \\sum_{ij \\in Pumps^f_{ij}} q_{ij} - \\sum_{ij \\in Pumps^t_{ji}} q_{ji} + \\sum_{ij \\in Tanks^f_{ij}} q_{ij} - \\sum_{ij \\in Tanks^t_{ji}} q_{ji} ``
  where ``qg`` and ``ql`` includes variable and constant demand and production as defined by the ``is\\_dispatchable`` flag"
 function constraint_junction_volume_flow_balance(pm::AbstractPetroleumModel, i; n::Int=pm.cnw)
-
     producer                = ref(pm,n,:producer)
     consumer                = ref(pm,n,:consumer)
     junction                = ref(pm,n,:junction,i)
@@ -69,20 +68,20 @@ constraint_leibenzon(pm::AbstractPetroleumModel, k::Int) = constraint_leibenzon(
 #################################################################################################
 
 function constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, n::Int, k)
-    pump    = ref(pm, n, :pump, k)
-    i       = pump["fr_junction"]
-    j       = pump["to_junction"]
-    eta_min = pm.ref[:nw][n][:pump][k]["pump_efficiency_min"]
-    eta_max = pm.ref[:nw][n][:pump][k]["pump_efficiency_max"]
-    w_min = pm.ref[:nw][n][:pump][k]["rotation_min"]
-    w_max = pm.ref[:nw][n][:pump][k]["rotation_max"]
-    flow_nom = pm.ref[:nw][n][:pump][k]["flow_nom"]
-    w_nom = pm.ref[:nw][n][:pump][k]["w_nom"]
-    a = pm.ref[:nw][n][:pump][k]["a"]
-    b = pm.ref[:nw][n][:pump][k]["b"]
-    delta_head_max = pm.ref[:nw][n][:pump][k]["delta_head_max"]
-    delta_head_min = pm.ref[:nw][n][:pump][k]["delta_head_min"]
-    Q_pump_dim = pm.data["Q_pump_dim"]
+    pump           = ref(pm, n, :pump, k)
+    i              = pump["fr_junction"]
+    j              = pump["to_junction"]
+    eta_min        = pump["pump_efficiency_min"]
+    eta_max        = pump["pump_efficiency_max"]
+    w_min          = pump["rotation_min"]
+    w_max          = pump["rotation_max"]
+    flow_nom       = pump["flow_nom"]
+    w_nom          = pump["w_nom"]
+    a              = pump["a"]
+    b              = pump["b"]
+    delta_head_max = pump["delta_head_max"]
+    delta_head_min = pump["delta_head_min"]
+    Q_pump_dim     = pm.data["Q_pump_dim"]
     constraint_pump_efficiency_and_rotation(pm, n, k, i, j, eta_min, eta_max, w_min, w_max, flow_nom, w_nom, a, b, delta_head_min, delta_head_max, Q_pump_dim)
 end
 constraint_pump_efficiency_and_rotation(pm::AbstractPetroleumModel, k::Int) = constraint_pump_efficiency_and_rotation(pm, pm.cnw, k)
