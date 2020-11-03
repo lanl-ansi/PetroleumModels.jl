@@ -49,7 +49,7 @@ These components model infrastructure used to boost pressure between two nodes.
 | to_junction                    | Int     | To Junction id                   |                     |                               | Y        | Unique id of the junction on the to side         |
 | station_i                      | Int     | Pump station id                  |                     |                               | Y        | Unique id of the station including up to 3 pumps |
 | rotation_coefficient           | Float64 | Pump rotation coefficient        | m                   | ft                            | Y        | Pump coefficient required to define pump head    |
-| b                              | Float64 | Pump coefficient                 | h2/m5               | h2/ft5                        | Y        | Pump coefficient required to define pump head    |
+| flow_coefficient               | Float64 | Pump flow coefficient            | h2/m5               | h2/ft5                        | Y        | Pump coefficient required to define pump head    |
 | flow_nom                       | Float64 | Nominal flow rate                | m3/h                | ft3/h                         | Y        | Pump nominal flow rate                           |
 | flow_max                       | Float64 | Maximum flow rate                | m3/h                | ft3/h                         | Y        | Pump maximum flow rate                           |
 | delta_head_max                 | Float64 | Maximum head difference          | m                   | ft                            | Y        | Maximum pump head difference                     |
@@ -104,7 +104,6 @@ These components model producers of product.
 | base_length                  | Float64 | Base Length            | m                   | ft                            |          | Base length                                                        |
 | base_flow                    | Float64 | Base Flow Rate         | m3/h                | ft3/h                         |          | Base flow rate                                                     |
 | base_elevation               | Float64 | Base elevation         | m                   | ft                            |          | Base elevation                                                     |
-| base_b                       | Float64 | Base pump coefficient  | h2/m5               | h2/ft5                        |          | Base pump coefficient                                              |
 | base_volume                  | Float64 | Base Volume            | m3                  | ft3                           |          | Base Volume                                                        |
 | base_diameter                | Float64 | Base Diameter          | m                   | ft                            |          | Base Diameter                                                      |
 | base_energy                  | Float64 | Base energy            | kW*h                | kW*h                          | Y        | Base pump energy                                                   |

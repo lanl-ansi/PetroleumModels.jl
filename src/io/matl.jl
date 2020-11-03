@@ -16,7 +16,6 @@ const _mlab_data_names = Vector{String}([
     "mpc.base_flow",
     "mpc.base_head",
     "mpc.base_elevation",
-    "mpc.base_b",
     "mpc.base_volume",
     "mpc.units",
     "mpc.is_per_unit",
@@ -58,7 +57,7 @@ const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
     ("to_junction", Int),
     ("station_i", Int),
     ("rotation_coefficient", Float64),
-    ("b", Float64),
+    ("flow_coefficient", Float64),
     ("flow_nom", Float64),
     ("flow_max", Float64),
     ("delta_head_min", Float64),
@@ -197,7 +196,6 @@ function parse_m_string(data_string::String)
         "mpc.base_length",
         "mpc.base_head",
         "mpc.base_elevation",
-        "mpc.base_b",
         "mpc.base_flow",
         "mpc.base_volume",
         "mpc.is_per_unit"
@@ -286,13 +284,6 @@ function parse_m_string(data_string::String)
     else
         Memento.warn(_LOGGER,"no base_elevation found in .m file.
             The file seems to be missing \"mpc.base_elevation = ...\" \n")
-    end
-
-    if haskey(matlab_data, "mpc.base_b")
-        case["base_b"] = matlab_data["mpc.base_b"]
-    else
-        Memento.warn(_LOGGER,"no base_b found in .m file.
-            The file seems to be missing \"mpc.base_b = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.base_volume")
@@ -514,7 +505,6 @@ const _matlab_global_params_order_optional = [
     "base_length",
     "base_head",
     "base_elevation",
-    "base_b",
     "base_volume",
     "base_flow",
     "is_per_unit",
@@ -531,7 +521,6 @@ const _units = Dict{String,Dict{String,String}}(
         "base_diameter" => "m",
         "base_length" => "m",
         "base_elevation" => "m",
-        "base_b" => "m",
         "base_head" => "m",
         "base_volume" => "m3",
         "base_flow" => "m3/s",
