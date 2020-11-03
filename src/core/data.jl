@@ -9,7 +9,6 @@
 @inline base_diameter(data::Dict{String,Any}) = data["base_diameter"]
 @inline base_length(data::Dict{String,Any}) = data["base_length"]
 @inline base_flow(data::Dict{String,Any}) = data["base_flow"]
-@inline base_elevation(data::Dict{String,Any}) = data["base_elevation"]
 @inline volumbase_energy(data::Dict{String,Any}) = data["base_volume"]
 @inline base_energy(data::Dict{String,Any}) = data["base_energy"]
 @inline leibenzon_exponent(data::Dict{String,Any}) = 0.25
@@ -226,9 +225,9 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_diameter                   = x -> x/base_diameter(data)
     rescale_length                     = x -> x/base_length(data)
     rescale_head                       = x -> x/base_head(data)
-    rescale_elevation                  = x -> x/base_elevation(data)
+    rescale_elevation                  = x -> x/base_head(data)
     rescale_rotation_coefficient       = x -> x/base_head(data)
-    rescale_flow_coefficient           = x -> x/base_head(data)*base_flow(data)^2 # s^2/m^55
+    rescale_flow_coefficient           = x -> x/base_head(data)*base_flow(data)^2 # head/flow^2 - s^2/m^5
     rescale_volume                     = x -> x/volumbase_energy(data)
 
     functions = _rescale_functions(
@@ -287,9 +286,9 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_diameter                   = x -> x*base_diameter(data)
     rescale_length                     = x -> x*base_length(data)
     rescale_head                       = x -> x*base_head(data)
-    rescale_elevation                  = x -> x*base_elevation(data)
+    rescale_elevation                  = x -> x*base_head(data)
     rescale_rotation_coefficient       = x -> x*base_head(data)
-    rescale_flow_coefficient           = x -> x*base_head(data) / base_flow(data)^2 # s^2/m^5
+    rescale_flow_coefficient           = x -> x*base_head(data) / base_flow(data)^2 # head/flow^2 - s^2/m^5
     rescale_volume                     = x -> x*volumbase_energy(data)
 
     functions = _rescale_functions(

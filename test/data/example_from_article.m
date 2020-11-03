@@ -8,7 +8,6 @@ mpc.base_viscosity             = 11.6e-6;  % base viscosity, m2 / s
 mpc.base_head                  = 100;      % base head, m
 mpc.base_length                = 542;      % m
 mpc.base_flow                  = 3600;     % petroleum volume flow rate, m3 per hour
-mpc.base_elevation             = 100;      % base elevation, m
 mpc.base_volume                = 1000;
 mpc.base_diameter              = 0.75;     % m
 mpc.base_energy                = 900;      % pump base energy, kw*h
