@@ -53,7 +53,7 @@ mpc.consumer = [
 %% tank
 % tank_i fr_junction to_junction vessel_pressure_head radius capacity_min capacity_max initial_volume intake_min intake_max offtake_min offtake_max Cd status price p_price
 mpc.tank = [
-  31  111 222 0 14.25 459 10283 10000 0.138 1.138 0.01 1.35 0.94 1 0.00800458 300
+  31  111 222 0 14.25 459 10283 10000 496.8 4096.8 36 4860 0.94 1 0.00800458 300
 ];
 
 end

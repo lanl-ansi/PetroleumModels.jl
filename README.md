@@ -13,10 +13,12 @@ PetroleumModels.jl is a Julia/JuMP package for Steady-State Petroleum (petroleum
 It is designed to optimize the operations of existing single liquid commodity pipeline systems subject to physical flow and pump engineering constraints. The code is engineered to decouple problem specifications from the network formulations. This enables the definition of a variety of liquid network formulations and their comparison on common problem specifications.
 
 **Core Problem Specifications**
-* Petro Flow (pf)
+
+* Optimal Petro Flow (opf)
 
 **Core Network Formulations**
 
+*LP
 
 ## Basic Usage
 
@@ -40,11 +42,10 @@ where FooPetroleumModel is the implementation of the mathematical program of the
 ## Acknowledgments
 
 This code has been developed as part of the Advanced Network Science Initiative at Los Alamos National Laboratory.
-The primary developer is Russell Bent, with significant contributions from .
+The primary developer is Elena Khlebnikova, with significant contributions from Kaarthik Sundar and Russell Bent.
 
-Special thanks to Miles Lubin for his assistance in integrating with Julia/JuMP.
 
 
 ## License
 
-This code is provided under .
+This code is provided under a BSD license as part of the Multi-Infrastructure Control and Optimization Toolkit (MICOT) project, LA-CC-13-108.

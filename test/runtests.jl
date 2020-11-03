@@ -9,7 +9,11 @@ import LinearAlgebra
 using Test
 
 
-ipopt_solver = JuMP.with_optimizer(Ipopt.Optimizer, print_level = 5, tol=1e-10)
+ipopt_solver = JuMP.optimizer_with_attributes(
+    Ipopt.Optimizer,
+    "print_level" => 5,
+    "tol" => 1e-10,
+)
 
 cvx_solver = ipopt_solver
 
