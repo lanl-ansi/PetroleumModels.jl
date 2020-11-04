@@ -6,10 +6,10 @@
 
     @test isapprox(result["objective"],-15.429, atol=1e-2)
     @test result["termination_status"] == LOCALLY_SOLVED || result["termination_status"] == OPTIMAL
-    @test isapprox(result["solution"]["pipe"]["3"]["q_pipe"],  1284.22, atol = 1e-1)
-    @test isapprox(result["solution"]["pipe"]["9"]["q_pipe"],  3472.03, atol = 1e-1)
-    @test isapprox(result["solution"]["pipe"]["15"]["q_pipe"], 500.0,   atol = 1e-1)
-    @test isapprox(result["solution"]["pipe"]["22"]["q_pipe"], 2584.12, atol = 1e-1)
+    @test isapprox(result["solution"]["pipe"]["3"]["q_pipe"],  0.3567, atol = 1e-1)
+    @test isapprox(result["solution"]["pipe"]["9"]["q_pipe"],  0.9644, atol = 1e-1)
+    @test isapprox(result["solution"]["pipe"]["15"]["q_pipe"], 0.1389, atol = 1e-1)
+    @test isapprox(result["solution"]["pipe"]["22"]["q_pipe"], 0.7178, atol = 1e-1)
 end
 
 @testset "test one pipe" begin
@@ -19,7 +19,7 @@ end
 
     @test isapprox(result["objective"],-50.0, atol=1e-2)
     @test result["termination_status"] == LOCALLY_SOLVED || result["termination_status"] == OPTIMAL
-    @test isapprox(result["solution"]["pipe"]["30"]["q_pipe"], 3600, atol = 1e-1)
+    @test isapprox(result["solution"]["pipe"]["30"]["q_pipe"], 1.0, atol = 1e-1)
 end
 
 @testset "test example from article" begin
@@ -29,10 +29,10 @@ end
 
     @test isapprox(result["objective"],-136.997, atol=1e-2)
     @test result["termination_status"] == LOCALLY_SOLVED || result["termination_status"] == OPTIMAL
-    @test isapprox(result["solution"]["pipe"]["4"]["q_pipe"],  3750., atol = 1e-1)
-    @test isapprox(result["solution"]["pipe"]["10"]["q_pipe"], 3750., atol = 1e-1)
-    @test isapprox(result["solution"]["pipe"]["12"]["q_pipe"], 3960, atol = 1e-1)
-    @test isapprox(result["solution"]["pipe"]["15"]["q_pipe"], 4110, atol = 1e-1)
+    @test isapprox(result["solution"]["pipe"]["4"]["q_pipe"],  3750., atol = 1e-2)
+    @test isapprox(result["solution"]["pipe"]["10"]["q_pipe"], 3750., atol = 1e-2)
+    @test isapprox(result["solution"]["pipe"]["12"]["q_pipe"], 3960, atol = 1e-2)
+    @test isapprox(result["solution"]["pipe"]["15"]["q_pipe"], 4110, atol = 1e-2)
 end
 
 @testset "test case" begin
@@ -51,5 +51,5 @@ end
 
     @test isapprox(result["objective"],-7.329, atol=1e-2)
     @test result["termination_status"] == LOCALLY_SOLVED || result["termination_status"] == OPTIMAL
-    @test isapprox(result["solution"]["pipe"]["33"]["q_pipe"], 2638.84, atol = 1e-1)
+    @test isapprox(result["solution"]["pipe"]["33"]["q_pipe"], 0.733, atol = 1e-1)
 end

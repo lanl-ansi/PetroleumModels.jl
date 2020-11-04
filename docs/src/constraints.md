@@ -45,7 +45,7 @@ constraint_pump_head_difference
 
 ### Flow balance constraints
 
-Tanks are used to model storage nodes in a pipeline system. The primary constraint ensures the head and flow on both sides of tanks are within the limits capability of the connected to them pipes.
+Tanks are used to model storage nodes in a pipeline system. The primary constraint ensures the head and flow on both sides of tanks are within the limits capability of the tank's intake and offtake pipes.
 
 ```@docs
 constraint_tank_volume_balance
