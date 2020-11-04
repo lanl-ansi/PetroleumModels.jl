@@ -3,15 +3,12 @@ function mpc = lib1
 mpc.density                    = 827;     % petroleum density, kg per cubic m
 mpc.viscosity                  = 4.9e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
-mpc.base_viscosity             = 4.9e-6;  % base viscosity, m2 / s
 mpc.base_head                  = 100;     % base head, m
 mpc.base_length                = 542;     % m
 mpc.base_flow                  = 1.0;     % petroleum volume flow rate, m3 per hour
-mpc.base_diameter              = 0.8;     % m
 mpc.units                      = 'si';
 mpc.is_per_unit                = 0;
 mpc.time_step                  = 0;
-
 
 %% junction data
 %  junction_i type head_min head_max elevation status

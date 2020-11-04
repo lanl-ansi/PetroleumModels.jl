@@ -9,8 +9,6 @@ const _mlab_data_names = Vector{String}([
     "mpc.density",
     "mpc.viscosity",
     "mpc.gravitational_acceleration",
-    "mpc.base_viscosity",
-    "mpc.base_diameter",
     "mpc.base_length",
     "mpc.base_flow",
     "mpc.base_head",
@@ -185,8 +183,6 @@ function parse_m_string(data_string::String)
     ]
 
     optional_metadata_names = [
-        "mpc.base_viscosity",
-        "mpc.base_diameter",
         "mpc.base_length",
         "mpc.base_head",
         "mpc.base_flow",
@@ -233,20 +229,6 @@ function parse_m_string(data_string::String)
     else
         Memento.warn(_LOGGER, string("no base_length found in .m file.
             This value will be auto-assigned based on the head limits provided in the data"))
-    end
-
-    if haskey(matlab_data, "mpc.base_viscosity")
-        case["base_viscosity"] = matlab_data["mpc.base_viscosity"]
-    else
-        Memento.warn(_LOGGER,"no base_viscosity found in .m file.
-            The file seems to be missing \"mpc.base_viscosity = ...\" \n")
-    end
-
-    if haskey(matlab_data, "mpc.base_diameter")
-        case["base_diameter"] = matlab_data["mpc.base_diameter"]
-    else
-        Memento.warn(_LOGGER,"no base_diameter found in .m file.
-            The file seems to be missing \"mpc.base_diameter = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.base_flow")
@@ -470,8 +452,6 @@ const _matlab_global_params_order_required = [
 
 "order of optional global parameters"
 const _matlab_global_params_order_optional = [
-    "base_viscosity",
-    "base_diameter",
     "base_length",
     "base_head",
     "base_flow",
@@ -483,8 +463,6 @@ const _matlab_global_params_order_optional = [
 "list of units of meta data fields"
 const _units = Dict{String,Dict{String,String}}(
     "si" => Dict{String,String}(
-        "base_viscosity"  => "m2/s",
-        "base_diameter" => "m",
         "base_length" => "m",
         "base_head" => "m",
         "base_flow" => "m3/s",

@@ -55,7 +55,7 @@ function constraint_leibenzon(pm::AbstractPetroleumModel, n::Int, k)
     zj     = ref(pm,n,:junction, j)["elevation"]
     m      = leibenzon_exponent(pm.data)
     lc     = leibenzon_constant(pm.data)
-    lambda = _calc_pipe_resistance_leibenzon(pipe, nu, m, lc)
+    lambda = _calc_pipe_resistance_leibenzon(pipe, nu, m, lc, base_length(pm.data), base_head(pm.data), base_flow(pm.data))
 
     constraint_leibenzon(pm, n, k, i, j, lambda, zi, zj, m)
 end

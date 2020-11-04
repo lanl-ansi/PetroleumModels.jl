@@ -1,11 +1,7 @@
 # tools for working with PetroleumModels internal data format
 
-
 "data getters"
 @inline base_head(data::Dict{String,Any})                       = data["base_head"]
-@inline base_viscosity(data::Dict{String,Any})                  = data["base_viscosity"]
-@inline base_gravitational_acceleration(data::Dict{String,Any}) = data["gravitational_acceleration"]
-@inline base_diameter(data::Dict{String,Any})                   = data["base_diameter"]
 @inline base_length(data::Dict{String,Any})                     = data["base_length"]
 @inline base_flow(data::Dict{String,Any})                       = data["base_flow"]
 @inline leibenzon_exponent(data::Dict{String,Any})              = 0.25
@@ -47,12 +43,9 @@ end
 
 "adds additional non-dimensional constants to data dictionary"
 function add_base_values!(data::Dict{String,Any})
-    (get(data, "base_head", false) == false) &&
-    (data["base_head"] = calc_base_head(data))
-    (get(data, "base_viscosity", false) == false) && (data["base_viscosity"] = 4.9e-6)
+    (get(data, "base_head", false) == false)   && (data["base_head"] = calc_base_head(data))
     (get(data, "base_length", false) == false) && (data["base_length"] = 500.0)
-    data["base_diameter"] = 0.75
-    (get(data, "base_flow", false) == false) && (data["base_flow"] = calc_base_flow(data))
+    (get(data, "base_flow", false) == false)   && (data["base_flow"] = calc_base_flow(data))
 end
 
 "make transient data to si units"
@@ -115,7 +108,6 @@ const _params_for_unit_conversions = Dict(
     "pipe" => [
         "flow_min",
         "flow_max",
-        "diameter",
         "length",
         "q_pipe"
     ],
@@ -160,8 +152,6 @@ function _rescale_functions(
     rescale_q_pump_nom::Function,
     rescale_qin::Function,
     rescale_qoff::Function,
-    rescale_viscosity::Function,
-    rescale_diameter::Function,
     rescale_length::Function,
     rescale_head::Function,
     rescale_elevation::Function,
@@ -190,8 +180,6 @@ function _rescale_functions(
         "delta_head_min"             => rescale_head,
         "rotation_coefficient"       => rescale_rotation_coefficient,
         "flow_coefficient"           => rescale_flow_coefficient,
-        "viscosity"                  => rescale_viscosity,
-        "diameter"                   => rescale_diameter,
         "length"                     => rescale_length,
         "capacity_min"               => rescale_volume,
         "capacity_max"               => rescale_volume,
@@ -210,8 +198,6 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pump_nom                 = x -> x/base_flow(data)
     rescale_qin                        = x -> x/base_flow(data)
     rescale_qoff                       = x -> x/base_flow(data)
-    rescale_viscosity                  = x -> x/base_viscosity(data)
-    rescale_diameter                   = x -> x/base_diameter(data)
     rescale_length                     = x -> x/base_length(data)
     rescale_head                       = x -> x/base_head(data)
     rescale_elevation                  = x -> x/base_head(data)
@@ -225,8 +211,6 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
         rescale_q_pump_nom,
         rescale_qin,
         rescale_qoff,
-        rescale_viscosity,
-        rescale_diameter,
         rescale_length,
         rescale_head,
         rescale_elevation,
@@ -236,7 +220,6 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
-    _apply_func!(nw_data, "viscosity", rescale_viscosity)
 
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
@@ -266,8 +249,6 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pump_nom                 = x -> x*base_flow(data)
     rescale_qin                        = x -> x*base_flow(data)
     rescale_qoff                       = x -> x*base_flow(data)
-    rescale_viscosity                  = x -> x*base_viscosity(data)
-    rescale_diameter                   = x -> x*base_diameter(data)
     rescale_length                     = x -> x*base_length(data)
     rescale_head                       = x -> x*base_head(data)
     rescale_elevation                  = x -> x*base_head(data)
@@ -281,8 +262,6 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
         rescale_q_pump_nom,
         rescale_qin,
         rescale_qoff,
-        rescale_viscosity,
-        rescale_diameter,
         rescale_length,
         rescale_head,
         rescale_elevation,
@@ -581,9 +560,9 @@ end
 
 
 "Calculates pipeline \"resistance\" using the leibenzon formulation"
-function _calc_pipe_resistance_leibenzon(pipe::Dict{String,Any}, nu, m, lc)
+function _calc_pipe_resistance_leibenzon(pipe::Dict{String,Any}, nu, m, lc, base_length, base_head, base_flow)
     beta = pipe["friction_factor"]
     D    = pipe["diameter"]
-    L    = pipe["length"]
-    return (beta * L * lc * nu^m) / (D^(5.0-m))
+    L    = pipe["length"] * base_length
+    return (beta * L * lc * nu^m*base_flow^(2.0-m)) / (D^(5.0-m) * base_head)
 end

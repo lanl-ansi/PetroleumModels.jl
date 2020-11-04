@@ -51,8 +51,4 @@ All formulation names refer to how underlying physics of a gas network is modele
 
 | Formulation      | Steady-State         | Transient             | Description           |
 | ---------------- | -------------------- | --------------------- | --------------------- |
-| WP               |       Y              |          Y            | Physics is modeled using nonlinear equations. |
-| DWP              |       Y              |          N            | Physics is modeled using nonlinear equations. Directionality of flow is modeled using discrete variables |
-| CRDWP            |       Y              |          N            | Physics is modeled using convex equations. Directionality of flow is modeled using discrete variables |
-| LRDWP            |       Y              |          N            | Physics is modeled using linear equations. Directionality of flow is modeled using discrete variables |
-| LRWP             |       Y              |          N            | Physics is modeled using linear equations. |
+| LP               |       Y              |          Y            | Physics is modeled using nonlinear equations. |

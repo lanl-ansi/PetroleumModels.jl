@@ -3,11 +3,9 @@ function mpc = lib1
 mpc.density                    = 851.5;    % petroleum density, kg per cubic m
 mpc.viscosity                  = 11.6e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
-mpc.base_viscosity             = 11.6e-6;  % base viscosity, m2 / s
 mpc.base_head                  = 100;      % base head, m
 mpc.base_length                = 542;      % m
 mpc.base_flow                  = 1.0;     % petroleum volume flow rate, m3 per hour
-mpc.base_diameter              = 0.75;     % m
 mpc.units                      = 'si';
 mpc.is_per_unit                = 0;
 mpc.time_step                  = 0;
@@ -25,7 +23,7 @@ mpc.junction = [
 %% pipeline data
 % pipeline_i fr_junction to_junction diameter length flow_min flow_max friction_factor status
 mpc.pipe = [
-  33  444  88 0.75  154e3   0.139 1.139 0.0246 1
+  33  444  88 0.75  154e3   0.139 1.139 0.019832 1
 ];
 
 

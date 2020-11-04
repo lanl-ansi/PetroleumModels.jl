@@ -100,11 +100,9 @@ These components model producers of product.
 | density                      | Float64 | Density                | kg/m^3              | lbm/ft3                       |          | Liquid density                                                     |
 | viscosity                    | Float64 | Viscosity              | m^s2/s              | ft2/s                         |          | Liquid kinematic viscosity                                         |
 | gravitational_acceleration   | Float64 | Gravity                | m/s^2               | ft/s2                         |          | Gravitational acceleration                                         |
-| base_viscosity               | Float64 | Base Viscosity         | m^2/s               | ft2/s                         |          | Base liquid kinematic viscosity                                    |
 | base_head                    | Float64 | Base Head              | m                   | ft                            |          | Base head                                                          |
 | base_length                  | Float64 | Base Length            | m                   | ft                            |          | Base length                                                        |
 | base_flow                    | Float64 | Base Flow Rate         | m^3/s               | ft3/h                         |          | Base flow rate                                                     |
-| base_diameter                | Float64 | Base Diameter          | m                   | ft                            |          | Base Diameter                                                      |
 | units                        | String  | Units                  |                     |                               |          | 'si' for standard units or 'usc' for United States customary units |
 | is_per_unit                  | Int     | Per-unit               |                     |                               |          | If data is already in per-unit (non-dimensionalized)               |
 
