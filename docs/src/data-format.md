@@ -106,7 +106,6 @@ These components model producers of product.
 | base_length                  | Float64 | Base Length            | m                   | ft                            |          | Base length                                                        |
 | base_flow                    | Float64 | Base Flow Rate         | m^3/s               | ft3/h                         |          | Base flow rate                                                     |
 | base_diameter                | Float64 | Base Diameter          | m                   | ft                            |          | Base Diameter                                                      |
-| base_energy                  | Float64 | Base energy            | kW*s                | kW*s                          | Y        | Base pump energy                                                   |
 | units                        | String  | Units                  |                     |                               |          | 'si' for standard units or 'usc' for United States customary units |
 | is_per_unit                  | Int     | Per-unit               |                     |                               |          | If data is already in per-unit (non-dimensionalized)               |
 

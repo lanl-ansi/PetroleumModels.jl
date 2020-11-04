@@ -9,7 +9,6 @@ mpc.base_head                  = 100;     % base head, m
 mpc.base_length                = 542;     % m
 mpc.base_flow                  = 1.0;     % petroleum volume flow rate, m3 per hour
 mpc.base_diameter              = 0.75;    % m
-mpc.base_energy                = 900;     % pump base energy, kw*h
 mpc.units                      = 'si';
 mpc.is_per_unit                = 0;
 mpc.time_step                  = 0;

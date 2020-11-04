@@ -9,7 +9,6 @@
 @inline base_diameter(data::Dict{String,Any})                   = data["base_diameter"]
 @inline base_length(data::Dict{String,Any})                     = data["base_length"]
 @inline base_flow(data::Dict{String,Any})                       = data["base_flow"]
-@inline base_energy(data::Dict{String,Any})                     = data["base_energy"]
 @inline leibenzon_exponent(data::Dict{String,Any})              = 0.25
 @inline leibenzon_constant(data::Dict{String,Any})              = 1.02
 
@@ -88,8 +87,7 @@ function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::
         "withdrawal_max",
         "withdrawl_nominal",
         "qin",
-        "qoff",
-        "electricity_price"
+        "qoff"
     ]
 
     inv_flow_params = ["bid_price", "offer_price"]
@@ -129,8 +127,7 @@ const _params_for_unit_conversions = Dict(
         "delta_head_max",
         "delta_head_min",
         "rotation_coefficient",
-        "flow_coefficient",
-        "electricity_price"
+        "flow_coefficient"
     ],
 
     "consumer" => [
@@ -159,7 +156,6 @@ const _params_for_unit_conversions = Dict(
 )
 
 function _rescale_functions(
-    rescale_electricity_price::Function,
     rescale_q_pipe::Function,
     rescale_q_pump::Function,
     rescale_q_pump_nom::Function,
@@ -176,7 +172,6 @@ function _rescale_functions(
     rescale_volume::Function
 )::Dict{String,Function}
     Dict{String,Function}(
-        "electricity_price"          => rescale_electricity_price,
         "q_pipe"                     => rescale_q_pipe,
         "q_pump"                     => rescale_q_pipe,
         "ql"                         => rescale_q_pipe,
@@ -213,7 +208,6 @@ end
 
 "Transforms data to si units"
 function si_to_pu!(data::Dict{String,<:Any}; id = "0")
-    rescale_electricity_price          = x -> x*base_energy(data)
     rescale_q_pipe                     = x -> x/base_flow(data)
     rescale_q_pump                     = x -> x/base_flow(data)
     rescale_q_pump_nom                 = x -> x/base_flow(data)
@@ -230,7 +224,6 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_volume                     = x -> x/base_head(data)^3
 
     functions = _rescale_functions(
-        rescale_electricity_price,
         rescale_q_pipe,
         rescale_q_pump,
         rescale_q_pump_nom,
@@ -274,7 +267,6 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
 end
 
 function pu_to_si!(data::Dict{String,<:Any}; id = "0")
-    rescale_electricity_price          = x -> x/base_energy(data)
     rescale_q_pipe                     = x -> x*base_flow(data)
     rescale_q_pump                     = x -> x*base_flow(data)
     rescale_q_pump_nom                 = x -> x*base_flow(data)
@@ -291,7 +283,6 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_volume                     = x -> x*base_head(data)^3
 
     functions = _rescale_functions(
-        rescale_electricity_price,
         rescale_q_pipe,
         rescale_q_pump,
         rescale_q_pump_nom,

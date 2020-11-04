@@ -23,8 +23,7 @@ const _mlab_data_names = Vector{String}([
     "mpc.producer",
     "mpc.consumer",
     "mpc.tank",
-    "mpc.time_step",
-    "mpc.base_energy"
+    "mpc.time_step"
 ])
 
 const _mlab_junction_columns = Vector{Tuple{String,Type}}([
@@ -183,8 +182,7 @@ function parse_m_string(data_string::String)
         "mpc.viscosity",
         "mpc.gravitational_acceleration",
         "mpc.units",
-        "mpc.time_step",
-        "mpc.base_energy"
+        "mpc.time_step"
     ]
 
     optional_metadata_names = [
@@ -488,8 +486,7 @@ const _matlab_global_params_order_optional = [
     "base_head",
     "base_flow",
     "is_per_unit",
-    "mpc.time_step",
-    "mpc.base_energy"
+    "mpc.time_step"
 ]
 
 

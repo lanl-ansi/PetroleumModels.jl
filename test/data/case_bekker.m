@@ -9,7 +9,6 @@ mpc.base_head                  = 100;      % base head, m
 mpc.base_length                = 542;      % m
 mpc.base_flow                  = 1.0;     % petroleum volume flow rate, m3 per hour
 mpc.base_diameter              = 0.75;     % m
-mpc.base_energy                = 900;      % pump base energy, kw*h
 mpc.units                      = 'si';
 mpc.is_per_unit                = 0;
 mpc.time_step                  = 0;
@@ -58,7 +57,6 @@ mpc.pump = [
   3   3   4      1  371   193.104  0.8681  1.0417 161 277 0.6 0.87  50 40  60 0.000028  1 0.966 0.95
   1   1   3      1  371   193.104  0.8681  1.0417 161 277 0.6 0.87  50 40  60 0.000028  1 0.966 0.95
 ];
-
 
 %% producer
 % producer_i junction injection_min injection_max injection_nominal status dispatchable offer_price
