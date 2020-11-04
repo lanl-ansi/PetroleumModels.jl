@@ -3,7 +3,6 @@ function mpc = lib1
 mpc.density                    = 827;     % petroleum density, kg per cubic m
 mpc.viscosity                  = 4.9e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
-mpc.base_density               = 827;     % petroleum base density, kg per m3
 mpc.base_viscosity             = 4.9e-6;  % base viscosity, m2 / s
 mpc.base_head                  = 100;     % base head, m
 mpc.base_length                = 542;     % m

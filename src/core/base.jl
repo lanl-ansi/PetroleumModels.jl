@@ -55,10 +55,10 @@ Some of the common keys include:
 * `:degree` -- the degree of junction i using existing connections (see `ref_degree!`)),
 """
 function ref_add_core!(refs::Dict{Symbol,<:Any})
-    _ref_add_core!(refs[:nw], base_density=refs[:base_density], base_viscosity=refs[:base_viscosity], base_diameter=refs[:base_diameter], base_length=refs[:base_length], base_flow=refs[:base_flow], base_head=refs[:base_head])
+    _ref_add_core!(refs[:nw], base_viscosity=refs[:base_viscosity], base_diameter=refs[:base_diameter], base_length=refs[:base_length], base_flow=refs[:base_flow], base_head=refs[:base_head])
 end
 
-function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_density=850, base_viscosity= 4.9e-6, base_diameter=0.75, base_length=100, base_flow = 1, base_head = 100)
+function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_viscosity= 4.9e-6, base_diameter=0.75, base_length=100, base_flow = 1, base_head = 100)
     for (nw, ref) in nw_refs
         ref[:junction] = haskey(ref, :junction) ? Dict(x for x in ref[:junction] if x.second["status"] == 1) : Dict()
         ref[:pipe] = haskey(ref, :pipe) ? Dict(x for x in ref[:pipe] if x.second["status"] == 1 && x.second["fr_junction"] in keys(ref[:junction]) && x.second["to_junction"] in keys(ref[:junction])) : Dict()

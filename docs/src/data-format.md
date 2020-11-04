@@ -100,7 +100,6 @@ These components model producers of product.
 | density                      | Float64 | Density                | kg/m^3              | lbm/ft3                       |          | Liquid density                                                     |
 | viscosity                    | Float64 | Viscosity              | m^s2/s              | ft2/s                         |          | Liquid kinematic viscosity                                         |
 | gravitational_acceleration   | Float64 | Gravity                | m/s^2               | ft/s2                         |          | Gravitational acceleration                                         |
-| base_density                 | Float64 | Base Density           | kg/m^3              | lbm/ft3                       |          | Base liquid density                                                |
 | base_viscosity               | Float64 | Base Viscosity         | m^2/s               | ft2/s                         |          | Base liquid kinematic viscosity                                    |
 | base_head                    | Float64 | Base Head              | m                   | ft                            |          | Base head                                                          |
 | base_length                  | Float64 | Base Length            | m                   | ft                            |          | Base length                                                        |

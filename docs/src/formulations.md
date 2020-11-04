@@ -29,29 +29,25 @@ AbstractLPModel <: AbstractGasModel
 Each of these forms can be used as the type parameter for a PetroleumModel, i.e.:
 
 ```julia
-WPGasModel <: AbstractWPForm
-MIDWPGasModel <: AbstractDWPModel
-CRDWPGasModel <: AbstractMISOCPModel
-LRDWPGasModel <: AbstractLRDWPModel
-LRWPGasModel <: AbstractLRWPModel
+LPPetroleumModel <: AbstractLPForm
 ```
 
-For details on `AbstractGasModel`, see the section on [Gas Model](@ref).
+For details on `AbstractPetroleumModel`, see the section on [Petroleum Model](@ref).
 
 ## User-Defined Abstractions
 
-The user-defined abstractions begin from a root abstract like the `AbstractGasModel` abstract type, i.e.
+The user-defined abstractions begin from a root abstract like the `AbstractPetroleumModel` abstract type, i.e.
 
 ```julia
-AbstractMyFooModel <: AbstractGasModel
+AbstractMyFooModel <: AbstractPetroleumModel
 
 StandardMyFooForm <: AbstractFooModel
-FooGasModel = AbstractGasModel{StandardFooForm}
+FooPetroleumModel = AbstractPetroleumModel{StandardFooForm}
 ```
 
 ## Supported Formulations
 
-All formulation names refer to how underlying physics of a gas network is modeled. For example, the `LRWP` model uses a linear representation of natural gas physics. If a model includes valves, then the resulting mathematical optimization problems will be mixed integer since valve controls are discrete.
+All formulation names refer to how underlying physics of a gas network is modeled. For example, the `LP` model uses a non convex form of the Bernoulli equations using the Leibenzon relationship.
 
 | Formulation      | Steady-State         | Transient             | Description           |
 | ---------------- | -------------------- | --------------------- | --------------------- |
