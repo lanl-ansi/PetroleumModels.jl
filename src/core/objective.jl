@@ -10,8 +10,7 @@ function objective_min_expenses_max_benefit(pm::AbstractPetroleumModel, nws=[pm.
     eta     = Dict(n => var(pm,n,:eta) for n in nws)
     h       = Dict(n => var(pm,n,:h) for n in nws)
 
-    seconds_per_hour           = 3600.0
-    watts_per_kw               = 1000.0
+    kw_s_to_J                  = 1000.0 # J = (kg ⋅m^2)/⋅ s
     density                    = pm.data["density"]
     gravitational_acceleration = pm.data["gravitational_acceleration"]
 
@@ -19,7 +18,7 @@ function objective_min_expenses_max_benefit(pm::AbstractPetroleumModel, nws=[pm.
          sum(
               sum(producer["offer_price"] * qg[n][i] for (i, producer) in ref(pm,n,:producer)) -
               sum(consumer["bid_price"]   * ql[n][i] for (i, consumer) in ref(pm,n,:consumer)) +
-              (density * gravitational_acceleration) / (seconds_per_hour * watts_per_kw) *
+              (density * gravitational_acceleration) / kw_s_to_J *
                 sum(pump["electricity_price"] * q_pump[n][i] * (h[n][pump["to_junction"]] - h[n][pump["fr_junction"]]) /
                 (pump["electric_motor_efficiency"] * pump["mechanical_transmission_efficiency"] * eta[n][i]
                 )

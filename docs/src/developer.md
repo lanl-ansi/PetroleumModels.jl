@@ -2,21 +2,17 @@
 
 ## Variable, constraint and parameter naming scheme
 
-### Suffixes
-
-- `_pf`: used to denote a concept specific to implementations where production and consumption are variables.
-
-### Head
+### Head variables
 
 - `h`: head
 
-### Flow
+### Flow variables
 
 - `q`: volume flow
 - `ql`: volume flow consumption
 - `qg`: volume flow production
 
-### Pump parameters
+### Pump variables
 
 - `eta`: pump efficiency
 - `w`: pump rotational speed

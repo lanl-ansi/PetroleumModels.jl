@@ -1,6 +1,6 @@
 
-@testset "test SeawayPipeline System" begin
-    data = parse_file("../test/data/pipeline_2012_seaway_m3_per_h.m")
+@testset "Seaway Pipeline Test" begin
+    data = parse_file("../test/data/case_seaway.m")
     result = run_opf(data, LPPetroleumModel, ipopt_solver)
     make_si_units!(result["solution"])
 
@@ -12,8 +12,8 @@
     @test isapprox(result["solution"]["pipe"]["22"]["q_pipe"], 0.7178, atol = 1e-1)
 end
 
-@testset "test one pipe" begin
-    data = parse_file("../test/data/one_pipe.m")
+@testset "One Pipe Test" begin
+    data = parse_file("../test/data/case_one_pipe.m")
     result = run_opf(data, LPPetroleumModel, ipopt_solver)
     make_si_units!(result["solution"])
 
@@ -22,8 +22,8 @@ end
     @test isapprox(result["solution"]["pipe"]["30"]["q_pipe"], 1.0, atol = 1e-1)
 end
 
-@testset "test example from article" begin
-    data = parse_file("../test/data/example_from_article.m")
+@testset "Bekker Test" begin
+    data = parse_file("../test/data/case_bekker.m")
     result = run_opf(data, LPPetroleumModel, ipopt_solver)
     make_si_units!(result["solution"])
 
@@ -35,8 +35,8 @@ end
     @test isapprox(result["solution"]["pipe"]["15"]["q_pipe"], 1.14166666667, atol = 1e-2)
 end
 
-@testset "test case" begin
-    data = parse_file("../test/data/case.m")
+@testset "Tank Test" begin
+    data = parse_file("../test/data/case_tank.m")
     result = run_opf(data, LPPetroleumModel, ipopt_solver)
     make_si_units!(result["solution"])
 
@@ -44,8 +44,8 @@ end
     @test result["termination_status"] == LOCALLY_SOLVED || result["termination_status"] == OPTIMAL
 end
 
-@testset "test small case" begin
-    data = parse_file("../test/data/small_case.m")
+@testset "5 Junction Test" begin
+    data = parse_file("../test/data/case5.m")
     result = run_opf(data, LPPetroleumModel, ipopt_solver)
     make_si_units!(result["solution"])
 
