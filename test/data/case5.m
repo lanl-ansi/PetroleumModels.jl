@@ -3,7 +3,7 @@ function mpc = lib1
 mpc.density                    = 827;     % petroleum density, kg per cubic m
 mpc.viscosity                  = 4.9e-6;  % petroleum viscosity, squared m per second
 mpc.gravitational_acceleration = 9.8;
-mpc.base_head                  = 100;     % base head, m
+mpc.base_head                  = 10;     % base head, m
 mpc.base_length                = 542;     % m
 mpc.base_flow                  = 1.0;    % petroleum volume flow rate, m3 per hour
 mpc.units                      = 'si';
@@ -28,8 +28,8 @@ mpc.pipe = [
 %% pump data
 % pump_i fr_junction to_junction station_i rotation_coefficient flow_coefficient flow_nom flow_max delta_head_min delta_head_max pump_efficiency_min pump_efficiency_max rotation_nom rotation_min rotation_max electricity_price status electric_motor_efficiency mechanical_transmission_efficiency
 mpc.pump = [
-  22  333   444  1  276.8  92  1.0  1.2 144 217 0.6 0.87  50 40  60 0.000033 1 0.966 0.95
-  15  222   333  1  276.8  92  1.0  1.2 144 217 0.6 0.87  50 40  60 0.000033 1 0.966 0.95
+  22  333   444  1  276.8  92  1.0  1.2 144 217 0.6 0.87  50 40  60 0.00000033 1 0.966 0.95
+  15  222   333  1  276.8  92  1.0  1.2 144 217 0.6 0.87  50 40  60 0.00000033 1 0.966 0.95
 ];
 
 %% producer

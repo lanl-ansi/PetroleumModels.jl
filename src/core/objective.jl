@@ -14,14 +14,13 @@ function objective_min_expenses_max_benefit(pm::AbstractPetroleumModel, nws=[pm.
     density                    = pm.data["density"]
     gravitational_acceleration = pm.data["gravitational_acceleration"]
 
-    obj = JuMP.@NLobjective(pm.model, _IM._MOI.MIN_SENSE,
+    JuMP.@NLobjective(pm.model, _IM._MOI.MIN_SENSE,
          sum(
               sum(producer["offer_price"] * qg[n][i] for (i, producer) in ref(pm,n,:producer)) -
               sum(consumer["bid_price"]   * ql[n][i] for (i, consumer) in ref(pm,n,:consumer)) +
               (density * gravitational_acceleration) / kw_s_to_J *
-                sum(pump["electricity_price"] * q_pump[n][i] * (h[n][pump["to_junction"]] - h[n][pump["fr_junction"]]) /
-                (pump["electric_motor_efficiency"] * pump["mechanical_transmission_efficiency"] * eta[n][i]
-                )
+                sum( (pump["electricity_price"] * q_pump[n][i] * (h[n][pump["to_junction"]] - h[n][pump["fr_junction"]])) /
+                     (pump["electric_motor_efficiency"] * pump["mechanical_transmission_efficiency"] * eta[n][i])
               for (i, pump) in ref(pm,n,:pump) )
          for n in nws)
          )
