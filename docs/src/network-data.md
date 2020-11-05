@@ -11,41 +11,20 @@ The network data dictionary structure is roughly as follows:
 "name":<string>,                         # a name for the model
 "density":<float>,                       # petroleum density, kg per cubic m
 "viscosity":<float>,                     # petroleum viscosity, squared m per second
-"gravitational_acceleration":<float>,     # accerlation due to gravity, squared m per second
-mpc.base_head                  = 100;      % base head, m
-mpc.base_length                = 542;      % m
-mpc.base_flow                  = 0.5;     % petroleum volume flow rate, m3 per hour
-mpc.units                      = 'si';
-mpc.is_per_unit                = 0;
-mpc.time_step                  = 0;
-
-
-
-
-"temperature":<float>,                   # gas temperature. SI units are kelvin
-"is_per_units":<int>,                    # Whether or not the file is in per unit (non dimensional units) or SI units.
-"is_english_units":<int>,                # Whether or not the file is in english units
-"gas_molar_mass":<float>,                # molecular mass of the gas. SI units are kg/mol
-"gas_specific_gravity":<float>,          # the specific gravity of the gas. Non-dimensional.
-"multinetwork":<boolean>,                # flag for whether or not this is multiple networks
-"base_length":<float>,                   # Base for non-dimensionalizing space (length). Si units are m
-"base_flow":<float>,                     # Base for non-dimensionalizing mass flow. SI units are kg/s
-"base_pressure":<float>,                 # Base for non-dimensionalizing pressure. SI units are pascal
-"base_time":<float>,                     # Base for non-dimensionalizing time. SI units are s
-"compressibility_factor":<float>,        # Gas compressability. Non-dimensional.
-"specific_heat_capacity_ratio":<float>,  # Gas compressability. Non-dimensional.
-"sound_speed":<float>,                   # Speed of sound through the gas. SI units are m/s.
-"R":<float>,                             # Universal Gas constant. SI units are J/mol/K.
-
-
+"gravitational_acceleration":<float>,    # accerlation due to gravity, squared m per second
+"base_head":<float>,                     # Base for non-dimensionalizing head. SI units are m
+"base_length":<float>,                   # Base for non-dimensionalizing length. SI units are m
+"base_flow":<float>,                     # Base for non-dimensionalizing flow. SI units are m^3/s
+"units":<string>,                        # Non-dimensonilized units. Options are "si" and "asu"
+"is_per_unit":<string>,                  # Whether or not the file is in per unit (non dimensional units) or SI units.
+"time_step":<int>,                        # size of the time step.
 "junction":{
     "1":{
-      "p_max": <float>,    # maximum pressure. SI units are pascals
-      "p_min": <float>,    # minimum pressure. SI units are pascals
-      "p_nominal": <float>,  # nominal pressure. SI units are pascals
-      "status": <int>,    # status of the component (0 = off, 1 = on). Default is 1.
-      "lat":<float>, # latitude position of the junction (optional)
-      "lon":<float>, # latitude position of the junction (optional)
+      "type": <int> ,         # the type of the junction
+      "head_min": <float>,    # minimum head. SI units are meters
+      "head_max": <float>,    # maximum head. SI units are meters
+      "elevation":<float>,    # elevation of the junction. SI units are meters
+      "status": <int>,        # status of the component (0 = off, 1 = on). Default is 1.
        ...
     },
     "2":{...},

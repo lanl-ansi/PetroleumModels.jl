@@ -1,5 +1,5 @@
 name = "PetroleumModels"
-uuid = "bb50e0bc-1b7b-5743-a97c-9918926c5417"
+uuid = "5779e974-1f92-11eb-9f64-57741d3a5e0e"
 authors = ["Elena Khlebnikova <elenak@lanl.gov>"]
 repo = "https://github.com/lanl-ansi/PetroleumModels.jl.git"
 version = "0.0.1"
