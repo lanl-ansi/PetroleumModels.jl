@@ -118,6 +118,7 @@ const _params_for_unit_conversions = Dict(
         "delta_head_max",
         "delta_head_min",
         "rotation_coefficient",
+        "electricity_price",
         "flow_coefficient"
     ],
 
@@ -125,6 +126,7 @@ const _params_for_unit_conversions = Dict(
         "withdrawal_min",
         "withdrawal_max",
         "withdrawal_nominal",
+        "bid_price",
         "ql"
     ],
 
@@ -132,6 +134,7 @@ const _params_for_unit_conversions = Dict(
         "injection_min",
         "injection_max",
         "injection_nominal",
+        "offer_price",
         "qg"
     ],
 
@@ -152,6 +155,9 @@ function _rescale_functions(
     rescale_q_pump_nom::Function,
     rescale_qin::Function,
     rescale_qoff::Function,
+    rescale_offer_price::Function,
+    rescale_bid_price::Function,
+    rescale_electricity_price::Function,
     rescale_length::Function,
     rescale_head::Function,
     rescale_elevation::Function,
@@ -173,6 +179,9 @@ function _rescale_functions(
         "injection_min"              => rescale_q_pipe,
         "injection_max"              => rescale_q_pipe,
         "injection_nominal"          => rescale_q_pipe,
+        "offer_price"                => rescale_offer_price,
+        "bid_price"                  => rescale_bid_price,
+        "electricity_price"          => rescale_electricity_price,
         "flow_min"                   => rescale_q_pipe,
         "flow_max"                   => rescale_q_pipe,
         "flow_nom"                   => rescale_q_pump_nom,
@@ -198,11 +207,14 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pump_nom                 = x -> x/base_flow(data)
     rescale_qin                        = x -> x/base_flow(data)
     rescale_qoff                       = x -> x/base_flow(data)
+    rescale_offer_price                = x -> x*base_flow(data)
+    rescale_bid_price                  = x -> x*base_flow(data)
+    rescale_electricity_price          = x -> x*(base_flow(data))#*base_head(data))
     rescale_length                     = x -> x/base_length(data)
     rescale_head                       = x -> x/base_head(data)
     rescale_elevation                  = x -> x/base_head(data)
     rescale_rotation_coefficient       = x -> x/base_head(data)
-    rescale_flow_coefficient           = x -> x/base_head(data)*base_flow(data)^2 # head/flow^2 - s^2/m^5
+    rescale_flow_coefficient           = x -> x/base_head(data)*base_flow(data)^2 # head/flow^2 = s^2/m^5
     rescale_volume                     = x -> x/base_head(data)^3
 
     functions = _rescale_functions(
@@ -211,6 +223,9 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
         rescale_q_pump_nom,
         rescale_qin,
         rescale_qoff,
+        rescale_offer_price,
+        rescale_bid_price,
+        rescale_electricity_price,
         rescale_length,
         rescale_head,
         rescale_elevation,
@@ -249,6 +264,9 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
     rescale_q_pump_nom                 = x -> x*base_flow(data)
     rescale_qin                        = x -> x*base_flow(data)
     rescale_qoff                       = x -> x*base_flow(data)
+    rescale_offer_price                = x -> x/base_flow(data)
+    rescale_bid_price                  = x -> x/base_flow(data)
+    rescale_electricity_price          = x -> x/(base_flow(data))#*base_head(data))
     rescale_length                     = x -> x*base_length(data)
     rescale_head                       = x -> x*base_head(data)
     rescale_elevation                  = x -> x*base_head(data)
@@ -262,6 +280,9 @@ function pu_to_si!(data::Dict{String,<:Any}; id = "0")
         rescale_q_pump_nom,
         rescale_qin,
         rescale_qoff,
+        rescale_offer_price,
+        rescale_bid_price,
+        rescale_electricity_price,
         rescale_length,
         rescale_head,
         rescale_elevation,
