@@ -5,8 +5,8 @@
 Release: [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://lanl-ansi.github.io/PetroleumModels.jl/stable)
 
 Dev:
-[![Build Status](https://travis-ci.org/lanl-ansi/GasModels.jl.svg?branch=master)](https://travis-ci.org/lanl-ansi/PetroleumModels.jl)
-[![codecov](https://codecov.io/gh/lanl-ansi/GasModels.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/lanl-ansi/PetroleumModels.jl)
+[![Build Status](https://travis-ci.org/lanl-ansi/PetroleumModels.jl.svg?branch=master)](https://travis-ci.org/lanl-ansi/PetroleumModels.jl)
+[![codecov](https://codecov.io/gh/lanl-ansi/PetroleumModels.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/lanl-ansi/PetroleumModels.jl)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://lanl-ansi.github.io/PetroleumModels.jl/latest)
 
 PetroleumModels.jl is a Julia/JuMP package for Steady-State Petroleum (petroleum products) Network Optimization.
