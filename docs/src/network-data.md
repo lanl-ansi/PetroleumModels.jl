@@ -194,6 +194,6 @@ All data is assumed to have consistent units (i.e. SI units or non-dimensionaliz
 The following commands can be used to explore the network data dictionary,
 
 ```julia
-network_data = GasModels.parse_file("gaslib-40.m")
+network_data = PetroleumModels.parse_file("case5.m")
 display(network_data)
 ```
