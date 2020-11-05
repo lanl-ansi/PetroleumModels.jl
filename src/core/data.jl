@@ -1,31 +1,12 @@
 # tools for working with PetroleumModels internal data format
 
-
 "data getters"
-@inline h_base(data::Dict{String,Any}) = data["baseH"]
-@inline base_rho(data::Dict{String,Any}) = data["base_rho"]
-@inline base_nu(data::Dict{String,Any}) = data["base_nu"]
-@inline base_gravitational_acceleration(data::Dict{String,Any}) = data["gravitational_acceleration"]
-@inline base_diameter(data::Dict{String,Any}) = data["base_diameter"]
-@inline base_length(data::Dict{String,Any}) = data["base_length"]
-@inline q_base(data::Dict{String,Any}) = data["baseQ"]
-@inline z_base(data::Dict{String,Any}) = data["base_z"]
-@inline a_base(data::Dict{String,Any}) = data["base_a"]
-@inline b_base(data::Dict{String,Any}) = data["base_b"]
-@inline volume_base(data::Dict{String,Any}) = data["base_volume"]
-@inline E_base(data::Dict{String,Any}) = data["E_base"]
+@inline base_head(data::Dict{String,Any})                       = data["base_head"]
+@inline base_length(data::Dict{String,Any})                     = data["base_length"]
+@inline base_flow(data::Dict{String,Any})                       = data["base_flow"]
+@inline leibenzon_exponent(data::Dict{String,Any})              = 0.25
+@inline leibenzon_constant(data::Dict{String,Any})              = 1.02
 
-# @inline get_base_time(data::Dict{String,Any}) = data["base_time"]
-
-"calculates constant flow production"
-function calc_qg(data::Dict{String,Any}, producer::Dict{String,Any})
-    producer["qg"]
-end
-
-"calculates constant flow consumer"
-function calc_ql(data::Dict{String,Any}, consumer::Dict{String,Any})
-    consumer["ql"]
-end
 
 "apply a function on a dict entry"
 function _apply_func!(data::Dict{String,Any}, key::String, func)
@@ -36,85 +17,76 @@ end
 
 function calc_tank_head_initial(data::Dict{String,Any}, tank::Dict{String,Any})
     radius     = tank["radius"]
-    volume     = tank["Initial_Volume"]
+    volume     = tank["initial_volume"]
     g          = data["gravitational_acceleration"]
     head_initial = (volume / (3.14 * radius ^ 2))
 
     if !haskey(data, "is_per_unit") || data["is_per_unit"] == true
-        head_initial  = head_initial / h_base(data)
+        head_initial  = head_initial / base_head(data)
     end
     return head_initial
 end
 
 
-
 "if original data is in per-unit ensure it has base values"
 function is_per_!(data::Dict{String,Any})
     if get(data, "is_per_unit", false) == true
-        if get(data, "baseH", false) == false ||
+        if get(data, "base_head", false) == false ||
            get(data, "base_length", false) == false
             Memento.error(
                 _LOGGER,
                 "data in .m file is in per unit but no base_head (in m) value is provided")
-
         end
-
     end
 end
 
 
 "adds additional non-dimensional constants to data dictionary"
 function add_base_values!(data::Dict{String,Any})
-    (get(data, "base_head", false) == false) &&
-    (data["base_head"] = calc_base_head(data))
-    (get(data, "base_nu", false) == false) && (data["base_nu"] = 4.9e-6)
-    # (get(data, "base_rho", false) == false) && (data["base_rho"] = 850)
+    (get(data, "base_head", false) == false)   && (data["base_head"] = calc_base_head(data))
     (get(data, "base_length", false) == false) && (data["base_length"] = 500.0)
-    data["base_diameter"] = 0.75
-    (get(data, "baseQ", false) == false) && (data["baseQ"] = calc_base_flow(data))
-
+    (get(data, "base_flow", false) == false)   && (data["base_flow"] = calc_base_flow(data))
 end
 
 "make transient data to si units"
-function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::Dict{String,Any},
-)
+function make_si_units!(transient_data::Array{Dict{String,Any},1}, static_data::Dict{String,Any})
     if static_data["units"] == "si"
         return
     end
     mmscfd_to_kgps = x -> x * get_mmscfd_to_kgps_conversion_factor(static_data)
     inv_mmscfd_to_kgps = x -> x / get_mmscfd_to_kgps_conversion_factor(static_data)
     head_params = [
-        "Hmin",
-        "Hmax",
+        "head_min",
+        "head_max",
         "H"
     ]
+
     flow_params = [
-        "rho",
-        "nu",
+        "density",
+        "viscosity",
         "gravitational_acceleration",
-        "Q_pipe_dim",
-        "Q_pump_dim",
         "q_pipe",
         "q_pump",
-        "q_nom",
-        "Qmin",
-        "Qmax",
+        "flow_nom",
+        "flow_min",
+        "flow_max",
         "qg",
         "ql",
-        "qgmin",
-        "qgmax",
-        "qlmin",
-        "qlmax",
-        "q_tank_in",
-        "q_tank_out",
-        "electricity_price"
-
+        "injection_min",
+        "injection_max",
+        "injection_nominal",
+        "withdrawal_min",
+        "withdrawal_max",
+        "withdrawl_nominal",
+        "qin",
+        "qoff"
     ]
+
     inv_flow_params = ["bid_price", "offer_price"]
     for line in transient_data
         param = line["parameter"]
         if param in head_params
-            line["value"] = psi_to_pascal(line["value"])
+            line["value"] = ft_to_m(line["value"])
         end
         if param in flow_params
             line["value"] = mmscfd_to_kgps(line["value"])
@@ -127,161 +99,143 @@ end
 
 const _params_for_unit_conversions = Dict(
 
-    "junction" =>
-        ["Hmax", "Hmin",  "z"],
-    #
-    # "original_junction" => ["p_min", "p_max", "p_nominal", "p"],
+    "junction" => [
+        "head_max",
+        "head_min",
+        "elevation"
+    ],
 
-    "pipe" => ["Qmin", "Qmax",
-    "diameter",
-    "length", "q_pipe"],
-
-    "ne_pipe" => ["Qmin", "Qmax",
-    "diameter",
-    "length"],
+    "pipe" => [
+        "flow_min",
+        "flow_max",
+        "length",
+        "q_pipe"
+    ],
 
     "pump" => [
-    "q_nom",
-    "delta_Hmax",
-    "delta_Hmin",
-    "a",
-    "b",
-    "electricity_price",
-    "Q_pump_dim"],
-
-    "ne_pump" => [
-    "q_nom",
-    "delta_Hmax",
-    "delta_Hmin",
-    "a",
-    "b",
-    "electricity_price",
-    "Q_pump_dim"],
+        "flow_nom",
+        "flow_max",
+        "delta_head_max",
+        "delta_head_min",
+        "rotation_coefficient",
+        "electricity_price",
+        "flow_coefficient"
+    ],
 
     "consumer" => [
-        "qlmin",
-        "qlmax", "ql"
+        "withdrawal_min",
+        "withdrawal_max",
+        "withdrawal_nominal",
+        "bid_price",
+        "ql"
     ],
+
     "producer" => [
-        "qgmin",
-        "qgmax",
+        "injection_min",
+        "injection_max",
+        "injection_nominal",
+        "offer_price",
         "qg"
     ],
 
     "tank" => [
-    "Min_Capacity_Limitation",
-    "Max_Capacity_Limitation",
-    "Min_Load_Flow_Rate",
-    "Max_Load_Flow_Rate",
-    "Min_Unload_Flow_Rate",
-    "Max_Unload_Flow_Rate"
+        "capacity_min",
+        "capacity_max",
+        "initial_volume",
+        "intake_min",
+        "intake_max",
+        "offtake_min",
+        "offtake_max"
     ],
 )
 
 function _rescale_functions(
-    rescale_electricity_price::Function,
     rescale_q_pipe::Function,
     rescale_q_pump::Function,
     rescale_q_pump_nom::Function,
-    rescale_q_tank_in::Function,
-    rescale_q_tank_out::Function,
-    rescale_rho::Function,
-    rescale_nu::Function,
-    rescale_gravitational_acceleration::Function,
-    rescale_diameter::Function,
+    rescale_qin::Function,
+    rescale_qoff::Function,
+    rescale_offer_price::Function,
+    rescale_bid_price::Function,
+    rescale_electricity_price::Function,
     rescale_length::Function,
-    rescale_H::Function,
-    rescale_z::Function,
-    rescale_a::Function,
-    rescale_b::Function,
-    rescale_volume::Function,
-    rescale_Q_pipe_dim::Function,
-    rescale_Q_pump_dim::Function
+    rescale_head::Function,
+    rescale_elevation::Function,
+    rescale_rotation_coefficient::Function,
+    rescale_flow_coefficient::Function,
+    rescale_volume::Function
 )::Dict{String,Function}
     Dict{String,Function}(
-        "electricity_price" => rescale_electricity_price,
-        "q_pipe" => rescale_q_pipe,
-        "q_pump" => rescale_q_pipe,
-        "ql" => rescale_q_pipe,
-        "qg" => rescale_q_pipe,
-        "Hmax" => rescale_H,
-        "Hmin" => rescale_H,
-        "z" => rescale_z,
-        "qlmin" => rescale_q_pipe,
-        "qlmax" => rescale_q_pipe,
-        "qgmin" => rescale_q_pipe,
-        "qgmax" => rescale_q_pipe,
-        "Qmin" => rescale_q_pipe,
-        "Qmax" => rescale_q_pipe,
-        "q_nom" => rescale_q_pump_nom,
-        "delta_Hmax" => rescale_H,
-        "delta_Hmin" => rescale_H,
-        "a" => rescale_a,
-        "b" => rescale_b,
-        "rho" => rescale_rho,
-        "nu" => rescale_nu,
-        "gravitational_acceleration" => rescale_gravitational_acceleration,
-        "diameter" => rescale_diameter,
-        "length" => rescale_length,
-        "Q_pipe_dim" => rescale_Q_pipe_dim,
-        "Q_pump_dim" => rescale_Q_pump_dim,
-
-        "Min_Capacity_Limitation" => rescale_volume,
-        "Max_Capacity_Limitation" => rescale_volume,
-        "Min_Load_Flow_Rate" => rescale_q_pipe,
-        "Max_Load_Flow_Rate" => rescale_q_pipe,
-        "Min_Unload_Flow_Rate" => rescale_q_pipe,
-        "Max_Unload_Flow_Rate" => rescale_q_pipe
+        "q_pipe"                     => rescale_q_pipe,
+        "q_pump"                     => rescale_q_pipe,
+        "ql"                         => rescale_q_pipe,
+        "qg"                         => rescale_q_pipe,
+        "head_max"                   => rescale_head,
+        "head_min"                   => rescale_head,
+        "elevation"                  => rescale_elevation,
+        "withdrawal_min"             => rescale_q_pipe,
+        "withdrawal_max"             => rescale_q_pipe,
+        "withdrawal_nominal"         => rescale_q_pipe,
+        "injection_min"              => rescale_q_pipe,
+        "injection_max"              => rescale_q_pipe,
+        "injection_nominal"          => rescale_q_pipe,
+        "offer_price"                => rescale_offer_price,
+        "bid_price"                  => rescale_bid_price,
+        "electricity_price"          => rescale_electricity_price,
+        "flow_min"                   => rescale_q_pipe,
+        "flow_max"                   => rescale_q_pipe,
+        "flow_nom"                   => rescale_q_pump_nom,
+        "delta_head_max"             => rescale_head,
+        "delta_head_min"             => rescale_head,
+        "rotation_coefficient"       => rescale_rotation_coefficient,
+        "flow_coefficient"           => rescale_flow_coefficient,
+        "length"                     => rescale_length,
+        "capacity_min"               => rescale_volume,
+        "capacity_max"               => rescale_volume,
+        "initial_volume"             => rescale_volume,
+        "intake_min"                 => rescale_q_pipe,
+        "intake_max"                 => rescale_q_pipe,
+        "offtake_min"                => rescale_q_pipe,
+        "offtake_max"                => rescale_q_pipe
     )
 end
+
 "Transforms data to si units"
 function si_to_pu!(data::Dict{String,<:Any}; id = "0")
-    rescale_electricity_price   = x -> x*E_base(data)
-    rescale_q_pipe   = x -> x/q_base(data)
-    rescale_Q_pipe_dim = x -> x/3600
-    rescale_Q_pump_dim = x ->  x*3600
-    rescale_q_pump   = x -> x/q_base(data)
-    rescale_q_pump_nom   = x -> x/q_base(data)
-    rescale_q_tank_in = x -> x/q_base(data)
-    rescale_q_tank_out = x -> x/q_base(data)
-    rescale_rho = x -> x/base_rho(data)
-    rescale_nu = x -> x/base_nu(data)
-    rescale_gravitational_acceleration = x -> x/9.8
-    rescale_diameter = x -> x/base_diameter(data)
-    rescale_length = x -> x/base_length(data)
-    rescale_H      = x -> x/h_base(data)
-    rescale_z      = x -> x/z_base(data)
-    rescale_a      = x -> x/a_base(data)
-    rescale_b      = x -> x/b_base(data)
-    rescale_volume  = x -> x/volume_base(data)
+    rescale_q_pipe                     = x -> x/base_flow(data)
+    rescale_q_pump                     = x -> x/base_flow(data)
+    rescale_q_pump_nom                 = x -> x/base_flow(data)
+    rescale_qin                        = x -> x/base_flow(data)
+    rescale_qoff                       = x -> x/base_flow(data)
+    rescale_offer_price                = x -> x*base_flow(data)
+    rescale_bid_price                  = x -> x*base_flow(data)
+    rescale_electricity_price          = x -> x*(base_flow(data)*base_head(data))
+    rescale_length                     = x -> x/base_length(data)
+    rescale_head                       = x -> x/base_head(data)
+    rescale_elevation                  = x -> x/base_head(data)
+    rescale_rotation_coefficient       = x -> x/base_head(data)
+    rescale_flow_coefficient           = x -> x/base_head(data)*base_flow(data)^2 # head/flow^2 = s^2/m^5
+    rescale_volume                     = x -> x/base_head(data)^3
 
     functions = _rescale_functions(
-    rescale_electricity_price,
-    rescale_q_pipe,
-    rescale_q_pump,
-    rescale_q_pump_nom,
-    rescale_q_tank_in,
-    rescale_q_tank_out,
-    rescale_rho,
-    rescale_nu,
-    rescale_gravitational_acceleration,
-    rescale_diameter,
-    rescale_length,
-    rescale_H,
-    rescale_z,
-    rescale_a,
-    rescale_b,
-    rescale_volume,
-    rescale_Q_pipe_dim,
-    rescale_Q_pump_dim
+        rescale_q_pipe,
+        rescale_q_pump,
+        rescale_q_pump_nom,
+        rescale_qin,
+        rescale_qoff,
+        rescale_offer_price,
+        rescale_bid_price,
+        rescale_electricity_price,
+        rescale_length,
+        rescale_head,
+        rescale_elevation,
+        rescale_rotation_coefficient,
+        rescale_flow_coefficient,
+        rescale_volume
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
-    _apply_func!(nw_data, "nu", rescale_nu)
-    _apply_func!(nw_data, "rho", rescale_rho)
-    _apply_func!(nw_data, "gravitational_acceleration", rescale_gravitational_acceleration)
-    _apply_func!(nw_data, "Q_pipe_dim", rescale_Q_pipe_dim)
-    _apply_func!(nw_data, "Q_pump_dim", rescale_Q_pump_dim)
+
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
             if ~haskey(comp, "is_per_unit") && ~haskey(data, "is_per_unit")
@@ -305,48 +259,39 @@ function si_to_pu!(data::Dict{String,<:Any}; id = "0")
 end
 
 function pu_to_si!(data::Dict{String,<:Any}; id = "0")
-    rescale_electricity_price   = x -> x/E_base(data)
-    rescale_q_pipe          = x -> x*q_base(data)
-    rescale_Q_pipe_dim      = x -> x*3600
-    rescale_Q_pump_dim      = x -> x/3600
-    rescale_q_pump          = x -> x*q_base(data)
-    rescale_q_pump_nom      = x -> x*q_base(data)
-    rescale_q_tank_in       = x -> x*q_base(data)
-    rescale_q_tank_out      = x -> x*q_base(data)
-    rescale_rho             = x -> x*base_rho(data)
-    rescale_nu              = x -> x*base_nu(data)
-    rescale_gravitational_acceleration = x -> x*9.8
-    rescale_diameter        = x -> x*base_diameter(data)
-    rescale_length = x -> x*base_length(data)
-    rescale_H      = x -> x
-    rescale_z      = x -> x*z_base(data)
-    rescale_a      = x -> x*a_base(data)
-    rescale_b      = x -> x*b_base(data)
-    rescale_volume = x -> x*volume_base(data)
+    rescale_q_pipe                     = x -> x*base_flow(data)
+    rescale_q_pump                     = x -> x*base_flow(data)
+    rescale_q_pump_nom                 = x -> x*base_flow(data)
+    rescale_qin                        = x -> x*base_flow(data)
+    rescale_qoff                       = x -> x*base_flow(data)
+    rescale_offer_price                = x -> x/base_flow(data)
+    rescale_bid_price                  = x -> x/base_flow(data)
+    rescale_electricity_price          = x -> x/(base_flow(data)*base_head(data))
+    rescale_length                     = x -> x*base_length(data)
+    rescale_head                       = x -> x*base_head(data)
+    rescale_elevation                  = x -> x*base_head(data)
+    rescale_rotation_coefficient       = x -> x*base_head(data)
+    rescale_flow_coefficient           = x -> x*base_head(data) / base_flow(data)^2 # head/flow^2 - s^2/m^5
+    rescale_volume                     = x -> x*base_head(data)^3
 
     functions = _rescale_functions(
-    rescale_electricity_price,
-    rescale_q_pipe,
-    rescale_q_pump,
-    rescale_q_pump_nom,
-    rescale_q_tank_in,
-    rescale_q_tank_out,
-    rescale_rho,
-    rescale_nu,
-    rescale_gravitational_acceleration,
-    rescale_diameter,
-    rescale_length,
-    rescale_H,
-    rescale_z,
-    rescale_a,
-    rescale_b,
-    rescale_volume,
-    rescale_Q_pipe_dim,
-    rescale_Q_pump_dim
+        rescale_q_pipe,
+        rescale_q_pump,
+        rescale_q_pump_nom,
+        rescale_qin,
+        rescale_qoff,
+        rescale_offer_price,
+        rescale_bid_price,
+        rescale_electricity_price,
+        rescale_length,
+        rescale_head,
+        rescale_elevation,
+        rescale_rotation_coefficient,
+        rescale_flow_coefficient,
+        rescale_volume
     )
 
     nw_data = (id == "0") ? data : data["nw"][id]
-    # _apply_func!(nw_data, "time_point", rescale_time)
     for (component, parameters) in _params_for_unit_conversions
         for (i, comp) in get(nw_data, component, [])
             if ~haskey(comp, "is_per_unit") && ~haskey(data, "is_per_unit")
@@ -385,14 +330,9 @@ function make_si_units!(data::Dict{String,<:Any})
         else
             pu_to_si!(data)
         end
-        # if haskey(data, "time_step")
-        #     rescale_time = x -> x * get_base_time(data)
-        #     data["time_step"] = rescale_time(data["time_step"])
-        # end
         data["is_si_units"] = 1
         data["is_per_unit"] = 0
     end
-
 end
 
 
@@ -410,10 +350,6 @@ function make_per_unit!(data::Dict{String,<:Any})
         else
             si_to_pu!(data)
         end
-        # if haskey(data, "time_step")
-        #     rescale_time = x -> x / get_base_time(data)
-        #     data["time_step"] = rescale_time(data["time_step"])
-        # end
         data["is_si_units"] = 0
         data["is_per_unit"] = 1
     end
@@ -483,7 +419,6 @@ function _calc_parallel_connections(
     pumps = ref(pm, n, :pump)
     tanks = ref(pm, n, :tank)
 
-
     aligned_pipes =
         filter(i -> pipes[i]["fr_junction"] == connection["fr_junction"], parallel_pipes)
     opposite_pipes =
@@ -507,113 +442,12 @@ function _calc_parallel_connections(
 
 
     return num_connections,
-    aligned_pipes,
-    opposite_pipes,
-    aligned_pumps,
-    opposite_pumps,
-    aligned_tanks,
-    opposite_tanks
-end
-
-
-"calculates connections in parallel with one another and their orientation"
-function _calc_parallel_ne_connections(
-    pm::AbstractPetroleumModel,
-    n::Int,
-    connection::Dict{String,Any},
-)
-    i = min(connection["fr_junction"], connection["to_junction"])
-    j = max(connection["fr_junction"], connection["to_junction"])
-
-    parallel_pipes = haskey(ref(pm, n, :parallel_pipes), (i, j)) ?
-        ref(pm, n, :parallel_pipes, (i, j)) : []
-    parallel_pumps = haskey(ref(pm, n, :parallel_pumps), (i, j)) ?
-        ref(pm, n, :parallel_pumps, (i, j)) : []
-    parallel_tanks = haskey(ref(pm, n, :parallel_tanks), (i, j)) ?
-        ref(pm, n, :parallel_tanks, (i, j)) : []
-
-    parallel_ne_pipes = haskey(ref(pm, n, :parallel_ne_pipes), (i, j)) ?
-        ref(pm, n, :parallel_ne_pipes, (i, j)) : []
-    parallel_ne_pumps = haskey(ref(pm, n, :parallel_ne_pumps), (i, j)) ?
-        ref(pm, n, :parallel_ne_pumps, (i, j)) : []
-    parallel_ne_tanks = haskey(ref(pm, n, :parallel_ne_tanks), (i, j)) ?
-        ref(pm, n, :parallel_ne_tanks, (i, j)) : []
-
-    num_connections =
-        length(parallel_pipes) +
-        length(parallel_pumps) +
-        length(parallel_tanks) +
-        length(parallel_ne_pipes) +
-        length(parallel_ne_pumps) +
-        length(parallel_ne_tanks)
-
-    pipes = ref(pm, n, :pipe)
-    pumps = ref(pm, n, :pump)
-    tank = ref(pm, n, :tank)
-    ne_pipes = ref(pm, n, :ne_pipe)
-    ne_pumps = ref(pm, n, :ne_pump)
-    ne_tanks = ref(pm, n, :ne_tank)
-
-    aligned_pipes = filter(
-        i -> pipes[i]["fr_junction"] == connection["fr_junction"], parallel_pipes
-    )
-    opposite_pipes = filter(
-        i -> pipes[i]["fr_junction"] != connection["fr_junction"], parallel_pipes
-    )
-    aligned_pumps = filter(
-        i -> pumps[i]["fr_junction"] == connection["fr_junction"],
-        parallel_pumps,
-    )
-    opposite_pumps = filter(
-        i -> pumps[i]["fr_junction"] != connection["fr_junction"],
-        parallel_pumps,
-    )
-    aligned_tanks = filter(
-        i -> tanks[i]["fr_junction"] == connection["fr_junction"],
-        parallel_tanks,
-    )
-    opposite_tanks = filter(
-        i -> tanks[i]["fr_junction"] != connection["fr_junction"],
-        parallel_tanks,
-    )
-    aligned_ne_pipes = filter(
-        i -> ne_pipes[i]["fr_junction"] == connection["fr_junction"],
-        parallel_ne_pipes,
-    )
-    opposite_ne_pipes = filter(
-        i -> ne_pipes[i]["fr_junction"] != connection["fr_junction"],
-        parallel_ne_pipes,
-    )
-    aligned_ne_pumps = filter(
-        i -> ne_pumps[i]["fr_junction"] == connection["fr_junction"],
-        parallel_ne_pumps,
-    )
-    opposite_ne_pumps = filter(
-        i -> ne_pumps[i]["fr_junction"] != connection["fr_junction"],
-        parallel_ne_pumps,
-    )
-    aligned_ne_tanks = filter(
-        i -> ne_tanks[i]["fr_junction"] == connection["fr_junction"],
-        parallel_ne_tanks,
-    )
-    opposite_ne_tanks = filter(
-        i -> ne_tanks[i]["fr_junction"] != connection["fr_junction"],
-        parallel_ne_tanks,
-    )
-
-    return num_connections,
-    aligned_pipes,
-    opposite_pipes,
-    aligned_pumps,
-    opposite_pumps,
-    aligned_tanks,
-    opposite_tanks,
-    aligned_ne_pipes,
-    opposite_ne_pipes,
-    aligned_ne_pumps,
-    opposite_ne_pumps,
-    aligned_ne_tanks,
-    opposite_ne_tanks
+        aligned_pipes,
+        opposite_pipes,
+        aligned_pumps,
+        opposite_pumps,
+        aligned_tanks,
+        opposite_tanks
 end
 
 
@@ -627,29 +461,29 @@ end
 
 const _pm_component_types_order = Dict(
     "junction" => 1.0,
-    "pipe" => 2.0,
-    "pump" => 3.0,
+    "pipe"     => 2.0,
+    "pump"     => 3.0,
     "consumer" => 4.0,
     "producer" => 5.0,
-    "tank" => 6.0,
+    "tank"     => 6.0,
 )
 
 
 const _pm_component_parameter_order = Dict(
-    "id" => 1.0,
-    "junction_type" => 2.0,
-    "Hmin" => 3.0,
-    "Hmax" => 4.0,
-    "fr_junction" => 11.0,
-    "to_junction" => 12.0,
-    "length" => 13.0,
-    "diameter" => 14.0,
-    "Qmin" => 16.0,
-    "Qmax" => 17.0,
-    "delta_Hmin" => 18.0,
-    "delta_Hmax" => 19.0,
-    "junction_id" => 51.0,
-    "status" => 500.0,
+    "id"             => 1.0,
+    "junction_type"  => 2.0,
+    "head_min"       => 3.0,
+    "head_max"       => 4.0,
+    "fr_junction"    => 11.0,
+    "to_junction"    => 12.0,
+    "length"         => 13.0,
+    "diameter"       => 14.0,
+    "flow_min"       => 16.0,
+    "flow_max"       => 17.0,
+    "delta_head_min" => 18.0,
+    "delta_head_max" => 19.0,
+    "junction_id"    => 51.0,
+    "status"         => 500.0,
 )
 
 
@@ -669,14 +503,11 @@ function add_pump_fields!(data::Dict{String,<:Any})
     is_per_unit = get(data, "is_per_unit", false)
     for (i, pump) in data["pump"]
         if is_si_units == true
-            # pump["Q_pump_dim"] = 3600
         end
 
         if is_per_unit == true
-
         end
     end
-
 end
 
 function add_pipe_fields!(data::Dict{String,:Any})
@@ -684,11 +515,9 @@ function add_pipe_fields!(data::Dict{String,:Any})
     is_per_unit = get(data, "is_per_unit", false)
     for (i, pipe) in data["pipe"]
         if is_si_units == true
-
         end
 
         if is_per_unit == true
-            pump["Q_pipe_dim"] = 1
         end
     end
 
@@ -748,4 +577,13 @@ function _dfs(i, neighbors, component_lookup, touched)
             _dfs(j, neighbors, component_lookup, touched)
         end
     end
+end
+
+
+"Calculates pipeline \"resistance\" using the leibenzon formulation"
+function _calc_pipe_resistance_leibenzon(pipe::Dict{String,Any}, nu, m, lc, base_length, base_head, base_flow)
+    beta = pipe["friction_factor"]
+    D    = pipe["diameter"]
+    L    = pipe["length"] * base_length
+    return (beta * L * lc * nu^m*base_flow^(2.0-m)) / (D^(5.0-m) * base_head)
 end

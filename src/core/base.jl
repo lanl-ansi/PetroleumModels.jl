@@ -16,11 +16,6 @@ end
 function run_model(data::Dict{String,<:Any}, model_type, optimizer, build_method; ref_extensions=[], solution_processors=[], kwargs...)
     pm = instantiate_model(data, model_type, build_method; ref_extensions=ref_extensions, ext=get(kwargs, :ext, Dict{Symbol,Any}()), setting=get(kwargs, :setting, Dict{String,Any}()), jump_model=get(kwargs, :jump_model, JuMP.Model()))
     result = optimize_model!(pm, optimizer=optimizer, solution_processors=solution_processors)
-
-    # if haskey(data, "objective_normalization")
-    #     result["objective"] *= data["objective_normalization"]
-    # end
-
     return result
 end
 
@@ -30,7 +25,7 @@ function instantiate_model(file::String,  model_type, build_method; kwargs...)
     return instantiate_model(data, model_type, build_method; kwargs...)
 end
 
-
+""
 function instantiate_model(data::Dict{String,<:Any}, model_type::Type, build_method; kwargs...)
     pm = _IM.instantiate_model(data, model_type, build_method, ref_add_core!, _pm_global_keys; kwargs...)
     return pm
@@ -60,10 +55,10 @@ Some of the common keys include:
 * `:degree` -- the degree of junction i using existing connections (see `ref_degree!`)),
 """
 function ref_add_core!(refs::Dict{Symbol,<:Any})
-    _ref_add_core!(refs[:nw], base_rho=refs[:base_rho], base_nu=refs[:base_nu], base_diameter=refs[:base_diameter], base_length=refs[:base_length], baseQ=refs[:baseQ], baseH=refs[:baseH], base_z=refs[:base_z], base_a = refs[:base_a] , base_b=refs[:base_b])
+    _ref_add_core!(refs[:nw], base_length=refs[:base_length], base_flow=refs[:base_flow], base_head=refs[:base_head])
 end
 
-function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_rho=850, base_nu= 4.9e-6, base_diameter=0.75, base_length=100, baseQ = 1, baseH = 100, base_z = 100, base_a = 100, base_b = 100)
+function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_length=100, base_flow = 1, base_head = 100)
     for (nw, ref) in nw_refs
         ref[:junction] = haskey(ref, :junction) ? Dict(x for x in ref[:junction] if x.second["status"] == 1) : Dict()
         ref[:pipe] = haskey(ref, :pipe) ? Dict(x for x in ref[:pipe] if x.second["status"] == 1 && x.second["fr_junction"] in keys(ref[:junction]) && x.second["to_junction"] in keys(ref[:junction])) : Dict()
@@ -90,7 +85,6 @@ function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_rho=850, base_nu= 4.9e-6,
         _add_junction_map!(ref[:nondispatchable_consumers_in_junction], ref[:nondispatchable_consumer])
         _add_junction_map!(ref[:dispatchable_producers_in_junction], ref[:dispatchable_producer])
         _add_junction_map!(ref[:nondispatchable_producers_in_junction], ref[:nondispatchable_producer])
-        # _add_junction_map!(ref[:tanks_in_junction], ref[:tank])
 
         ref[:parallel_pipes] = Dict()
         ref[:parallel_pumps] = Dict()
@@ -110,26 +104,11 @@ function _ref_add_core!(nw_refs::Dict{Int,<:Any}; base_rho=850, base_nu= 4.9e-6,
         _add_edges_to_junction_map!(ref[:tanks_fr], ref[:tanks_to], ref[:tank])
 
         ref_degree!(ref)
-
-        for (idx, pipe) in ref[:pipe]
-            i = pipe["fr_junction"]
-            j = pipe["to_junction"]
-
-        end
-
-        for (idx, pump) in ref[:pump]
-            i = pump["fr_junction"]
-            j = pump["to_junction"]
-
-        end
-        for (idx, tank) in ref[:tank]
-            i = tank["fr_junction"]
-            j = tank["to_junction"]
-        end
     end
 
 end
 
+""
 function _add_junction_map!(junction_map::Dict, collection::Dict)
     for (i, component) in collection
         junction_id = component["junction_id"]
@@ -137,7 +116,7 @@ function _add_junction_map!(junction_map::Dict, collection::Dict)
     end
 end
 
-
+""
 function _add_parallel_edges!(parallel_ref::Dict, collection::Dict)
     for (idx, connection) in collection
         i = connection["fr_junction"]
@@ -153,6 +132,7 @@ function _add_parallel_edges!(parallel_ref::Dict, collection::Dict)
     end
 end
 
+""
 function _add_edges_to_junction_map!(fr_ref::Dict, to_ref::Dict, collection::Dict)
     for (idx, connection) in collection
         i = connection["fr_junction"]

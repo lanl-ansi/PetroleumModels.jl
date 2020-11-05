@@ -1,10 +1,10 @@
 # MatlabPetroleum Format (.m)
 
-Here we detail the parameters that can be inputted using the matpetroleum format. They can be inputted in the order they appear here, or selectively, in the case where some data is not required, by using the following header format.
+Here we detail the parameters that can be inputted using the matpetroleum format. They can be inputted in the order they appear here, or selectively, in the case where some data is not required, by using the following (example) header format.
 
 ```matlab
 %% junction data
-% junction_i type Hmin Hmax z status
+% junction_i type head_min head_max elevation status
 ```
 
 See case files in `test/data/` for examples of file syntax.
@@ -13,129 +13,98 @@ See case files in `test/data/` for examples of file syntax.
 
 These components model “point” locations in the system, i.e. locations of withdrawal or injection, or simply connection points between pipes. Each junction may have multiple pipes attached.
 
-| Variable      | Type    | Name             | Standard Units (SI) | United States Customary Units | Required           | Description                                                                                                                                      |
-| ------------- | ------- | ---------------- | ------------------- | ----------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| junction_i            | Int     | Junction id      |                     |                               | Y | Unique id for junctions                                                                                                                          |
-| type | Int     | Junction Type    |                     |                               | Y | Classification of the junction: 0 = standard node, 1 = slack node                                                                                |
-| Hmin         | Float64 | Head Minimum | m              | ft                           | Y |  Minimum operating head used in line pack calculations, which is higher than the minimum allowable                                                                                                                          |
-| Hmax         | Float64 | Head Maximum | m              | ft                           | Y | Maximum operating head used in line pack calculations, which is lower than the maximum allowable |                                                                           |
-| z           | Float64 | Elevation         | m     | ft               |                    | Elevation of the junction                                                                                                                         |
-| status        | Int     | Junction Status  |                     |                               | Y | Determines if the component is active in the model                                                                                               |
+| Parameter     | Type    | Name             | Standard Units (SI) | United States Customary Units | Required           | Description                                                           |
+| ------------- | ------- | ---------------- | ------------------- | ----------------------------- | ------------------ | --------------------------------------------------------------------- |
+| junction_i    | Int     | Junction id      |                     |                               | Y                  | Unique id for junctions                                               |
+| type          | Int     | Junction Type    |                     |                               | Y                  | Classification of the junction: 0 = standard node, 1 = slack node     |
+| head_min      | Float64 | Head Minimum     | m                   | ft                            | Y                  |  Minimum operating head used in line pack calculations, which is higher than the minimum allowable |
+| head_max      | Float64 | Head Maximum     | m                   | ft                            | Y                  | Maximum operating head used in line pack calculations, which is lower than the maximum allowable |                                                                          
+| elevation     | Float64 | Elevation        | m                   | ft                            |                    | Elevation of the junction                                             |
+| status        | Int     | Junction Status  |                     |                               | Y                  | Determines if the component is active in the model                    |
 
 ## Pipes (mpc.pipe)
-  status
+
 These components model pipelines which connect two junctions.
 
-| Variable                          | Type    | Name              | Standard Units (SI) | United States Customary Units | Required           | Description                                                                                                                             |
-| --------------------------------- | ------- | ----------------- | ------------------- | ----------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| pipeline_i                                | Int     | Pipe id           |                     |                               | Y | Unique id for pipes                                                                                                                     |
-| fr_junction                       | Int     | From Junction id  |                     |                               | Y | Unique id of the junction on the from side                                                                                              |
-| to_junction                       | Int     | To Junction id    |                     |                               | Y | Unique id of the junction on the to side                                                                                                |
-| diameter                          | Float64 | Diameter          | m              | ft                        | Y | Pipe diameter                                                                                                                           |
-| length                            | Float64 | Length            | m              | ft                         | Y | Pipe Length                                                                                                                             |
-| Qmin                             | Float64 | Flow Rate Minimum  | m3/h              | ft3/h                           | Y | Minimum allowable operating flow rate, usually depends on pipe diameter |
-| Qmax                             | Float64 | Flow Rate Maximum  | m3/h              | ft3/h                           | Y | Maximum allowable operating flow rate, usually depends on pipe diameter                                                          |
-| status                            | Int     | Pipe status       |                     |                               | Y | Determines if the component is active in the model                                                                                      |
+| Parameter                         | Type    | Name                 | Standard Units (SI) | United States Customary Units | Required | Description                                                 |
+| --------------------------------- | ------- | -------------------  | ------------------- | ----------------------------- | -------- | ----------------------------------------------------------- |
+| pipeline_i                        | Int     | Pipe id              |                     |                               | Y        | Unique id for pipes                                         |
+| fr_junction                       | Int     | From Junction id     |                     |                               | Y        | Unique id of the junction on the from side                  |
+| to_junction                       | Int     | To Junction id       |                     |                               | Y        | Unique id of the junction on the to side                    |
+| diameter                          | Float64 | Diameter             | m                   | ft                            | Y        | Pipe diameter                                               |
+| length                            | Float64 | Length               | m                   | ft                            | Y        | Pipe Length                                                 |
+| fiction_factor                    | Float64 | Friction coefficient | s^2/m               | s^2/ft                        |          | Coefficient in the Leibenzon equation for turbulent flow    |
+| flow_min                          | Float64 | Flow Rate Minimum    | m^3/s               | ft3/h                         | Y        | Minimum allowable operating flow rate, usually depends on pipe diameter |
+| flow_max                          | Float64 | Flow Rate Maximum    | m^3/s               | ft3/h                         | Y        | Maximum allowable operating flow rate, usually depends on pipe diameter |
+| status                            | Int     | Pipe status          |                     |                               | Y        | Determines if the component is active in the model          |
 
 ## Pumps (mpc.pump)
 
 These components model infrastructure used to boost pressure between two nodes.
 
-| Variable                       | Type    | Name                             | Standard Units (SI) | United States Customary Units | Required           | Description                                                                                                                                                                                                                                             |
-| ------------------------------ | ------- | -------------------------------- | ------------------- | ----------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| pump_i                             | Int     | pump id                    |                     |                               | Y | Unique id for pump                                                                                                                                                                                                                                |
-| fr_junction                    | Int     | From Junction id                 |                     |                               | Y | Unique id of the junction on the from side                                                                                                                                                                                                              |
-| to_junction                    | Int     | To Junction id                   |                     |                               | Y | Unique id of the junction on the to side                                                                                                                                                                                                                |
-| station_i                    | Int | Pump station id        |                     |                               | Y | Unique id of the station including up to 3 pumps                                                                                                                                                                                                                               |
-| a                    | Float64 | Pump coefficient        |    m                 |        ft                       | Y | Pump coefficient required to define pump head                                                                                                                                                                                                                               |
-| b                    | Float64 | Pump coefficient        |    h2/m5                 |        h2/ft5                       | Y | Pump coefficient required to define pump head                                                                                                                                                                                                                               |
-| q_nom                      | Float64 | Nominal flow rate                   | m3/h                   | ft3/h                            | Y | Pump nominal flow rate                                                                                                                                                                                      |
-| delta_Hmax                       | Float64 | Maximum head difference                | m                |    ft                           | Y | Maximum pump head difference                                                                                                                                                                                                                                        |
-| delta_Hmin                       | Float64 | Minimum head difference                | m                |   ft                            | Y | Minimum pump head difference                                                                                                                                                                                                                                                |
-| min_pump_efficiency                    | Float64 | Minimum inlet pressure           |               |                            | Y | Minimum pump efficiency  inlet                                                                                                                                                                                                                    |
-| max_pump_efficiency                    | Float64 | Maximum inlet pressure           |               |                            | Y | Maximum pump efficiency  inlet                                                                                                                                                                                                                    |
-| w_nom                   | Int | Nominal rotational speed          | rpm              | rpm                           | Y | Nominal pump rotational speed                                                                                                                                                                                                                    |
-| min_w                    | Int | Minimum rotational speed          | rpm              | rpm                           | Y | Minimum pump rotational speed                                                                                                                                                                                                                   |
-| max_w                 | Int | Maximum rotational speed             | rpm              | rpm                           | Y  | Maximum pump rotational speed                                                                                   |
-| electricity_price    | Float64| Electricity price                  |     $/(kW*h)         |      $/(kW*h)       |         Y           | Electricity price for every pump maintain |
-| status                         | Int     | pump status                |                     |                               | Y | Determines if the component is active in the model                                                                                                                                                                                                      |
-                                                                                                                                                                   |
+| Parameter                          | Type    | Name                                  | Standard Units (SI) | United States Customary Units | Required | Description                                      |
+| ---------------------------------- | ------- | ------------------------------------- | ------------------- | ----------------------------- | -------- | ------------------------------------------------ |
+| pump_i                             | Int     | Pump id                               |                     |                               | Y        | Unique id for pump                               |
+| fr_junction                        | Int     | From Junction id                      |                     |                               | Y        | Unique id of the junction on the from side       |
+| to_junction                        | Int     | To Junction id                        |                     |                               | Y        | Unique id of the junction on the to side         |
+| station_i                          | Int     | Pump station id                       |                     |                               | Y        | Unique id of the station including up to 3 pumps |
+| rotation_coefficient               | Float64 | Pump rotation coefficient             | m                   | ft                            | Y        | Pump coefficient required to define pump head    |
+| flow_coefficient                   | Float64 | Pump flow coefficient                 | s^2/m^5               | h2/ft5                        | Y        | Pump coefficient required to define pump head    |
+| flow_nom                           | Float64 | Nominal flow rate                     | m^3/s                | ft3/h                         | Y        | Pump nominal flow rate                           |
+| flow_max                           | Float64 | Maximum flow rate                     | m^3/s                | ft3/h                         | Y        | Pump maximum flow rate                           |
+| delta_head_max                     | Float64 | Maximum head difference               | m                   | ft                            | Y        | Maximum pump head difference                     |
+| delta_head_min                     | Float64 | Minimum head difference               | m                   | ft                            | Y        | Minimum pump head difference                     |
+| pump_efficiency_min                | Float64 | Minimum inlet pressure                |                     |                               | Y        | Minimum pump efficiency inlet                    |
+| pump_efficiency_max                | Float64 | Maximum inlet pressure                |                     |                               | Y        | Maximum pump efficiency inlet                    |
+| rotation_nom                       | Int     | Nominal rotational speed              | rotations/s         | rotations/minute              | Y        | Nominal pump rotational speed                    |
+| rotation_min                       | Int     | Minimum rotational speed              | rotations/s         | rotations/minute              | Y        | Minimum pump rotational speed                    |
+| rotation_max                       | Int     | Maximum rotational speed              | rotations/s         | rotations/minute              | Y        | Maximum pump rotational speed                    |
+| electricity_price                  | Float64 | Electricity price                     | $/(kW*s)            | $/(kW*h)                      | Y        | Electricity price for every pump maintain        |
+| status                             | Int     | Pump status                           |                     |                               | Y        | Determines if the component is active in the model |
+| electric_motor_efficiency          | Float64 | Efficiency of the pump's motor        |                     |                               | Y        | Pump constant for computing pump efficiency      |
+| mechanical_transmission_efficiency | Float64 | Efficiency of the pump's transmission |                     |                               | Y        | Pump constant for computing pump efficiency      |
+
 ## Producers (mpc.producer)
 
 These components model producers of product.
 
-| Variable             | Type    | Name                  | Standard Units (SI) | United States Customary Units | Required           | Description                                                                                                                                                                                        |
-| -------------------- | ------- | --------------------- | ------------------- | ----------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| producer_i                   | Int     | producer id            |                     |                               | Y | Unique id for producer                                                                                                                                                                              |
-| junction_id          | Int     | Junction id           |                     |                               | Y | Unique id of Junction to which component is connected                                                                                                                                              |
-| qgmin        | Float64 | Minimum flow rate     | m3/h                | ft3/h                        | Y | Minimum flow rate that can be injected                                                                                                                                                         |
-| qgmax        | Float64 | Maximum Injection     | m3/h                | ft3/h                          | Y | Maximum flow rate that can be injected                                                                                                                                                         |
-| qg    | Float64 | Fixed flow rate      | m3/h                | ft3/h                          | Y |  Producer flow rate if it's fixed                                                                                                                                                                              |
-| status               | Int     | producer status        |                     |                               | Y | Determines if the component is active in the model                                                                                                                                                 |
-| is_dispatchable      | Int     | Dispatchable          |                     |                               | Y | If the component is marked as dispatchable, it means that it can vary its injection between its minimum and maximum. If not, then the component is injecting exactly at the fixed injection rate |
-| offer_price          | Float64 | Offer Price           | $/m3                 | $/ft3                         |                    | Offer price  
+| Parameter            | Type    | Name                  | Standard Units (SI) | United States Customary Units | Required | Description                                                           |
+| -------------------- | ------- | --------------------- | ------------------- | ----------------------------- | -------- | --------------------------------------------------------------------- |
+| producer_i           | Int     | producer id           |                     |                               | Y        | Unique id for producer                                                |
+| junction_id          | Int     | Junction id           |                     |                               | Y        | Unique id of Junction to which component is connected                 |
+| injection_min        | Float64 | Minimum injection     | m^3/s               | ft3/h                         | Y        | Minimum flow rate that can be injected                                |
+| injection_max        | Float64 | Maximum Injection     | m^3/s               | ft3/h                         | Y        | Maximum flow rate that can be injected                                |
+| qg                   | Float64 | Fixed flow rate       | m^3/s               | ft3/h                         | Y        | Producer flow rate if it's fixed                                      |
+| status               | Int     | producer status       |                     |                               | Y        | Determines if the component is active in the model                    |
+| is_dispatchable      | Int     | Dispatchable          |                     |                               | Y        | If the component is marked as dispatchable, it means that it can vary its injection between its minimum and maximum. If not, then the component is injecting exactly at the fixed injection rate |
+| offer_price          | Float64 | Offer Price           | $/m^3               | $/ft^3                        |          | Offer price                                                           |
 
 ## Consumers (mpc.consumer)
 
-| Variable             | Type    | Name                  | Standard Units (SI) | United States Customary Units | Required           | Description                                                                                                                                                                                        |
-| -------------------- | ------- | --------------------- | ------------------- | ----------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| consumer_i                   | Int     | consumer id            |                     |                               | Y | Unique id for consumer                                                                                                                                                                              |
-| junction_id          | Int     | Junction id           |                     |                               | Y | Unique id of Junction to which component is connected                                                                                                                                              |
-| qlmin        | Float64 | Minimum Injection     | m3/h                | ft3/h                        | Y | Minimum flow rate that can be withdrawn                                                                                                                                                         |
-| qlmax        | Float64 | Maximum Injection     | m3/h                | ft3/h                        | Y | Maximum flow rate that can be withdrawn                                                                                                                                                         |
-| ql    | Float64 | Fixed flow rate     | m3/h                | ft3/h                        | Y | Consumer flow rate if it's fixed                                                                                                                                                                              |
-| status               | Int     | consumer status        |                     |                               | Y | Determines if the component is active in the model                                                                                                                                                 |
-| is_dispatchable      | Int     | Dispatchable          |                     |                               | Y | If the component is marked as dispatchable, it means that it can vary its withdrawal between its minimum and maximum. If not, then the component is withdrawal_nominal exactly at the fixed flow rate |
-| bid_price          | Float64 | Bid Price           |  $/m3                  | $/ft3                         |                    | Bid price                                                                                                                                                                                      |
-                                                                                                                                           |
-<!-- ## Storage (mpc.storage)
+| Parameter             | Type    | Name                  | Standard Units (SI) | United States Customary Units | Required | Description                                                           |
+| -------------------- | ------- | --------------------- | ------------------- | ----------------------------- | -------- | --------------------------------------------------------------------- |
+| consumer_i           | Int     | consumer id           |                     |                               | Y        | Unique id for consumer                                                |
+| junction_id          | Int     | Junction id           |                     |                               | Y        | Unique id of Junction to which component is connected                 |
+| withdrawal_min       | Float64 | Minimum Withdrawal    | m^3/s               | ft3/h                         | Y        | Minimum flow rate that can be withdrawn                               |
+| withdrawal_max       | Float64 | Maximum Withdrawal    | m^3/s               | ft3/h                         | Y        | Maximum flow rate that can be withdrawn                               |
+| ql                   | Float64 | Fixed flow rate       | m^3/s               | ft3/h                         | Y        | Consumer flow rate if it's fixed                                      |
+| status               | Int     | consumer status       |                     |                               | Y        | Determines if the component is active in the model                    |
+| is_dispatchable      | Int     | Dispatchable          |                     |                               | Y        | If the component is marked as dispatchable, it means that it can vary its withdrawal between its minimum and maximum. If not, then the component is withdrawal_nominal exactly at the fixed flow rate |
+| bid_price            | Float64 | Bid Price             |  $/m3               | $/ft3                         |          | Bid price                                                             |
 
-These components are used to model locations which can store and release natural gas.
-
-| Variable                 | Type    | Name                     | Standard Units (SI) | United States Customary Units | Required           | Description                                                     |
-| ------------------------ | ------- | ------------------------ | ------------------- | ----------------------------- | ------------------ | --------------------------------------------------------------- |
-| id                       | Int     | Storage id               |                     |                               | Y | Unique id for storage                                           |
-| junction_id              | Int     | Junction id              |                     |                               | Y | Unique id of Junction to which component is connected           |
-| pressure_nominal         | Float64 | Nominal pressure         | Pascal              | PSI                           | Y | pressure at the storage                                         |
-| flow\_injection\_rate\_min  | Float64 | Minimum injection rate   | kg/s                | MMSCFD                        | Y | Minimum flow injection rate                                     |
-| flow\_injection\_rate\_max  | Float64 | Maximum injection rate   | kg/s                | MMSCFD                        | Y | Maximum flow injection rate                                     |
-| flow\_withdrawal\_rate\_min | Float64 | Minimum withdrawal rate  | kg/s                | MMSCFD                        | Y | Minimum flow withdrawal rate                                    |
-| flow\_withdrawal\_rate\_max | Float64 | Maximum withdrawal rate  | kg/s                | MMSCFD                        | Y | Maximum flow withdrawal rate                                    |
-| capacity                 | Float64 | Capacity                 | kg                  | MMSCF                         | Y | Capacity of the storage                                         |
-| status                   | Int     | Storage status           |                     |                               | Y | Determines if the component is active in the model              |
-| name                     | String  | Storage Name             |                     |                               |                    | Name of the Storage point                                       |
-| owner_name               | String  | Owner Name               |                     |                               |                    | Name of the Storage point owner                                 |
-| storage_type             | String  | Storage type             |                     |                               |                    | Type of storage (aquifer, salt cavern, or depleted oil and gas) |
-| daily\_withdrawal\_max     | Float64 | Daily withdrawal rate    | kg/s                | MMSCFD                        |                    | Maximum daily withdrawal                                        |
-| seasonal\_withdrawal\_max  | Float64 | Seasonal withdrawal rate | kg/s                | MMSCFD                        |                    | Maximum Seasonal withdrawal                                     |
-| base\_gas\_capacity        | Float64 | Base gas capacity        | kg                  | MMSCF                         |                    | Base gas capacity                                               |
-| working\_gas\_capacity     | Float64 | Working gas capacity     | kg                  | MMSCF                         |                    | Working gas capacity                                            |
-| total\_field\_capacity     | Float64 | Total field capacity     | kg                  | MMSCF                         |                    | Total field gas capacity                                        |
-| edi_id                   | Int     | EDI ID                   |                     |                               |                    | Unique ID to allow easy input of near-real-time EDI data        | -->
 
 ## Network Parameters (mpc._parameter_)
 
-| Variable                     | Type    | Name                   | Standard Units (SI) | United States Customary Units | Required | Description                                                        |
+| Parameter                    | Type    | Name                   | Standard Units (SI) | United States Customary Units | Required | Description                                                        |
 | ---------------------------- | ------- | ---------------------- | ------------------- | ----------------------------- | -------- | ------------------------------------------------------------------ |
-| beta                         | Float64 | Fixed coefficient  |     s/m2             |            s/ft2                   |          | Coefficient in the Leibenzon equation for turbulent flow                                       |
-| rho                  | Float64 | Density            | kg/m3                 |          lbm/ft3                     |          | Liquid density                                         |
-| nu                  | Float64 | Viscosity            | m2/s                |          ft2/s                     |          | Liquid kinematic viscosity                                         |
-| gravitational_acceleration         | Float64 |  Gravity       |        m/s2             |        ft/s2                       |          | Gravitational acceleration                                                        |
-| base_rho                  | Float64 | Base Density            | kg/m3                 |          lbm/ft3                     |          | Base liquid density                                         |
-| base_nu                  | Float64 | Base Viscosity            | m2/s                |          ft2/s                     |          | Base liquid kinematic viscosity                                         |
-| baseH                | Float64 | Base Head          | m              | ft                           |          | Base head                                        |
-| base_length                  | Float64 | Base Length            | m              | ft                         |          | Base length                                         |
-| baseQ                    | Float64 | Base Flow Rate              | m3/h               | ft3/h                         |          | Base flow rate                                                   |
-| base_z                  | Float64 | Base elevation            | m                 |          ft                     |          | Base elevation                                         |
-| base_a                  | Float64 |Base pump coefficient             | m                |          ft                     |          | Base pump coefficient                                         |
-| base_b                | Float64 | Base pump coefficient           | h2/m5              | h2/ft5                           |          | Base pump coefficient                                         |
-| base_volume                  | Float64 | Base Volume            | m3              | ft3                         |          | Base Volume                                         |
-| base_diameter   | Float64 | Base Diameter             | m              | ft                         |          | Base Diameter                                                   |
-| Q_pipe_dim                  | Int | Pipe coefficient            |              |                          |          | Petroleum pipe flow coefficient                                        |
-| Q_pump_dim   | Int | Pump coefficient              |              |                         |          | Petroleum pump flow coefficient                                                   |
-| E_base    | Float64| Base energy                    |     kW*h         |      kW*h       |         Y           | Base pump energy |
+| density                      | Float64 | Density                | kg/m^3              | lbm/ft3                       |          | Liquid density                                                     |
+| viscosity                    | Float64 | Viscosity              | m^s2/s              | ft2/s                         |          | Liquid kinematic viscosity                                         |
+| gravitational_acceleration   | Float64 | Gravity                | m/s^2               | ft/s2                         |          | Gravitational acceleration                                         |
+| base_head                    | Float64 | Base Head              | m                   | ft                            |          | Base head                                                          |
+| base_length                  | Float64 | Base Length            | m                   | ft                            |          | Base length                                                        |
+| base_flow                    | Float64 | Base Flow Rate         | m^3/s               | ft3/h                         |          | Base flow rate                                                     |
 | units                        | String  | Units                  |                     |                               |          | 'si' for standard units or 'usc' for United States customary units |
-| is\_per\_unit                  | Int     | Per-unit               |                     |                               |          | If data is already in per-unit (non-dimensionalized)                |
+| is_per_unit                  | Int     | Per-unit               |                     |                               |          | If data is already in per-unit (non-dimensionalized)               |
 
 
 ## Matlab extensions

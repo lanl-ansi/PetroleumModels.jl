@@ -6,161 +6,112 @@ function parse_matlab(file::Union{IO, String})
 end
 
 const _mlab_data_names = Vector{String}([
-"mpc.beta","mpc.rho", "mpc.nu", "mpc.gravitational_acceleration",
- "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length", "mpc.baseQ", "mpc.baseH", "mpc.base_z", "mpc.base_a",
- "mpc.base_b",  "mpc.base_volume","mpc.units","mpc.is_per_unit","mpc.junction", "mpc.pipe",  #="mpc.booster_pump",=# "mpc.pump", "mpc.producer", "mpc.consumer",
- "mpc.tank", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"
+    "mpc.density",
+    "mpc.viscosity",
+    "mpc.gravitational_acceleration",
+    "mpc.base_length",
+    "mpc.base_flow",
+    "mpc.base_head",
+    "mpc.units",
+    "mpc.is_per_unit",
+    "mpc.junction",
+    "mpc.pipe",
+    "mpc.pump",
+    "mpc.producer",
+    "mpc.consumer",
+    "mpc.tank",
+    "mpc.time_step"
 ])
 
 const _mlab_junction_columns = Vector{Tuple{String,Type}}([
-("id", Int),
-("junction_type", Int),
-("Hmin", Float64),
-("Hmax", Float64),
-("z", Float64),
-("status", Int)
+    ("id", Int),
+    ("junction_type", Int),
+    ("head_min", Float64),
+    ("head_max", Float64),
+    ("elevation", Float64),
+    ("status", Int)
 ])
 
 const _mlab_pipe_columns =  Vector{Tuple{String,Type}}([
-("pipline_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("diameter", Float64),
-("length", Float64),
-("Qmin", Float64),
-("Qmax", Float64),
-("status", Int)
+    ("pipline_i", Int),
+    ("fr_junction", Int),
+    ("to_junction", Int),
+    ("diameter", Float64),
+    ("length", Float64),
+    ("flow_min", Float64),
+    ("flow_max", Float64),
+    ("friction_factor", Float64),
+    ("status", Int)
 ])
 
-const _mlab_ne_pipe_columns =  Vector{Tuple{String,Type}}([
-("pipline_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("diameter", Float64),
-("length", Float64),
-("Qmin", Float64),
-("Qmax", Float64),
-("status", Int)
-])
-
-# const _mlab_booster_pump_columns =  Vector{Tuple{String,Type}}([
-# ("pump_i", Int),
-# ("fr_junction", Int),
-# ("to_junction", Int),
-# ("station_i", Int),
-# ("a", Float64),
-# ("b", Float64),
-# ("q_nom", Float64),
-# ("delta_Hmax", Float64),
-# ("delta_Hmin", Float64),
-# ("min_pump_efficiency", Float64),
-# ("max_pump_efficiency", Float64),
-# ("w_nom", Float64),
-# ("min_w", Float64),
-# ("max_w", Float64),
-# ("electricity_price", Float64),
-# ("status", Int)
-# ])
 
 const _mlab_pump_columns =  Vector{Tuple{String,Type}}([
-("pump_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("station_i", Int),
-("a", Float64),
-("b", Float64),
-("q_nom", Float64),
-("delta_Hmax", Float64),
-("delta_Hmin", Float64),
-("min_pump_efficiency", Float64),
-("max_pump_efficiency", Float64),
-("w_nom", Float64),
-("min_w", Float64),
-("max_w", Float64),
-("electricity_price", Float64),
-("status", Int)
-])
-
-const _mlab_ne_pump_columns =  Vector{Tuple{String,Type}}([
-("pump_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("station_i", Int),
-("a", Float64),
-("b", Float64),
-("q_nom", Float64),
-("delta_Hmax", Float64), ("delta_Hmin", Float64),
-("min_pump_efficiency", Float64),
-("max_pump_efficiency", Float64),
-("w_nom", Float64),
-("min_w", Float64),
-("max_w", Float64),
-("electricity_price", Float64),
-("status", Int)
+    ("pump_i", Int),
+    ("fr_junction", Int),
+    ("to_junction", Int),
+    ("station_i", Int),
+    ("rotation_coefficient", Float64),
+    ("flow_coefficient", Float64),
+    ("flow_nom", Float64),
+    ("flow_max", Float64),
+    ("delta_head_min", Float64),
+    ("delta_head_max", Float64),
+    ("pump_efficiency_min", Float64),
+    ("pump_efficiency_max", Float64),
+    ("rotation_nom", Float64),
+    ("rotation_min", Float64),
+    ("rotation_max", Float64),
+    ("electricity_price", Float64),
+    ("status", Int),
+    ("electric_motor_efficiency", Float64),
+    ("mechanical_transmission_efficiency", Float64)
 ])
 
 
 const _mlab_producer_columns =  Vector{Tuple{String,Type}}([
-("producer_i", Int),
-("junction_id", Int),
-("qgmin", Float64),
-("qgmax", Float64),
-("qg", Float64),
-("status", Int),
-("is_dispatchable", Int),
-("offer_price", Float64)
+    ("producer_i", Int),
+    ("junction_id", Int),
+    ("injection_min", Float64),
+    ("injection_max", Float64),
+    ("injection_nominal", Float64),
+    ("status", Int),
+    ("is_dispatchable", Int),
+    ("offer_price", Float64)
 ])
 
 const _mlab_consumer_columns =  Vector{Tuple{String,Type}}([
-("consumer_i", Int),
-("junction_id", Int),
-("qlmin", Float64),
-("qlmax", Float64),
-("ql", Float64),
-("status", Float64),
-("is_dispatchable", Int),
-("bid_price", Float64)
+    ("consumer_i", Int),
+    ("junction_id", Int),
+    ("withdrawal_min", Float64),
+    ("withdrawal_max", Float64),
+    ("withdrawal_nominal", Float64),
+    ("status", Float64),
+    ("is_dispatchable", Int),
+    ("bid_price", Float64)
 ])
 
 const _mlab_time_series_columns =  Vector{Tuple{String,Type}}([
-("consumer_price", Float64),
-("producer_price", Float64)
+    ("consumer_price", Float64),
+    ("producer_price", Float64)
 ])
 
 const _mlab_tank_columns =  Vector{Tuple{String,Type}}([
-("tank_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("vessel_pressure_head", Float64),
-("radius", Float64),
-("Min_Capacity_Limitation", Float64),
-("Max_Capacity_Limitation", Float64),
-("Initial_Volume", Float64),
-("Min_Load_Flow_Rate", Float64),
-("Max_Load_Flow_Rate", Float64),
-("Min_Unload_Flow_Rate", Float64),
-("Max_Unload_Flow_Rate", Float64),
-("Cd", Float64),
-("status", Int),
-("price", Float64),
-("p_price", Float64)
-])
-
-const _mlab_ne_tank_columns =  Vector{Tuple{String,Type}}([
-("tank_i", Int),
-("fr_junction", Int),
-("to_junction", Int),
-("vessel_pressure_head", Float64),
-("radius", Float64),
-("Min_Capacity_Limitation", Float64),
-("Max_Capacity_Limitation", Float64),
-("Initial_Volume", Float64),
-("Min_Unload_Flow_Rate", Float64),
-("Max_Unload_Flow_Rate", Float64),
-("Cd", Float64),
-("status", Int),
-("price", Float64),
-("p_price", Float64)
+    ("tank_i", Int),
+    ("fr_junction", Int),
+    ("to_junction", Int),
+    ("vessel_pressure_head", Float64),
+    ("radius", Float64),
+    ("capacity_min", Float64),
+    ("capacity_max", Float64),
+    ("initial_volume", Float64),
+    ("intake_min", Float64),
+    ("intake_max", Float64),
+    ("offtake_min", Float64),
+    ("offtake_max", Float64),
+    ("Cd", Float64),
+    ("status", Int),
+    ("price", Float64),
+    ("p_price", Float64)
 ])
 
 
@@ -171,9 +122,6 @@ const _mlab_dtype_lookup = Dict{String,Dict{String,Type}}(
     "mpc.producer" => Dict{String,Type}(_mlab_producer_columns),
     "mpc.consumer" => Dict{String,Type}(_mlab_consumer_columns),
     "mpc.tank" => Dict{String,Type}(_mlab_tank_columns),
-    "mpc.ne_tank" => Dict{String,Type}(_mlab_ne_tank_columns),
-    "mpc.ne_pipe" => Dict{String,Type}(_mlab_ne_pipe_columns),
-    "mpc.ne_pump" => Dict{String,Type}(_mlab_ne_pump_columns),
 )
 
 
@@ -226,14 +174,20 @@ function parse_m_string(data_string::String)
         case["source_version"] = "0.0.0+"
     end
 
-    required_metadata_names = ["mpc.beta","mpc.rho",
-    "mpc.nu",
-    "mpc.gravitational_acceleration",
-     "mpc.units", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
+    required_metadata_names = [
+        "mpc.density",
+        "mpc.viscosity",
+        "mpc.gravitational_acceleration",
+        "mpc.units",
+        "mpc.time_step"
+    ]
 
-    optional_metadata_names = [ "mpc.base_rho", "mpc.base_nu", "mpc.base_diameter", "mpc.base_length",
-    "mpc.baseH", "mpc.base_z", "mpc.base_a",
-    "mpc.base_b", "mpc.baseQ",  "mpc.base_volume","mpc.is_per_unit"]
+    optional_metadata_names = [
+        "mpc.base_length",
+        "mpc.base_head",
+        "mpc.base_flow",
+        "mpc.is_per_unit"
+    ]
 
     for data_name in required_metadata_names
         (data_name == "mpc.units") && (continue)
@@ -263,10 +217,10 @@ function parse_m_string(data_string::String)
     end
 
     # handling optional meta data names
-    if haskey(matlab_data, "mpc.baseH")
-        case["baseH"] = matlab_data["mpc.baseH"]
+    if haskey(matlab_data, "mpc.base_head")
+        case["base_head"] = matlab_data["mpc.base_head"]
     else
-        Memento.warn(_LOGGER, string("no baseH found in .m file.
+        Memento.warn(_LOGGER, string("no base_head found in .m file.
             This value will be auto-assigned based on the head limits provided in the data"))
     end
 
@@ -277,32 +231,11 @@ function parse_m_string(data_string::String)
             This value will be auto-assigned based on the head limits provided in the data"))
     end
 
-    if haskey(matlab_data, "mpc.base_rho")
-        case["base_rho"] = matlab_data["mpc.base_rho"]
+    if haskey(matlab_data, "mpc.base_flow")
+        case["base_flow"] = matlab_data["mpc.base_flow"]
     else
-        Memento.warn(_LOGGER,"no base_rho found in .m file.
-            The file seems to be missing \"mpc.base_rho = ...\" \n")
-    end
-
-    if haskey(matlab_data, "mpc.base_nu")
-        case["base_nu"] = matlab_data["mpc.base_nu"]
-    else
-        Memento.warn(_LOGGER,"no base_nu found in .m file.
-            The file seems to be missing \"mpc.base_nu = ...\" \n")
-    end
-
-    if haskey(matlab_data, "mpc.base_diameter")
-        case["base_diameter"] = matlab_data["mpc.base_diameter"]
-    else
-        Memento.warn(_LOGGER,"no base_diameter found in .m file.
-            The file seems to be missing \"mpc.base_diameter = ...\" \n")
-    end
-
-    if haskey(matlab_data, "mpc.baseQ")
-        case["baseQ"] = matlab_data["mpc.baseQ"]
-    else
-        Memento.warn(_LOGGER,"no baseQ found in .m file.
-            The file seems to be missing \"mpc.baseQ = ...\" \n")
+        Memento.warn(_LOGGER,"no base_flow found in .m file.
+            The file seems to be missing \"mpc.base_flow = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.is_per_unit")
@@ -311,34 +244,6 @@ function parse_m_string(data_string::String)
         Memento.warn(_LOGGER, string("no is_per_unit found in .m file.
             Auto assigning a value of 0 (false) for the is_per_unit field"))
         case["is_per_unit"] = 0
-    end
-
-    if haskey(matlab_data, "mpc.base_z")
-        case["base_z"] = matlab_data["mpc.base_z"]
-    else
-        Memento.warn(_LOGGER,"no base_z found in .m file.
-            The file seems to be missing \"mpc.base_z = ...\" \n")
-    end
-
-    if haskey(matlab_data, "mpc.base_a")
-        case["base_a"] = matlab_data["mpc.base_a"]
-    else
-        Memento.warn(_LOGGER,"no base_a found in .m file.
-            The file seems to be missing \"mpc.base_a = ...\" \n")
-    end
-
-    if haskey(matlab_data, "mpc.base_b")
-        case["base_b"] = matlab_data["mpc.base_b"]
-    else
-        Memento.warn(_LOGGER,"no base_b found in .m file.
-            The file seems to be missing \"mpc.base_b = ...\" \n")
-    end
-
-    if haskey(matlab_data, "mpc.base_volume")
-        case["base_volume"] = matlab_data["mpc.base_volume"]
-    else
-        Memento.warn(_LOGGER,"no base_volume found in .m file.
-            The file seems to be missing \"mpc.base_volume = ...\" \n")
     end
 
     if haskey(matlab_data, "mpc.junction")
@@ -373,19 +278,6 @@ function parse_m_string(data_string::String)
             The file seems to be missing \"mpc.pipe = [...];\""))
     end
 
-    if haskey(matlab_data, "mpc.ne_pipe")
-        ne_pipes = []
-        for pipe_row in matlab_data["mpc.ne_pipe"]
-            pipe_data = _IM.row_to_typed_dict(pipe_row, get(_colnames, "mpc.ne_pipe", _mlab_ne_pipe_columns))
-            pipe_data["index"] = _IM.check_type(Int, pipe_row[1])
-            pipe_data["is_si_units"] = case["is_si_units"]
-            pipe_data["is_english_units"] = case["is_english_units"]
-            pipe_data["is_per_unit"] = case["is_per_unit"]
-            push!(ne_pipes, pipe_data)
-        end
-        case["ne_pipe"] = ne_pipes
-    end
-
     if haskey(matlab_data, "mpc.pump")
         pumps = []
         for pump_row in matlab_data["mpc.pump"]
@@ -397,19 +289,6 @@ function parse_m_string(data_string::String)
             push!(pumps, pump_data)
         end
         case["pump"] = pumps
-    end
-
-    if haskey(matlab_data, "mpc.ne_pump")
-        ne_pumps = []
-        for pump_row in matlab_data["mpc.ne_pump"]
-            pump_data = _IM.row_to_typed_dict(pump_row, get(_colnames, "mpc.ne_pump", _mlab_ne_pump_columns))
-            pump_data["index"] = _IM.check_type(Int, pump_row[1])
-            pump_data["is_si_units"] = case["is_si_units"]
-            pump_data["is_english_units"] = case["is_english_units"]
-            pump_data["is_per_unit"] = case["is_per_unit"]
-            push!(ne_pumps, pump_data)
-        end
-        case["ne_pump"] = ne_pumps
     end
 
     if haskey(matlab_data, "mpc.producer")
@@ -449,19 +328,6 @@ function parse_m_string(data_string::String)
             push!(tanks, tank_data)
         end
         case["tank"] = tanks
-    end
-
-    if haskey(matlab_data, "mpc.ne_tank")
-        tanks = []
-        for tank_row in matlab_data["mpc.ne_tank"]
-            tank_data = _IM.row_to_typed_dict(tank_row, get(_colnames, "mpc.ne_tank", _mlab_ne_tank_columns))
-            tank_data["index"] = _IM.check_type(Int, tank_row[1])
-            tank_data["is_si_units"] = case["is_si_units"]
-            tank_data["is_english_units"] = case["is_english_units"]
-            tank_data["is_per_unit"] = case["is_per_unit"]
-            push!(ne_tanks, tank_data)
-        end
-        case["ne_tank"] = ne_tanks
     end
 
 
@@ -563,7 +429,7 @@ end
 
 
 "order data types should appear in matlab format"
-const _matlab_data_order = ["junction", "pipe", "pump", "short_pipe", "producer", "consumer", "tank", "ne_pipe", "ne_pump", "ne_tank"]
+const _matlab_data_order = ["junction", "pipe", "pump", "short_pipe", "producer", "consumer", "tank"]
 
 "order data fields should appear in matlab format"
 const _matlab_field_order = Dict{String,Array}(
@@ -573,37 +439,33 @@ const _matlab_field_order = Dict{String,Array}(
     "producer"      => [key for (key, dtype) in _mlab_producer_columns],
     "consumer"      => [key for (key, dtype) in _mlab_consumer_columns],
     "tank"          => [key for (key, dtype) in _mlab_tank_columns],
-    "ne_pipe"       => [key for (key, dtype) in _mlab_ne_pipe_columns],
-    "ne_pump"       => [key for (key, dtype) in _mlab_ne_pump_columns],
-    "ne_tank"       => [key for (key, dtype) in _mlab_ne_tank_columns]
 )
 
 
 "order of required global parameters"
-const _matlab_global_params_order_required = ["beta", "rho",
-"nu",
-"gravitational_acceleration"]
+const _matlab_global_params_order_required = [
+    "density",
+    "viscosity",
+    "gravitational_acceleration"
+]
 
 
 "order of optional global parameters"
-const _matlab_global_params_order_optional = ["base_rho", "base_nu", "base_diameter",
-"base_length","baseH", "base_z", "base_a",
-"base_b", "base_volume", "baseQ", "is_per_unit", "mpc.time_step", "mpc.Q_pipe_dim", "mpc.Q_pump_dim", "mpc.E_base"]
+const _matlab_global_params_order_optional = [
+    "base_length",
+    "base_head",
+    "base_flow",
+    "is_per_unit",
+    "mpc.time_step"
+]
 
 
 "list of units of meta data fields"
 const _units = Dict{String,Dict{String,String}}(
     "si" => Dict{String,String}(
-        "base_rho" => "kg/m3",
-        "base_nu"  => "m2/s",
-        "base_diameter" => "m",
         "base_length" => "m",
-        "base_z" => "m",
-        "base_a" => "m",
-        "base_b" => "m",
-        "baseH" => "m",
-        "base_volume" => "m3",
-        "baseQ" => "m3/s",
+        "base_head" => "m",
+        "base_flow" => "m3/s",
     ),
     "english" => Dict{String,String}(
 
