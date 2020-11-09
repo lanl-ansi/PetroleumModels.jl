@@ -30,22 +30,21 @@ The network data dictionary structure is roughly as follows:
     "2":{...},
     ...
 },
-"delivery":{
+"consumer":{
     "1":{
       "junction_id": <float>,  # junction id
-      "withdrawal_max": <float>,  # the maximum mass flow demand. SI units are kg/s.
-      "withdrawal_min": <float>,  # the minimum mass flow demand. SI units are kg/s.
-      "withdrawal_nominal": <float>, # nominal mass flow demand. SI units are kg/s.
-      "priority": <float>, # priority for serving the variable load. High numbers reflect a higher desired to serve this load.
-      "bid_price": <float>, # price for buying gas at the delivery.
-      "is_dispatchable": <int>,  # whether or not the unit is dispatchable (0 = delivery should consume withdrawl_nominal, 1 = delivery can consume between withdrawal_min and withdrawal_max).
+      "withdrawal_max": <float>,  # the maximum mass flow demand. SI units are m^3/s.
+      "withdrawal_min": <float>,  # the minimum mass flow demand. SI units are m^3/s.
+      "withdrawal_nominal": <float>, # nominal mass flow demand. SI units are m^3/s.
+      "bid_price": <float>, # price for buying gas at the delivery. SI units are $/m^3
+      "is_dispatchable": <int>,  # whether or not the unit is dispatchable (0 = consumer should consume withdrawl_nominal, 1 = consumer can consume between withdrawal_min and withdrawal_max).
       "status": <int>,   # status of the component (0 = off, 1 = on). Default is 1.
        ...
     },
     "2":{...},
     ...
 },
-"receipt":{
+"producer":{
     "1":{
       "junction_id": <float>,         # junction id
       "injection_min": <float>,       # the minimum mass flow gas production. SI units are kg/s.

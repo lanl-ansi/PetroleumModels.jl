@@ -4,7 +4,6 @@ import InfrastructureModels
 import Memento
 import JuMP
 import Ipopt
-import LinearAlgebra
 
 using Test
 

@@ -2,7 +2,7 @@
 # The purpose of this file is to define commonly used and created objective functions used in models
 ##########################################################################################################
 
-"Economic objective function for petroluem models that takes the form of ``min \\sum_{i \\in producer} c_i - \\sum_{i \\in consumer} c_i + \\rho * g * \\sum_{ij \\in pump} c_{ij} * ``"
+"Economic objective function for petroleum models that takes the form of ``min \\sum_{i \\in producer} c_i - \\sum_{i \\in consumer} c_i + \\rho * g * \\sum_{ij \\in pump} c_{ij} * ``"
 function objective_min_expenses_max_benefit(pm::AbstractPetroleumModel, nws=[pm.cnw])
     qg      = Dict(n => var(pm,n,:qg) for n in nws)
     ql      = Dict(n => var(pm,n,:ql) for n in nws)

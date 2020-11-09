@@ -18,7 +18,7 @@ It is designed to optimize the operations of existing single liquid commodity pi
 
 **Core Network Formulations**
 
-*LP
+* LP
 
 ## Basic Usage
 

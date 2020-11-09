@@ -19,7 +19,7 @@ build_ref
 # Network Formulations
 
 ## Type Hierarchy
-We begin with the top of the hierarchy, where we can distinguish between the physics of petroleum flow models. There is currently one formulation supported in PetroluemModels, a full non convex formulation.
+We begin with the top of the hierarchy, where we can distinguish between the physics of petroleum flow models. There is currently one formulation supported in PetroleumModels, a full non convex formulation.
 
 ```julia
 AbstractLPModel <: AbstractPetroleumModel
