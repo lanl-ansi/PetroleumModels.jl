@@ -4,7 +4,7 @@ Parses the IOStream of a file into a Models data structure.
 """
 function parse_file(io::IO; filetype::AbstractString="m", validate::Bool = true)
     if filetype == "m"
-        pmd_data = PetroleumModels.parse_matlab(io)
+        pmd_data = PetroleumModels.parse_matpetro(io)
     elseif filetype == "json"
         pmd_data = PetroleumModels.parse_json(io)
     else

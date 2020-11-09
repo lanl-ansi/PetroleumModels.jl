@@ -54,8 +54,8 @@ These components model infrastructure used to boost pressure between two nodes.
 | flow_max                           | Float64 | Maximum flow rate                     | m^3/s                | ft3/h                         | Y        | Pump maximum flow rate                           |
 | delta_head_max                     | Float64 | Maximum head difference               | m                   | ft                            | Y        | Maximum pump head difference                     |
 | delta_head_min                     | Float64 | Minimum head difference               | m                   | ft                            | Y        | Minimum pump head difference                     |
-| pump_efficiency_min                | Float64 | Minimum inlet pressure                |                     |                               | Y        | Minimum pump efficiency inlet                    |
-| pump_efficiency_max                | Float64 | Maximum inlet pressure                |                     |                               | Y        | Maximum pump efficiency inlet                    |
+| pump_efficiency_min                | Float64 | Minimum pump efficiency               |                     |                               | Y        | Minimum pump efficiency inlet                    |
+| pump_efficiency_max                | Float64 | Maximum pump efficiency               |                     |                               | Y        | Maximum pump efficiency inlet                    |
 | rotation_nom                       | Int     | Nominal rotational speed              | rotations/s         | rotations/minute              | Y        | Nominal pump rotational speed                    |
 | rotation_min                       | Int     | Minimum rotational speed              | rotations/s         | rotations/minute              | Y        | Minimum pump rotational speed                    |
 | rotation_max                       | Int     | Maximum rotational speed              | rotations/s         | rotations/minute              | Y        | Maximum pump rotational speed                    |

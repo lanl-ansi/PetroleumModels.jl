@@ -58,133 +58,68 @@ The network data dictionary structure is roughly as follows:
     "2":{...},
     ...
 },
-"transfer":{
-    "1":{
-        "junction_id": <float>,         # junction id
-        "withdrawal_max": <float>,      # the maximum mass flow demand. SI units are kg/s.
-        "withdrawal_min": <float>,      # the minimum mass flow demand. SI units are kg/s. (can be negative, in which case it is gas injection)
-        "withdrawal_nominal": <float>,  # nominal mass flow demand. SI units are kg/s.
-        "offer_price": <float>,         # price for selling gas at the receipt.
-        "bid_price": <float>,           # price for buying gas at the delivery.
-        "is_dispatchable": <int>,       # whether or not the unit is dispatchable (0 = transfer should consume withdrawl_nominal, 1 = transfer can consume between withdrawal_min and withdrawal_max).
-        "status": <int>,                # status of the component (0 = off, 1 = on). Default is 1.
-        ...
-    },
-    "2":{...},
-    ...
-},
 "pipe":{
     "1":{
       "length": <float>,            # the length of the connection. SI units are m.
       "fr_junction": <int>,         # the "from" side junction id
       "to_junction": <int>,         # the "to" side junction id
-      "friction_factor": <float>,   # the friction component of the resistance term of the pipe. Non dimensional.
+      "friction_factor": <float>,   # the friction component of the resistance term of the pipe. SI units are s^2/ft.
       "diameter": <float>,          # the diameter of the connection. SI units are m.
       "status": <int>,              # status of the component (0 = off, 1 = on). Default is 1.
-      "p_max": <float>,             # maximum pressure. SI units are pascals
-      "p_min": <float>,             # minimum pressure. SI units are pascals
-      "is_bidirectional": <int>,    # flag for whether or not flow can go in both directions
+      "flow_max": <float>,          # maximum volumetric flow. SI units are m^3/s
+      "flow_min": <float>,          # minimum volumetric flow. SI units are m^3/s
         ...
     },
     "2":{...},
     ...
 },
-"compressor":{
+"pump":{
     "1":{
-      "fr_junction": <int>,         # the "from" side junction id
-      "to_junction": <int>,         # the "to" side junction id
-      "c_ratio_min": <float>,       # minimum multiplicative pressure change (compression or decompressions). Compression only goes from f_junction to t_junction (1 if flow reverses).
-      "c_ratio_max": <float>,       # maximum multiplicative pressure change (compression or decompressions). Compression only goes from f_junction to t_junction (1 if flow reverses).
-      "status": <int>,              # status of the component (0 = off, 1 = on). Default is 1.
-      "operating_cost": <float>,    # The cost per W of running the compressor
-      "power_max": <float>,         # Maximum power consumed by the compressor. SI units is W
-      "type": <int>,                # type of the compressor (two way compression or not, one way flow or not, etc.)
+      "fr_junction": <int>,                           # the "from" side junction id
+      "to_junction": <int>,                           # the "to" side junction id
+      "status": <int>,                                # status of the component (0 = off, 1 = on). Default is 1.
+      "electricity_price": <float>,                   # the cost per kW of running the compressor
+      "station_i": <int>,                             # the pump station id for this pumps
+      "rotation_coefficient": <float>,                # pump rotation coefficient, SI units are m
+      "flow_coefficient": <float>,                    # pump flow coefficient, SI units are s^2/m^5
+      "flow_nom": <float>,                            # normal flow through the pump. SI units are m^3/s
+      "flow_max": <float>,                            # maximum flow through the pump. SI units are m^3/s
+      "delta_head_min": <float>,                      # minimum pressure difference through the pump. SI units are m.
+      "delta_head_max": <float>,                      # maximum pressure difference through the pump. SI units are m.
+      "pump_efficiency_min": <float>,                 # minimum pump efficiency. Non dimensional
+      "pump_efficiency_max": <float>,                 # maximum pump efficiency. Non dimensional
+      "rotation_nom": <float>,                        # normal rotation speed. SI units are rotations per second
+      "rotation_min": <float>,                        # minimum rotation speed. SI units are rotations per second
+      "rotation_max": <float>,                        # maximum rotation speed. SI units are rotations per second
+      "electric_motor_efficiency": <float>,           # efficiency of the pump's motor. Non dimensional.
+      "mechanical_transmission_efficiency": <float>,  # efficiency of the pump's transmission. Non dimensional.
         ...
     },
     "2":{...},
     ...
-}
-"short_pipe":{
+},
+"tank":{
     "1":{
-      "fr_junction": <int>,         # the "from" side junction id
-      "to_junction": <int>,         # the "to" side junction id
-      "status": <int>,              # status of the component (0 = off, 1 = on). Default is 1.
-      "is_bidirectional": <int>,    # flag for whether or not flow can go in both directions
+      "fr_junction": <int>,              # the "from" side junction id
+      "to_junction": <int>,              # the "to" side junction id
+      "status": <int>,                   # status of the component (0 = off, 1 = on). Default is 1.
+      "vessel_pressure_head": <float>,   # TODO
+      "radius": <float>,                 # radius of the tank. SI units are m.
+      "capacity_min": <float>,           # minimum capcity of the tank. SI units are m^3.
+      "capacity_max": <float>,           # maximum capcity of the tank. SI units are m^3.
+      "initial_volume": <float>,         # initial volume of the tank. SI units are m^3.
+      "intake_min": <float>,             # minimum flow into the tank. SI units are m^3/s.
+      "intake_max": <float>,             # maximum flow into the tank. SI units are m^3/s.
+      "offtake_min": <float>,            # minimum flow out of the tank. SI units are m^3/s.
+      "offtake_max": <float>,            # maximum flow out of the tank. SI units are m^3/s.
+      "Cd": <float>,                     # Todo
+      "price": <float>,                  # Todo
+      "p_price": <float>,                # Todo
         ...
     },
     "2":{...},
     ...
-}
-"valve":{
-    "1":{
-      "fr_junction": <int>,             # the "from" side junction id
-      "to_junction": <int>,             # the "to" side junction id
-      "status": <int>,                  # status of the component (0 = off, 1 = on). Default is 1.
-      "is_bidirectional": <int>,        # flag for whether or not flow can go in both directions
-        ...
-    },
-    "2":{...},
-    ...
-}
-"regulator":{
-    "1":{
-      "fr_junction": <int>,             # the "from" side junction id
-      "to_junction": <int>,             # the "to" side junction id
-      "reduction_factor_min": <float>,  # minimum multiplicative pressure change (compression or decompressions). Compression only goes from f_junction to t_junction (1 if flow reverses).
-      "reduction_factor_max": <float>,  # maximum multiplicative pressure change (compression or decompressions). Compression only goes from f_junction to t_junction (1 if flow reverses).
-      "status": <int>,                  # status of the component (0 = off, 1 = on). Default is 1.
-      "is_bidirectional": <int>,        # flag for whether or not flow can go in both directions
-        ...
-    },
-    "2":{...},
-    ...
-}
-"resistor":{
-    "1":{
-      "fr_junction": <int>,          # the "from" side junction id
-      "to_junction": <int>,          # the "to" side junction id
-      "drag": <float>,              # the drag factor of resistors. Non dimensional.
-      "status": <int>,              # status of the component (0 = off, 1 = on). Default is 1.
-      "is_bidirectional": <int>,    # flag for whether or not flow can go in both directions
-        ...
-    },
-    "2":{...},
-    ...
-}
-"loss_resistor":{
-    "1":{
-      "fr_junction": <int>,         # the "from" side junction id
-      "to_junction": <int>,         # the "to" side junction id
-      "p_loss": <float>,            # constant pressure loss along the edge
-      "status": <int>,              # status of the component (0 = off, 1 = on). Default is 1.
-      "is_bidirectional": <int>,    # flag for whether or not flow can go in both directions
-        ...
-    },
-    "2":{...},
-    ...
-}
-"storage":{
-    "1":{
-        "id": <int>,                                # id of the junction in which storage is located
-        "well_diameter": <float>,                   # diameter of the wells
-        "well_depth": <float>,                      # depth of the wells
-        "well_friction_factor": <float>,            # friction factor of the wells
-        "reservoir_p_max": <float>,                 # maximum pressure of the reservoir
-        "base_gas_capacity": <float>,               # base gas capacity in reservoir (SI units: kg)
-        "total_field_capacity": <float>,            # total gas capacity in reservoir (SI units: kg)
-        "initial_field_capacity_percent": <float>,  # initial gas in reservoir as a percentage of total capacity
-        "reduction_factor_max": <float>             # maximum reduction factor of the regulator
-        "c_ratio_max": <float>,                     # maximum compression ratio of the compressor
-        "status": <int>,                            # status of the component (0=off, 1=on). Default is 1.
-        "flow_injection_rate_min": <float>,         # minimum flow rate at which gas can be injected into storage. SI units is kg/s
-        "flow_injection_rate_max": <float>,         # maximum flow rate at which gas can be injected into storage. SI units is kg/s
-        "flow_withdrawal_rate_min": <float>,        # minimum flow rate at which gas can be withdrawn from storage. SI units is kg/s
-        "flow_withdrawal_rate_max": <float>,        # maxium flow rate at which gas can be withdrawn storage. SI units is kg/s  
-        ...
-    },
-    "2":{...},
-    ...
-}
+  },
 }
 ```
 
