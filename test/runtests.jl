@@ -4,7 +4,6 @@ import InfrastructureModels
 import Memento
 import JuMP
 import Ipopt
-import LinearAlgebra
 
 using Test
 
@@ -18,5 +17,5 @@ ipopt_solver = JuMP.optimizer_with_attributes(
 cvx_solver = ipopt_solver
 
 @testset "Petroleum" begin
-    include("pf.jl")
+    include("opf.jl")
 end

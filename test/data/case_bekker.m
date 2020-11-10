@@ -10,7 +10,6 @@ mpc.units                      = 'si';
 mpc.is_per_unit                = 0;
 mpc.time_step                  = 0;
 
-
 %% junction data
 %  junction_i type head_min head_max elevation status
 mpc.junction = [
