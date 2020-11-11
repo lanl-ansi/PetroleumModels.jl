@@ -17,7 +17,7 @@ Because the fluid is weakly compressible and homogeneous, $\rho$ is roughly cons
 along the length of the pipe, $L$, the relationship between endpoint pressure variables $p(0)$ and $p(L)$ and the flow velocity $u$ is given by
 
 ```math
-\frac{p(0) - p(L)}{\rho g} &= \lambda \frac{L}{D}\frac{{u}^{2}}{2g}+\Delta z.
+\frac{p(0) - p(L)}{\rho g} = \lambda \frac{L}{D}\frac{{u}^{2}}{2g}+\Delta z.
 ```
 
 The values $h(0)\equiv p(0)/(\rho g)$ and $h(L)\equiv p(L)/(\rho g)$ denote the heights the liquid is lifted to under the pressures $p(0)$ and $p(L)$ at either end of the pipe. The value $h$ is referred to as head.  A general equation that is used to determine the coefficient of hydraulic resistance $\lambda$ is given as follows:
@@ -35,7 +35,7 @@ where $A$ is the cross-sectional area of the pipe and $m$ is a Reynolds constant
 For turbulent flow in smooth pipes, parameters of $m$ = 0.25 and $\beta$ = 0.0246$ (friction factor) is often used. However, the parameter $m$ can be adjusted to reflect the laminarization effects of anti-turbulent drag reduction additives that are widely used to facilitate petroleum transport. Given these relationships the total head loss between the ends, $(i,j)$,, of a pipe is equal to the sum of losses caused by friction and the head difference arising from pipeline elevation.
 
 ```math
-h_i - h_j = z_j - z_i + 1.02 \beta_{ij} \frac{q_{ij}^{2-m} \nu^m} {D_{ij}^{5-m}} L_{ij}   
+h_i - h_j = z_j - z_i + 1.02 \beta_{ij} \frac{q_{ij}^{2-m} \nu^m}{D_{ij}^{5-m}} L_{ij}   
 ```
 where $z$ is the elevation of the pipe on either end.
 
@@ -43,10 +43,10 @@ where $z$ is the elevation of the pipe on either end.
 To create a better numerically conditioned problem, it is very useful to non-dimensionalize the units. Here we use a typical head $h_0$ and a typical volumetric flow $q_0$ and normalize the equations. This yields
 
 ```math
-  \tilde{h}_i - \tilde{h}_j = \tilde{z}_j - \tilde{z}_i + 1.02 \beta_{ij} \frac{\tilde{q}_{ij}^{2-m} \nu^m} {D_{ij}^{5-m}} L_{ij * \frac{q_0}{p_0}}
+  \tilde{h}_i - \tilde{h}_j = \tilde{z}_j - \tilde{z}_i + 1.02 \beta_{ij} \frac{\tilde{q}_{ij}^{2-m} \nu^m} {D_{ij}^{5-m}} L_{ij} * \frac{q_0}{p_0}
 ```
 
-where $\tilde{q}=\frac{q}{f_q}$ and $\tilde{h}=\frac{h}{h_0}$ are the dimensionless volumetric flow and head, respectively, and are both of order one. While not strictly necessary in steady-state formulations, length, $L$, can also be made non dimensional in a similar way and is often useful for transient modeling. For notational convenience, the non-dimensionalization constants and pipeline constants (diameter, length, etc.) can be lumped as a single constant *resistance*, $\gamma=\frac{1.02 \beta \nu^m L q_0}{D^{5-m} h_0}$ yielding a non dimensional equation of the form
+where $\tilde{q}=\frac{q}{q_0}$, $\tilde{z}=\frac{z}{h_0}$, and $\tilde{h}=\frac{h}{h_0}$ are the dimensionless volumetric flow and head, respectively, and are both of order one. While not strictly necessary in steady-state formulations, length, $L$, can also be made non dimensional in a similar way and is often useful for transient modeling. For notational convenience, the non-dimensionalization constants and pipeline constants (diameter, length, etc.) can be lumped as a single constant *resistance*, $\gamma=\frac{1.02 \beta \nu^m L q_0}{D^{5-m} h_0}$ yielding a non dimensional equation of the form
 
 ```math
   \tilde{h}_i - \tilde{h}_j = \tilde{z}_j - \tilde{z}_i + \gamma_{ij} \tilde{q}_{ij}^{2-m}
@@ -75,7 +75,7 @@ where $b_0$, $b_1$, and $b_2$ are approximation coefficients obtained by the lea
 Thus, pump efficiency as a function of rotational speed is then written as
 
 ```math
-\eta^{pump} &= b_0+b_1\frac{q^{nom}}{\omega^{nom}}\omega+b_2\left( \frac{q^{nom}}{\omega^{nom}}\right)^2\omega^2
+\eta^{pump} = b_0+b_1\frac{q^{nom}}{\omega^{nom}}\omega+b_2\left( \frac{q^{nom}}{\omega^{nom}}\right)^2\omega^2
 ```
 
 The laws of affinity require the use of a nominal point on the curve to determine the new rotational speed.
@@ -83,7 +83,7 @@ PetroleumModels uses the equation given by [2] to provide an analytical relation
 $\eta$ and $\eta^{nom}$:
 
 ```math
-\eta &= 1 – (1 - \eta^{nom})\left(\frac{\omega^{nom}}{\omega}\right)^{0.1}.
+\eta = 1 – (1 - \eta^{nom})\left(\frac{\omega^{nom}}{\omega}\right)^{0.1}.
 ```
 
 Therefore, for large pumps the change in efficiency can be neglected if the frequency is within 33\% of its nominal value. However, this does not mean the pump will perform at the same efficiency when installed in the pipeline system, because the operating point is determined by the intersection of the pump curve with the system curve. Thus, we model the dependence of pump efficiency on flow at a constant speed using a second-degree polynomial [3]:
@@ -158,7 +158,7 @@ A complete petroleum flow mathematical model is the defined by
 & (h_i - h_j) = z_j - z_i + {\gamma}_{a} q_a^{2-m} &\text{Hydraulic equation for pipe $a$} \\
 && \text{connected from junction $i$ to junction $j$}  \\
 &\sum\limits_{a=a_{ij}\in A} q_{a} - \sum\limits_{a=a_{ji} \in A} q_{a} = \sum_{j \in P_i} qg_j- \sum_{j \in C_i} ql_j & \text{volumetric flow balance at junction $i$} \\
-& \h_i - h_j = \alpha_{a}^0 \left(\frac{\omega_{a}}{\omega_{a}^{nom}}\right)^2 - \alpha_{a}^1 q_{ij}^2 & \text{head boost at pump $a$} \\
+& h_i - h_j = \alpha_{a}^0 \left(\frac{\omega_{a}}{\omega_{a}^{nom}}\right)^2 - \alpha_{a}^1 q_{ij}^2 & \text{head boost at pump $a$} \\
 && \text{connected from junction $i$ to junction $j$}  \\
 &\eta_{a}  = \eta_{a}^{nom} - \left(\frac{q_{a}}{Q_{a}^{nom}} - \frac{\omega_{a}}{\omega_{a}^{nom}}\right)^2 \eta_{a}^{nom} \left(\frac{\omega_{a}^{nom}}{\omega_{a}}\right)^2 & \text{efficiency of pump $q$} \\
 && \text{connected from junction $i$ to junction $j$}  \\

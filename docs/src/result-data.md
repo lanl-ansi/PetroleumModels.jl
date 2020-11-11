@@ -19,7 +19,7 @@ At the top level the results data dictionary is structured as follows:
 "objective_gap":<float>,     # the final gap between the lower bound and upper bound of the objective function (if available)
 "machine":{...},             # computer hardware information (details below)
 "data":{...},                # test case information (details below)
-"solution":{...}            # complete solution information (details below)
+"solution":{...}             # complete solution information (details below)
 }
 ```
 
@@ -110,7 +110,7 @@ By default, all results are reported in per-unit (non-dimenionalized). Below are
 },
 "pipe":{
     "1":{
-      "q": <float>,                 # volumetric flow through the pipe.  Non-dimensional quantity. Multiply by base_flow to get m^3/s.
+      "q": <float>,  # volumetric flow through the pipe.  Non-dimensional quantity. Multiply by base_flow to get m^3/s.
         ...
     },
     "2":{...},
@@ -118,8 +118,8 @@ By default, all results are reported in per-unit (non-dimenionalized). Below are
 },
 "tank":{
     "1":{
-      "qin": <float>,                 # volumetric flow into the tank.  Non-dimensional quantity. Multiply by base_flow to get m^3/s.
-      "qout": <float>,                # volumetric flow out of the tank.  Non-dimensional quantity. Multiply by base_flow to get m^3/s.
+      "qin": <float>,    # volumetric flow into the tank.  Non-dimensional quantity. Multiply by base_flow to get m^3/s.
+      "qout": <float>,   # volumetric flow out of the tank.  Non-dimensional quantity. Multiply by base_flow to get m^3/s.
         ...
     },
     "2":{...},
@@ -127,9 +127,9 @@ By default, all results are reported in per-unit (non-dimenionalized). Below are
 },
 "pump":{
     "1":{
-      "q": <float>,                 # volumetric flow through the pump.  Non-dimensional quantity. Multiply by base_flow to get m^3/s.
-      "eta": <float>,               # pump efficiency. Non-dimensional quantiy.
-      "w": <float>,                 # pump rotation speed in rotations per second.
+      "q": <float>,    # volumetric flow through the pump.  Non-dimensional quantity. Multiply by base_flow to get m^3/s.
+      "eta": <float>,  # pump efficiency. Non-dimensional quantiy.
+      "w": <float>,    # pump rotation speed in rotations per second.
         ...
     },
     "2":{...},
