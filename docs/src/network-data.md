@@ -17,7 +17,7 @@ The network data dictionary structure is roughly as follows:
 "base_flow":<float>,                     # Base for non-dimensionalizing flow. SI units are m^3/s
 "units":<string>,                        # Non-dimensonilized units. Options are "si" and "asu"
 "is_per_unit":<string>,                  # Whether or not the file is in per unit (non dimensional units) or SI units.
-"time_step":<int>,                        # size of the time step.
+"time_step":<int>,                       # size of the time step.
 "junction":{
     "1":{
       "type": <int> ,         # the type of the junction
@@ -32,13 +32,13 @@ The network data dictionary structure is roughly as follows:
 },
 "consumer":{
     "1":{
-      "junction_id": <float>,  # junction id
-      "withdrawal_max": <float>,  # the maximum mass flow demand. SI units are m^3/s.
-      "withdrawal_min": <float>,  # the minimum mass flow demand. SI units are m^3/s.
+      "junction_id": <float>,        # junction id
+      "withdrawal_max": <float>,     # the maximum mass flow demand. SI units are m^3/s.
+      "withdrawal_min": <float>,     # the minimum mass flow demand. SI units are m^3/s.
       "withdrawal_nominal": <float>, # nominal mass flow demand. SI units are m^3/s.
-      "bid_price": <float>, # price for buying gas at the delivery. SI units are $/m^3
-      "is_dispatchable": <int>,  # whether or not the unit is dispatchable (0 = consumer should consume withdrawl_nominal, 1 = consumer can consume between withdrawal_min and withdrawal_max).
-      "status": <int>,   # status of the component (0 = off, 1 = on). Default is 1.
+      "bid_price": <float>,          # price for buying gas at the delivery. SI units are $/m^3
+      "is_dispatchable": <int>,      # whether or not the unit is dispatchable (0 = consumer should consume withdrawl_nominal, 1 = consumer can consume between withdrawal_min and withdrawal_max).
+      "status": <int>,               # status of the component (0 = off, 1 = on). Default is 1.
        ...
     },
     "2":{...},

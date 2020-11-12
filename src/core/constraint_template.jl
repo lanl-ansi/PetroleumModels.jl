@@ -43,7 +43,7 @@ end
 # Constraints associated with pipes
 #################################################################################################
 " Constraint for computing the relationship between volumetric flow and head difference at either end of a pipe.  For a pipe ``(i,j)``, this constraint is computed as
-`` (h_i - h_j) == (z_j - z_i) + \\frac{\\beta * \\nu^m}{D_{ij}^(5.0-m)} * L_{ij} * 1.02 * q_{ij}^{2.0-m} ``.
+`` (h_i - h_j) = (z_j - z_i) + \\frac{\\beta * \\nu^m}{D_{ij}^{5.0-m}} * L_{ij} * 1.02 * q_{ij}^{2.0-m} ``.
 The constraint adopts the Leibenzon model
 "
 function constraint_leibenzon(pm::AbstractPetroleumModel, n::Int, k)
@@ -67,7 +67,7 @@ constraint_leibenzon(pm::AbstractPetroleumModel, k::Int) = constraint_leibenzon(
 
 "
 Constraints that bound the head difference when fluids are pushed through a pump
-``\\underline{h}_{ij} \\le hj - hi \\le \\overline{h}_{ij}``
+``\\underline{h}_{ij} \\le h_j - h_i \\le \\overline{h}_{ij}``
 "
 function constraint_pump_head_difference_bounds(pm::AbstractPetroleumModel, n::Int, k)
     pump           = ref(pm, n, :pump, k)
@@ -81,7 +81,7 @@ constraint_pump_head_difference_bounds(pm::AbstractPetroleumModel, k::Int) = con
 
 
 " Constraint for computing the efficiency of a pump
-``\\eta == \\overline{\\eta} - (\\frac{q_{ij}}{\\hat{q_{ij}}} -  \frac{w_{ij}}{\\hat{w}_ij})^2 * (\\frac{\\hat{w}}{w_{ij}})^2 * \\overline{\\eta})``
+``\\eta = \\overline{\\eta} - (\\frac{q_{ij}}{\\hat{q_{ij}}} -  \\frac{w_{ij}}{\\hat{w}_{ij}})^2 * (\\frac{\\hat{w}}{w_{ij}})^2 * \\overline{\\eta})``
 "
 function constraint_pump_efficiency(pm::AbstractPetroleumModel, n::Int, k)
     pump           = ref(pm, n, :pump, k)
@@ -93,7 +93,7 @@ end
 constraint_pump_efficiency(pm::AbstractPetroleumModel, k::Int) = constraint_pump_efficiency(pm, pm.cnw, k)
 
 "Constraint for computing the head difference when pushing fluids through a pump
-``h_j - h_i == \\frac{w_{ij}}{\\hat{w}_{ij}}^2 * a -  q_{ij}^2 * b``
+``h_j - h_i = \\frac{w_{ij}}{\\hat{w}_{ij}}^2 * a -  q_{ij}^2 * b``
 "
 function constraint_pump_head_difference(pm::AbstractPetroleumModel, n, k)
     pump           = ref(pm, n, :pump, k)

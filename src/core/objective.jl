@@ -2,8 +2,8 @@
 # The purpose of this file is to define commonly used and created objective functions used in models
 ##########################################################################################################
 
-"Economic objective function for petroleum models that takes the form of ``min \\sum_{i \\in producer} c_i - \\sum_{i \\in consumer} c_i + \\frac{\\rho * g}{1000} * \\sum_{ij \\in pump} c_{ij} * q_{ij} * \\frac{(h_i - h_j)}{\\eta_{ij} * \\eta_{em} * \eta{et}}``
-where 1000 is the factor convert kw seconds into Joules (kg * m^2)/s."
+"Economic objective function for petroleum models that takes the form of ``min \\sum_{i \\in producer} c_i - \\sum_{i \\in consumer} c_i + \\frac{\\rho * g}{1000} * \\sum_{ij \\in pump} c_{ij} * q_{ij} * \\frac{(h_i - h_j)}{\\eta_{ij} * \\eta_{em} * \\eta{et}}``
+where 1000 is the factor to convert kw seconds into Joules (kg * m^2)/s."
 function objective_min_expenses_max_benefit(pm::AbstractPetroleumModel, nws=[pm.cnw])
     qg      = Dict(n => var(pm,n,:qg) for n in nws)
     ql      = Dict(n => var(pm,n,:ql) for n in nws)
