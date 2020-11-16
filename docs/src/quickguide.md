@@ -22,7 +22,7 @@ The run commands in PetroleumModels return detailed results data in the form of 
 This dictionary can be saved for further processing as follows,
 
 ```julia
-result = GasModels.run_opf("test/data/case5.m", LPPetroleumModel, ipopt_solver)
+result = PetroleumModels.run_opf("test/data/case5.m", LPPetroleumModel, ipopt_solver)
 ```
 
 For example, the algorithm's runtime, final objective value, and status can be accessed with,
