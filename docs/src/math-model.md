@@ -32,7 +32,7 @@ where $A$ is the cross-sectional area of the pipe and $m$ is a Reynolds constant
 1.02  \beta \frac{q^{2-m} \nu^m} {D^{5-m}}
 ```
 
-For turbulent flow in smooth pipes, parameters of $m$ = 0.25 and $\beta$ = 0.0246$ (friction factor) is often used. However, the parameter $m$ can be adjusted to reflect the laminarization effects of anti-turbulent drag reduction additives that are widely used to facilitate petroleum transport. Given these relationships the total head loss between the ends, $(i,j)$,, of a pipe is equal to the sum of losses caused by friction and the head difference arising from pipeline elevation.
+For turbulent flow in smooth pipes, parameters of $m$ = 0.25 and $\beta$ = 0.0246 (friction factor) is often used. However, the parameter $m$ can be adjusted to reflect the laminarization effects of anti-turbulent drag reduction additives that are widely used to facilitate petroleum transport. Given these relationships the total head loss between the ends $(i,j)$ of a pipe is equal to the sum of losses caused by friction and the head difference arising from pipeline elevation.
 
 ```math
 h_i - h_j = z_j - z_i + 1.02 \beta_{ij} \frac{q_{ij}^{2-m} \nu^m}{D_{ij}^{5-m}} L_{ij}   
