@@ -4,7 +4,7 @@
 CurrentModule = PetroleumModels
 ```
 
-All methods for constructing petroleummodels should be defined on the following type:
+All methods for constructing PetroleumModels should be defined on the following type:
 
 ```@docs
 AbstractPetroleumModel
