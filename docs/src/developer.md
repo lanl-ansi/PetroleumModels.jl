@@ -14,7 +14,7 @@
 
 ### Pump variables
 
-- `$\eta$`: pump efficiency
+- `eta`: pump efficiency
 - `w`: pump rotational speed
 
 ## Developing steady-state problems and formulations
